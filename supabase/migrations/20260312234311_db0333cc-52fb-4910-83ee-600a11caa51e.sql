@@ -1,0 +1,4 @@
+
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS bank_alias text DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS bank_cvu text DEFAULT NULL;

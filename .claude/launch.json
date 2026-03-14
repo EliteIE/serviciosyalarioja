@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite Dev Server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["./node_modules/vite/bin/vite.js"],
+      "port": 8080
+    },
+    {
+      "name": "Vite Preview (production build)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["./node_modules/vite/bin/vite.js", "preview"],
+      "port": 4173
+    },
+    {
+      "name": "Vitest (watch mode)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["./node_modules/vitest/vitest.mjs"],
+      "port": 0
+    }
+  ]
+}
