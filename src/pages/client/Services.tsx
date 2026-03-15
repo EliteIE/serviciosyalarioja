@@ -25,6 +25,16 @@ import { useCreateReview } from "@/hooks/useReviews";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Mapeamento de icones por categoria
 const getCategoryIcon = (category: string) => {
@@ -51,6 +61,9 @@ export default function ClientServices() {
 
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Cancel confirmation
+  const [cancelServiceId, setCancelServiceId] = useState<string | null>(null);
 
   // Modal de Avaliação
   const [servicioACalificar, setServicioACalificar] = useState<any>(null);
@@ -281,19 +294,7 @@ export default function ClientServices() {
                     )}
                     {solicitud.status === 'nuevo' && (
                       <button
-                        onClick={async () => {
-                          try {
-                            const { error } = await supabase
-                              .from("service_requests")
-                              .update({ status: "cancelado" as any })
-                              .eq("id", solicitud.id);
-                            if (error) throw error;
-                            toast.success("Solicitud cancelada");
-                            queryClient.invalidateQueries({ queryKey: ["service-requests"] });
-                          } catch {
-                            toast.error("Error al cancelar");
-                          }
-                        }}
+                        onClick={() => setCancelServiceId(solicitud.id)}
                         className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10 font-semibold text-sm rounded-lg transition-colors shadow-sm"
                       >
                         <X size={14} />
@@ -393,6 +394,42 @@ export default function ClientServices() {
           </div>
         </div>
       )}
+
+      {/* AlertDialog de confirmación para cancelar */}
+      <AlertDialog open={!!cancelServiceId} onOpenChange={(open) => { if (!open) setCancelServiceId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Cancelar esta solicitud?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Tu solicitud será cancelada y los prestadores no podrán verla.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!cancelServiceId) return;
+                try {
+                  const { error } = await supabase
+                    .from("service_requests")
+                    .update({ status: "cancelado" as any })
+                    .eq("id", cancelServiceId);
+                  if (error) throw error;
+                  toast.success("Solicitud cancelada");
+                  queryClient.invalidateQueries({ queryKey: ["service-requests"] });
+                } catch {
+                  toast.error("Error al cancelar");
+                } finally {
+                  setCancelServiceId(null);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sí, cancelar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

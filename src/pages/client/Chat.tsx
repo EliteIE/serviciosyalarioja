@@ -18,6 +18,7 @@ import { useMessages, useSendMessage } from "@/hooks/useMessages";
 import { useClientRequests, useProviderRequests, useUploadFile } from "@/hooks/useServiceRequests";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { toast } from "sonner";
 
 export default function ChatPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -98,7 +99,7 @@ export default function ChatPage() {
         message_type: "image",
       });
     } catch (err) {
-      console.error("Failed to upload image", err);
+      toast.error("Error al subir la imagen. Intentá de nuevo.");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -372,7 +373,7 @@ export default function ChatPage() {
                 >
                   {uploading ? <Loader2 size={20} className="animate-spin text-orange-500" /> : <Paperclip size={20} />}
                 </button>
-                <button type="button" className="p-2.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors hidden sm:block">
+                <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()} className="p-2.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors hidden sm:block">
                   <ImageIcon size={20} />
                 </button>
               </div>

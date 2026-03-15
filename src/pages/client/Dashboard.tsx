@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ClipboardList, MessageSquare, Clock, CheckCircle2, AlertCircle, Loader2, DollarSign, KeyRound, ShieldCheck, Plus, X, Banknote, CreditCard, Smartphone, ArrowRightLeft, Copy, Check, ListTodo } from "lucide-react";
+import { ClipboardList, MessageSquare, Clock, CheckCircle2, AlertCircle, Loader2, DollarSign, KeyRound, ShieldCheck, Plus, X, Banknote, CreditCard, Smartphone, ArrowRightLeft, Copy, Check, ListTodo, TrendingUp, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,9 @@ import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
+  const arr = new Uint8Array(6);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, (b) => chars[b % chars.length]).join("");
 }
 
 type PaymentMethod = "mercadopago" | "transferencia" | "efectivo" | "tarjeta" | null;
@@ -313,24 +313,50 @@ const ClientDashboard = () => {
         </Link>
       </div>
 
+      {/* Neurotécnica: Alerta urgente si hay presupuestos o finalizados pendientes (Loss Aversion) */}
+      {(budgetReceived.length > 0 || finalizados.length > 0) && (
+        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center justify-between gap-4 mb-6 animate-in slide-in-from-top duration-500">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground">
+                {budgetReceived.length > 0 ? `¡Tenés ${budgetReceived.length} presupuesto(s) esperando tu respuesta!` : `¡${finalizados.length} servicio(s) listo(s) para confirmar y pagar!`}
+              </p>
+              <p className="text-xs text-muted-foreground">Respondé rápido para no perder al profesional</p>
+            </div>
+          </div>
+          <a href="#action-section" className="text-sm font-semibold text-primary hover:underline shrink-0 flex items-center gap-1">
+            Ver ahora <ArrowRight size={14} />
+          </a>
+        </div>
+      )}
+
       {/* Grelha de KPIs (Estatísticas) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
         {[
-          { label: 'Servicios Activos', value: activeServices.length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100' },
-          { label: 'Pendientes', value: activeServices.filter((s) => s.status === "nuevo").length, icon: AlertCircle, color: 'text-orange-600', bg: 'bg-orange-100' },
-          { label: 'Completados', value: completedServices.length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100' },
-          { label: 'Total Histórico', value: services?.length || 0, icon: ListTodo, color: 'text-slate-600', bg: 'bg-slate-100' },
+          { label: 'Servicios Activos', value: activeServices.length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100', pulse: activeServices.length > 0 },
+          { label: 'Requieren Acción', value: budgetReceived.length + finalizados.length + pendingExtras.length, icon: AlertCircle, color: 'text-orange-600', bg: 'bg-orange-100', pulse: (budgetReceived.length + finalizados.length + pendingExtras.length) > 0 },
+          { label: 'Completados', value: completedServices.length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100', pulse: false },
+          { label: 'Total Histórico', value: services?.length || 0, icon: TrendingUp, color: 'text-slate-600', bg: 'bg-slate-100', pulse: false },
         ].map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-card rounded-2xl p-6 border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+            <div key={index} className="bg-card rounded-2xl p-6 border border-border/50 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">{stat.label}</p>
                   <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
                 </div>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} relative`}>
                   <Icon size={24} />
+                  {stat.pulse && stat.value > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -343,6 +369,7 @@ const ClientDashboard = () => {
         <div className="xl:col-span-2 space-y-8">
 
           {/* Budget received section */}
+          <div id="action-section" />
           {budgetReceived.length > 0 && (
             <Card className="border-primary/30 rounded-2xl shadow-sm">
               <CardHeader>
@@ -352,22 +379,33 @@ const ClientDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {budgetReceived.map((service) => (
-                  <div key={service.id} className="p-4 rounded-xl border border-border/50 bg-accent/30 space-y-3">
+                  <div key={service.id} className="p-5 rounded-xl border-2 border-primary/20 bg-primary/[0.02] space-y-4 hover:border-primary/40 transition-colors">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-foreground">{service.title}</h4>
-                        <p className="text-sm text-muted-foreground">Prestador: {service.provider_name}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center border border-primary/20">
+                          {service.provider_name?.charAt(0) || "?"}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-foreground">{service.title}</h4>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            {service.provider_name}
+                            {service.provider_rating_avg && Number(service.provider_rating_avg) > 0 && (
+                              <span className="text-yellow-500 text-xs">★ {Number(service.provider_rating_avg).toFixed(1)}</span>
+                            )}
+                          </p>
+                        </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-primary">${service.budget_amount?.toLocaleString()}</p>
+                        <p className="text-2xl font-extrabold text-primary">${service.budget_amount?.toLocaleString()}</p>
+                        <p className="text-[10px] text-muted-foreground">Presupuesto total</p>
                       </div>
                     </div>
                     {service.budget_message && (
-                      <p className="text-sm bg-background/50 border border-border p-3 rounded-lg text-foreground/80">{service.budget_message}</p>
+                      <p className="text-sm bg-background/50 border border-border p-3 rounded-lg text-foreground/80 italic">"{service.budget_message}"</p>
                     )}
                     <div className="flex gap-3">
                       <Button
-                        className="flex-1 gap-2 rounded-xl"
+                        className="flex-1 gap-2 rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.25)]"
                         onClick={() => handleAcceptBudget(service.id)}
                         disabled={accepting === service.id}
                       >
@@ -562,8 +600,9 @@ const ClientDashboard = () => {
 
         </div>
 
-        {/* Coluna Lateral (Widget Opcional para preencher ecrãs grandes) */}
-        <div className="hidden xl:block">
+        {/* Coluna Lateral */}
+        <div className="hidden xl:block space-y-6">
+          {/* CTA Urgente */}
           <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden sticky top-6">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
             <h3 className="text-xl font-bold mb-2 relative z-10">¿Necesitás ayuda urgente?</h3>
@@ -573,6 +612,37 @@ const ClientDashboard = () => {
                 Pedir Servicio Express
               </button>
             </Link>
+          </div>
+
+          {/* Neurotécnica: Cognitive Fluency — "Cómo funciona" stepper */}
+          <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
+            <h3 className="font-bold text-foreground text-sm mb-4">¿Cómo funciona?</h3>
+            <div className="space-y-4">
+              {[
+                { step: '1', label: 'Pedí', desc: 'Describí qué necesitás' },
+                { step: '2', label: 'Elegí', desc: 'Compará presupuestos' },
+                { step: '3', label: 'Listo', desc: 'El profesional va a tu casa' },
+              ].map((item) => (
+                <div key={item.step} className="flex items-start gap-3">
+                  <div className="w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center flex-shrink-0 border border-primary/20">
+                    {item.step}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trust Badge */}
+          <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm text-center">
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-1">
+              <ShieldCheck size={14} className="text-green-500" />
+              <span className="font-semibold text-foreground">100% Garantizado</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground">Tus datos están protegidos. Solo compartimos tu info con el prestador asignado.</p>
           </div>
         </div>
 

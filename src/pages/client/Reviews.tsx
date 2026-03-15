@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { 
-  Star, 
-  MessageSquare, 
-  Calendar, 
-  Wrench, 
-  Sparkles, 
+import React from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Star,
+  MessageSquare,
+  Calendar,
+  Wrench,
+  Sparkles,
   Zap,
   Quote,
-  EyeOff,
-  Eye,
   Loader2,
   Briefcase
 } from 'lucide-react';
@@ -19,9 +18,6 @@ export default function ClientReviews() {
   const { user } = useAuth();
   const { data: reviews, isLoading } = useReviews(user?.id ?? null);
 
-  // Estado para simular o ver a página com/sem dados manualmente
-  const [forceEmptyState, setForceEmptyState] = useState(false);
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-16 min-h-[60vh]">
@@ -30,7 +26,7 @@ export default function ClientReviews() {
     );
   }
 
-  const hasData = !forceEmptyState && reviews && reviews.length > 0;
+  const hasData = reviews && reviews.length > 0;
 
   // Cálculos Reales de Estadísticas
   const averageRating = reviews?.length
@@ -81,14 +77,6 @@ export default function ClientReviews() {
           <p className="text-sm text-slate-500 hidden sm:block">Reseñas que te dejaron los prestadores tras cada servicio</p>
         </div>
         
-        {/* Botão de Teste (Apenas para ver os dois estados) */}
-        <button 
-          onClick={() => setForceEmptyState(!forceEmptyState)}
-          className="flex items-center gap-2 px-3 py-2 sm:px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-sm rounded-lg transition-colors"
-        >
-          {forceEmptyState ? <Eye size={16} /> : <EyeOff size={16} />}
-          <span className="hidden sm:inline">{forceEmptyState ? 'Ver con datos' : 'Ver estado vacío'}</span>
-        </button>
       </header>
 
       <main className="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full">
@@ -213,10 +201,10 @@ export default function ClientReviews() {
               Las reseñas aparecerán acá cuando un profesional finalice un servicio tuyo y deje un comentario sobre su experiencia.
             </p>
 
-            <button className="px-6 py-3 bg-white border border-slate-200 hover:border-orange-200 hover:bg-orange-50 text-slate-700 hover:text-orange-600 font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2">
+            <Link to="/cliente/solicitar" className="px-6 py-3 bg-white border border-slate-200 hover:border-orange-200 hover:bg-orange-50 text-slate-700 hover:text-orange-600 font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2">
               <Calendar size={18} />
               Solicitar un nuevo servicio
-            </button>
+            </Link>
             
           </div>
         )}

@@ -1,17 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { 
-  ChevronDown, 
-  MapPin, 
-  DollarSign, 
-  ImagePlus, 
-  Clock, 
-  AlertCircle, 
-  Zap, 
+import {
+  ChevronDown,
+  MapPin,
+  DollarSign,
+  ImagePlus,
+  Clock,
+  AlertCircle,
+  Zap,
   Send,
   Check,
   Loader2,
-  X
+  X,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 import { CATEGORIES } from "@/constants/categories";
 import { useCreateServiceRequest, useUploadFile } from "@/hooks/useServiceRequests";
@@ -83,23 +85,62 @@ export default function RequestService() {
 
   const isSubmitting = createRequest.isPending;
 
+  // Neurotécnica: Endowed Progress Effect — barra de progresso do formulário
+  const formProgress = useMemo(() => {
+    const fields = [category, title, description, address];
+    const filled = fields.filter(Boolean).length;
+    return Math.round((filled / fields.length) * 100);
+  }, [category, title, description, address]);
+
   return (
     <div className="font-sans flex justify-center pb-10 px-4 md:px-8 min-h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.16))]">
-      
+
       {/* Contentor Principal */}
       <div className="w-full max-w-7xl bg-card rounded-[2rem] shadow-sm border border-border flex flex-col lg:h-full overflow-hidden">
-        
+
         {/* Cabeçalho do Formulário */}
         <div className="bg-slate-900 px-8 py-8 md:py-10 relative shrink-0">
           {/* Efeito visual de fundo */}
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary rounded-full opacity-20 blur-[50px] pointer-events-none"></div>
-          
+
           <h1 className="text-3xl font-extrabold text-white mb-2 relative z-10">
             {isSuccess ? '¡Listo!' : 'Solicitar Servicio'}
           </h1>
           <p className="text-slate-300 relative z-10 text-lg">
             {isSuccess ? 'Tu solicitud ha sido procesada correctamente.' : 'Describí qué necesitás y te conectamos con el mejor profesional de tu zona.'}
           </p>
+
+          {/* Neurotécnica: Progress Bar (Goal Gradient Effect) */}
+          {!isSuccess && (
+            <div className="mt-5 relative z-10">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                <span>{formProgress === 100 ? '¡Todo listo para enviar!' : `${formProgress}% completado`}</span>
+                <span className="flex items-center gap-1"><ShieldCheck size={12} /> Datos encriptados</span>
+              </div>
+              <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-primary to-orange-400 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${formProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Neurotécnica: Social Proof (Bandwagon Effect) */}
+          {!isSuccess && (
+            <div className="mt-4 flex items-center gap-2 relative z-10">
+              <div className="flex -space-x-2">
+                {['bg-blue-500', 'bg-green-500', 'bg-purple-500'].map((color, i) => (
+                  <div key={i} className={`w-6 h-6 rounded-full ${color} border-2 border-slate-900 flex items-center justify-center text-[9px] font-bold text-white`}>
+                    {['M', 'J', 'L'][i]}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-slate-400">
+                <span className="text-slate-300 font-semibold">+12 personas</span> solicitaron servicios hoy en tu zona
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Corpo do Formulário ou Animação de Sucesso */}
@@ -331,8 +372,8 @@ export default function RequestService() {
 
                   {/* Botão Submit */}
                   <div className="mt-auto pt-4 flex-1 flex flex-col justify-end">
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       disabled={isSubmitting}
                       className={`w-full flex items-center justify-center gap-2 px-8 py-4 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${isSubmitting ? 'bg-primary/80 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
                     >
@@ -344,13 +385,22 @@ export default function RequestService() {
                       ) : (
                         <>
                           <Send size={20} strokeWidth={2.5} />
-                          Enviar Solicitud
+                          Enviar Solicitud Gratis
                         </>
                       )}
                     </button>
-                    <p className="text-center text-xs text-muted-foreground mt-3">
-                      Te notificaremos cuando recibas presupuestos.
-                    </p>
+
+                    {/* Neurotécnica: Trust Badges + Micro-copy (Redução de Ansiedade) */}
+                    <div className="mt-4 space-y-2">
+                      <p className="text-center text-xs text-muted-foreground">
+                        Sin compromiso — recibí presupuestos y decidí sin presión.
+                      </p>
+                      <div className="flex items-center justify-center gap-4 text-[10px] text-muted-foreground">
+                        <span className="flex items-center gap-1"><ShieldCheck size={12} className="text-green-500" /> 100% Seguro</span>
+                        <span className="flex items-center gap-1"><Users size={12} className="text-blue-500" /> +500 Profesionales</span>
+                        <span className="flex items-center gap-1"><Check size={12} className="text-primary" /> Sin costo</span>
+                      </div>
+                    </div>
                   </div>
                 </section>
               </div>
