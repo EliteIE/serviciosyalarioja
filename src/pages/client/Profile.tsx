@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import AvatarUpload from "@/components/AvatarUpload";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -97,16 +97,14 @@ const ClientProfile = () => {
 
       {/* Avatar & email */}
       <Card>
-        <CardContent className="p-6 flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={profile.avatar_url ?? ""} />
-            <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div>
+        <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+          <AvatarUpload
+            currentUrl={profile.avatar_url}
+            initials={initials}
+          />
+          <div className="text-center sm:text-left">
             <p className="font-semibold text-lg">{formData.full_name || "Sin nombre"}</p>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
+            <p className="text-sm text-muted-foreground flex items-center gap-1 justify-center sm:justify-start">
               <Mail className="h-3 w-3" /> {user?.email}
             </p>
           </div>

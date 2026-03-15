@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { User, Phone, MapPin, FileText, Upload, X, Loader2, CheckCircle2, Clock, XCircle, Save, CreditCard, Link2, Unlink, Trash2 } from "lucide-react";
+import { User, Phone, MapPin, FileText, Upload, X, Loader2, CheckCircle2, Clock, XCircle, Save, CreditCard, Link2, Unlink, Trash2, Mail } from "lucide-react";
+import AvatarUpload from "@/components/AvatarUpload";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -290,6 +291,34 @@ const ProviderProfile = () => {
         <h1 className="text-2xl font-bold">Mi Perfil</h1>
         <p className="text-muted-foreground">Administrá tu información personal y documentación</p>
       </div>
+
+      {/* Avatar & email */}
+      <Card>
+        <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+          <AvatarUpload
+            currentUrl={profile?.avatar_url}
+            initials={
+              fullName
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase() || "P"
+            }
+          />
+          <div className="text-center sm:text-left">
+            <p className="font-semibold text-lg">{fullName || "Sin nombre"}</p>
+            <p className="text-sm text-muted-foreground flex items-center gap-1 justify-center sm:justify-start">
+              <Mail className="h-3 w-3" /> {user?.email}
+            </p>
+            {profile?.provider_verified && (
+              <span className="text-xs text-success font-semibold flex items-center gap-1 mt-1 justify-center sm:justify-start">
+                <CheckCircle2 className="h-3 w-3" /> Prestador verificado
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Profile Info */}
       <Card>
