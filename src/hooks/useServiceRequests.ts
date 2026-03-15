@@ -156,10 +156,29 @@ export const useUpdateServiceStatus = () => {
 export const useUploadFile = () => {
   const { user } = useAuth();
 
+  const ALLOWED_TYPES: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+  };
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
   return async (file: File, folder: string = "photos") => {
-    const ext = file.name.split(".").pop();
-    const path = `${user!.id}/${folder}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, file);
+    // Validate MIME type (don't trust file extension)
+    if (!ALLOWED_TYPES[file.type]) {
+      throw new Error("Solo se permiten imágenes (JPG, PNG, WebP, GIF)");
+    }
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error("El archivo no puede superar los 5 MB");
+    }
+
+    const safeExt = ALLOWED_TYPES[file.type];
+    const path = `${user!.id}/${folder}/${Date.now()}_${crypto.randomUUID()}.${safeExt}`;
+    const { error } = await supabase.storage.from("media").upload(path, file, {
+      contentType: file.type,
+    });
     if (error) throw error;
     const { data } = supabase.storage.from("media").getPublicUrl(path);
     if (!data?.publicUrl) throw new Error("Failed to generate public URL");

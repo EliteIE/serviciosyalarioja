@@ -92,6 +92,10 @@ export const useMessages = (serviceRequestId: string | null) => {
 };
 
 export const useSendMessage = () => {
+  const lastSentRef = { current: 0 };
+  const MAX_MESSAGE_LENGTH = 5000;
+  const MIN_INTERVAL_MS = 800; // anti-spam: min 800ms between messages
+
   return useMutation({
     mutationFn: async ({
       service_request_id,
@@ -106,10 +110,25 @@ export const useSendMessage = () => {
       message_type?: string;
       metadata?: Record<string, unknown>;
     }) => {
+      // Rate limiting
+      const now = Date.now();
+      if (now - lastSentRef.current < MIN_INTERVAL_MS) {
+        throw new Error("Esperá un momento antes de enviar otro mensaje");
+      }
+      // Content validation
+      if (message_type === "text" && content.trim().length === 0) {
+        throw new Error("El mensaje no puede estar vacío");
+      }
+      if (content.length > MAX_MESSAGE_LENGTH) {
+        throw new Error(`El mensaje no puede superar los ${MAX_MESSAGE_LENGTH} caracteres`);
+      }
+
+      lastSentRef.current = now;
+
       const { error } = await supabase.from("messages").insert({
         service_request_id,
         sender_id,
-        content,
+        content: content.trim(),
         message_type,
         metadata: (metadata || null) as import("@/integrations/supabase/types").Json,
       });

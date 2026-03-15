@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { CATEGORIES } from "@/constants/categories";
 import { useCreateServiceRequest, useUploadFile } from "@/hooks/useServiceRequests";
+import { toast } from "sonner";
 
 export default function RequestService() {
   const [searchParams] = useSearchParams();
@@ -54,15 +55,39 @@ export default function RequestService() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!category || !title || !description || !address) return;
-    
+
+    // Input validation
+    if (title.trim().length < 3 || title.length > 120) {
+      toast.error("El título debe tener entre 3 y 120 caracteres");
+      return;
+    }
+    if (description.trim().length < 10 || description.length > 5000) {
+      toast.error("La descripción debe tener entre 10 y 5000 caracteres");
+      return;
+    }
+    if (address.trim().length < 5 || address.length > 200) {
+      toast.error("La dirección debe tener entre 5 y 200 caracteres");
+      return;
+    }
+    const budgetNum = budget ? parseFloat(budget) : undefined;
+    if (budgetNum !== undefined && (isNaN(budgetNum) || budgetNum < 0 || budgetNum > 10_000_000)) {
+      toast.error("El presupuesto debe estar entre $0 y $10.000.000");
+      return;
+    }
+    // Validate category slug
+    if (!CATEGORIES.some((c) => c.slug === category)) {
+      toast.error("Categoría inválida");
+      return;
+    }
+
     try {
       await createRequest.mutateAsync({
         category,
-        title,
-        description,
-        address,
+        title: title.trim(),
+        description: description.trim(),
+        address: address.trim(),
         urgency: urgencia,
-        budget: budget ? parseFloat(budget) : undefined,
+        budget: budgetNum,
         photos: photos.length > 0 ? photos : undefined,
         provider_id: providerIdParam || undefined,
       });
@@ -157,9 +182,16 @@ export default function RequestService() {
               </div>
               
               <h2 className="text-3xl font-extrabold text-foreground mb-4 tracking-tight">¡Solicitud enviada con éxito!</h2>
-              <p className="text-lg text-muted-foreground max-w-md mb-10 leading-relaxed">
+              <p className="text-lg text-muted-foreground max-w-md mb-4 leading-relaxed">
                 Los profesionales de tu zona ya fueron notificados. Muy pronto empezarás a recibir presupuestos en tu panel.
               </p>
+              {/* Neurotécnica: Peak-End Rule + Anchoring — timeline de expectativa */}
+              <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl px-5 py-3 mb-8">
+                <Clock size={18} className="text-primary shrink-0" />
+                <p className="text-sm text-foreground">
+                  <strong>Tiempo promedio de respuesta:</strong> menos de 2 horas
+                </p>
+              </div>
               
               <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                 <button 
@@ -222,15 +254,27 @@ export default function RequestService() {
 
                   {/* Descrição */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-foreground">Descripción <span className="text-destructive">*</span></label>
-                    <textarea 
+                    <label className="text-sm font-semibold text-foreground flex justify-between">
+                      <span>Descripción <span className="text-destructive">*</span></span>
+                      <span className={`text-xs font-normal ${description.length > 4500 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                        {description.length}/5000
+                      </span>
+                    </label>
+                    <textarea
                       rows={5}
                       required
+                      maxLength={5000}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Describí el problema con el mayor detalle posible. ¿Cuándo empezó? ¿Qué intentaste hacer?" 
+                      placeholder="Describí el problema con el mayor detalle posible. ¿Cuándo empezó? ¿Qué intentaste hacer?"
                       className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal resize-none"
                     ></textarea>
+                    {/* Neurotécnica: Loss Aversion — solicitudes com mais detalhes recebem mais propostas */}
+                    {description.length > 0 && description.length < 50 && (
+                      <p className="text-[11px] text-amber-600 flex items-center gap-1">
+                        <AlertCircle size={12} /> Las descripciones más detalladas reciben hasta un 60% más de presupuestos
+                      </p>
+                    )}
                   </div>
 
                   {/* Upload de Fotos */}
@@ -360,14 +404,20 @@ export default function RequestService() {
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <DollarSign className="text-muted-foreground" size={18} />
                       </div>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
+                        min="0"
+                        max="10000000"
                         value={budget}
                         onChange={(e) => setBudget(e.target.value)}
-                        placeholder="0" 
+                        placeholder="0"
                         className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-bold placeholder:text-muted-foreground font-normal text-lg"
                       />
                     </div>
+                    {/* Neurotécnica: Anchoring — referencia de preço para reduzir incerteza */}
+                    <p className="text-[11px] text-muted-foreground">
+                      Indicar un presupuesto ayuda a recibir propuestas más precisas y rápidas.
+                    </p>
                   </div>
 
                   {/* Botão Submit */}

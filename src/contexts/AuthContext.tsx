@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -71,21 +71,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .single();
     if (error) {
       console.error("Failed to fetch role:", error.message);
-      // Default to "client" so user is not stuck in a loading spinner
-      setUserRole("client");
+      // Fallback: check profile.is_provider to determine role safely
+      // This prevents a missing user_roles row from granting wrong access
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("is_provider")
+        .eq("id", userId)
+        .single();
+      setUserRole(prof?.is_provider ? "provider" : "client");
       return null;
     }
     setUserRole(data?.role ?? "client");
     return data;
   };
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
     setUserRole(null);
-  };
+  }, []);
+
+  // Security: Inactivity timeout — auto-logout after 30 min of no interaction
+  useEffect(() => {
+    const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
+    let inactivityTimer: ReturnType<typeof setTimeout>;
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      if (user) {
+        inactivityTimer = setTimeout(() => {
+          signOut();
+        }, INACTIVITY_LIMIT);
+      }
+    };
+
+    const events = ["mousemove", "keydown", "mousedown", "touchstart", "scroll"];
+    events.forEach((ev) => window.addEventListener(ev, resetTimer, { passive: true }));
+    resetTimer();
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+    };
+  }, [user, signOut]);
 
   useEffect(() => {
     let isMounted = true;

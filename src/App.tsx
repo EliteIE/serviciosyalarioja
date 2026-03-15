@@ -85,8 +85,8 @@ const App = () => (
             <Route path="/recuperar" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* Client — protected */}
-            <Route element={<ProtectedRoute allowedRoles={["client", "provider", "admin"]} />}>
+            {/* Client — protected (only client role) */}
+            <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
               <Route element={<DashboardLayout variant="client" />}>
                 <Route path="/cliente" element={<ClientDashboard />} />
                 <Route path="/cliente/solicitar" element={<RequestService />} />
