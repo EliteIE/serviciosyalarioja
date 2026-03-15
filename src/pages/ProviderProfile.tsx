@@ -102,8 +102,12 @@ export default function ProviderProfilePage() {
             <div className="flex flex-col sm:flex-row sm:items-end gap-5 sm:gap-6 -mt-16 sm:-mt-20 relative z-10 mb-4 sm:mb-0">
               
               {/* Avatar com Borda */}
-              <div className={`relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background flex items-center justify-center ${theme.txt} shadow-lg flex-shrink-0`}>
-                <span className="text-5xl font-extrabold">{provider.full_name?.charAt(0) || "?"}</span>
+              <div className={`relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background flex items-center justify-center ${theme.txt} shadow-lg flex-shrink-0 overflow-hidden`}>
+                {provider.avatar_url ? (
+                  <img src={provider.avatar_url} alt={provider.full_name || ""} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-5xl font-extrabold">{provider.full_name?.charAt(0) || "?"}</span>
+                )}
                 {provider.provider_available && (
                   <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-6 h-6 bg-success border-4 border-card rounded-full" title="Online agora"></div>
                 )}
@@ -224,8 +228,12 @@ export default function ProviderProfilePage() {
                     <div key={review.id} className="border-b border-border last:border-0 pb-6 last:pb-0">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-foreground font-bold text-sm">
-                            {review.reviewer_name?.[0] || "?"}
+                          <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-foreground font-bold text-sm overflow-hidden">
+                            {review.reviewer_avatar ? (
+                              <img src={review.reviewer_avatar} alt={review.reviewer_name || ""} className="w-full h-full object-cover" />
+                            ) : (
+                              review.reviewer_name?.[0] || "?"
+                            )}
                           </div>
                           <div>
                             <p className="font-bold text-foreground leading-none mb-1">{review.reviewer_name}</p>

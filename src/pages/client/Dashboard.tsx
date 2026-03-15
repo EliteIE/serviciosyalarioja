@@ -517,8 +517,12 @@ const ClientDashboard = () => {
                     <li key={servicio.id} className="p-4 md:p-5 hover:bg-accent/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-4 group">
                       <div className="flex items-start gap-4 flex-1 min-w-0">
                         {/* Avatar */}
-                        <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg ${servicio.provider_name ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground border border-border border-dashed'}`}>
-                          {servicio.provider_name?.[0] || '?'}
+                        <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg overflow-hidden ${servicio.provider_name ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground border border-border border-dashed'}`}>
+                          {servicio.provider_avatar ? (
+                            <img src={servicio.provider_avatar} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            servicio.provider_name?.[0] || '?'
+                          )}
                         </div>
                         
                         {/* Info Principal */}

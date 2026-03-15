@@ -187,8 +187,15 @@ export default function ChatPage() {
 
                   {/* Avatar com Indicador */}
                   <div className="relative flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
-                      {initial}
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 overflow-hidden">
+                      {(() => {
+                        const avatar = isProvider ? s.client_avatar : s.provider_avatar;
+                        return avatar ? (
+                          <img src={avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          initial
+                        );
+                      })()}
                     </div>
                     {/* Status indicator: active service (not online presence) */}
                     {s.status !== 'completado' && s.status !== 'cancelado' && (
@@ -246,9 +253,19 @@ export default function ChatPage() {
               </button>
 
               <div className="relative flex-shrink-0">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
-                  {(isProvider ? currentService.client_name : currentService.provider_name)?.charAt(0).toUpperCase() || '?'}
-                </div>
+                {(() => {
+                  const counterpartAvatar = isProvider ? currentService.client_avatar : currentService.provider_avatar;
+                  const counterpartName = isProvider ? currentService.client_name : currentService.provider_name;
+                  return (
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 overflow-hidden">
+                      {counterpartAvatar ? (
+                        <img src={counterpartAvatar} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        counterpartName?.charAt(0).toUpperCase() || '?'
+                      )}
+                    </div>
+                  );
+                })()}
                 {currentService.status !== 'completado' && currentService.status !== 'cancelado' && <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-orange-400 border-2 border-white dark:border-slate-900 rounded-full" title="Servicio activo"></div>}
               </div>
               
@@ -312,9 +329,19 @@ export default function ChatPage() {
 
                 // Regular Chat Bubbles
                 return (
-                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] sm:max-w-[75%] lg:max-w-[60%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                      
+                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} gap-2`}>
+                    {/* Avatar do remetente (só para mensagens de outros) */}
+                    {!isMe && (
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-foreground flex-shrink-0 mt-5 overflow-hidden border border-border">
+                        {msg.sender_avatar ? (
+                          <img src={msg.sender_avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          msg.sender_name?.charAt(0)?.toUpperCase() || "?"
+                        )}
+                      </div>
+                    )}
+                    <div className={`max-w-[80%] sm:max-w-[70%] lg:max-w-[55%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+
                       {!isMe && <span className="text-[11px] text-muted-foreground mb-1 ml-1">{msg.sender_name}</span>}
 
                       {msg.message_type === "image" ? (

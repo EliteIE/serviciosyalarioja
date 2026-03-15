@@ -242,8 +242,12 @@ export default function SearchPage() {
                     <div className="flex gap-4">
                       {/* Avatar */}
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-2xl">
-                          {prestador.full_name?.[0] || "?"}
+                        <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden">
+                          {prestador.avatar_url ? (
+                            <img src={prestador.avatar_url} alt={prestador.full_name} className="w-full h-full object-cover" />
+                          ) : (
+                            prestador.full_name?.[0] || "?"
+                          )}
                         </div>
                         {prestador.provider_available && (
                           <div className="absolute bottom-0 right-0 w-4 h-4 bg-success border-2 border-card rounded-full" title="En línea ahora"></div>
