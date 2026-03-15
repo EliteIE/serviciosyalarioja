@@ -36,6 +36,7 @@ import AdminProviders from "./pages/admin/Providers";
 import AdminDisputes from "./pages/admin/Disputes";
 import AdminReports from "./pages/admin/Reports";
 import AdminModeration from "./pages/admin/Moderation";
+import Contacto from "./pages/Contacto";
 import RequestBudget from "./pages/RequestBudget";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/prestador/:id" element={<ProviderProfilePage />} />
               <Route path="/terminos" element={<TermsAndConditions />} />
               <Route path="/privacidad" element={<PrivacyPolicy />} />
+              <Route path="/contacto" element={<Contacto />} />
             </Route>
 
             {/* Standalone pages — protected (user must be logged in to request) */}

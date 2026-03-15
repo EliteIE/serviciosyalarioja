@@ -44,6 +44,22 @@ Deno.serve(async (req) => {
   const appUrl = "https://serviciosyalr.com";
 
   try {
+    // Rate limiting for non-webhook requests
+    if (path !== "webhook") {
+      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      const { data: allowed } = await supabase.rpc("check_rate_limit", {
+        p_key: `mp:${clientIp}`,
+        p_max_requests: 20,
+        p_window_seconds: 60,
+      });
+      if (allowed === false) {
+        return new Response(JSON.stringify({ error: "Demasiadas solicitudes. Intentá en un minuto." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // POST /mercadopago - Create preference (checkout)
     if (req.method === "POST" && path !== "webhook") {
       const authHeader = req.headers.get("Authorization");

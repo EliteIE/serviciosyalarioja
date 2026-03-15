@@ -43,6 +43,20 @@ Deno.serve(async (req) => {
   const path = url.pathname.split("/").pop();
 
   try {
+    // Rate limiting
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { data: allowed } = await supabase.rpc("check_rate_limit", {
+      p_key: `oauth:${clientIp}`,
+      p_max_requests: 10,
+      p_window_seconds: 60,
+    });
+    if (allowed === false) {
+      return new Response(JSON.stringify({ error: "Demasiadas solicitudes. Intentá en un minuto." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // GET /mercadopago-oauth/callback - Handle OAuth callback from MercadoPago
     if (path === "callback") {
       const nonce = url.searchParams.get("state");

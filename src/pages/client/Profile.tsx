@@ -1,18 +1,32 @@
 import { useState } from "react";
-import { User, Mail, Phone, MapPin, Loader2, Save } from "lucide-react";
+import { User, Mail, Phone, MapPin, Loader2, Save, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const ClientProfile = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || "",
     phone: profile?.phone || "",
@@ -47,6 +61,22 @@ const ClientProfile = () => {
       toast.error(err.message || "Error al guardar");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.rpc("delete_my_account" as any);
+      if (error) throw error;
+      toast.success("Tu cuenta ha sido eliminada");
+      await signOut();
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err.message || "Error al eliminar la cuenta");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -140,6 +170,48 @@ const ClientProfile = () => {
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Cambios
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Danger Zone */}
+      <Card className="border-destructive/30">
+        <CardHeader>
+          <CardTitle className="text-lg text-destructive flex items-center gap-2">
+            <Trash2 className="h-5 w-5" />
+            Zona de Peligro
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Al eliminar tu cuenta, se borrarán permanentemente todos tus datos, historial de servicios y reseñas. Esta acción no se puede deshacer.
+          </p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="gap-2 rounded-xl">
+                <Trash2 className="h-4 w-4" />
+                Eliminar mi cuenta
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Estás seguro que querés eliminar tu cuenta?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción es permanente y no se puede deshacer. Se eliminarán todos tus datos, historial de servicios y reseñas.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-2"
+                >
+                  {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Sí, eliminar mi cuenta
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
