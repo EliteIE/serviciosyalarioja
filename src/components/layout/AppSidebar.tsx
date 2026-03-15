@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, AlertTriangle, TrendingUp,
   Home, Briefcase, Image, DollarSign, UserCircle,
-  ClipboardList, MessageSquare, Star, Shield, PlusCircle
+  ClipboardList, MessageSquare, Star, Shield, PlusCircle, FileText
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -17,6 +17,7 @@ const adminItems = [
   { title: "Disputas", url: "/admin/disputas", icon: AlertTriangle },
   { title: "Reportes", url: "/admin/reportes", icon: TrendingUp },
   { title: "Moderación", url: "/admin/moderacion", icon: Shield },
+  { title: "Auditoría", url: "/admin/audit", icon: FileText },
 ];
 
 const providerItems = [

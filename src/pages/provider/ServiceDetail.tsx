@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { STATUS_LABELS, STATUS_COLORS, URGENCY_LABELS, CATEGORIES } from "@/constants/categories";
 import { ArrowLeft, Calendar, MapPin, AlertTriangle, Image as ImageIcon, Send, XCircle, Loader2, Clock } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,6 +60,7 @@ const ServiceDetail = () => {
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgetMessage, setBudgetMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
 
   const service = services?.find((s) => s.id === id);
 
@@ -96,9 +98,16 @@ const ServiceDetail = () => {
   };
 
   const handleReject = () => {
+    setRejectDialogOpen(true);
+  };
+
+  const confirmReject = () => {
     if (!service) return;
     updateStatus.mutate({ id: service.id, status: "cancelado" }, {
-      onSuccess: () => navigate("/prestador/servicios"),
+      onSuccess: () => {
+        setRejectDialogOpen(false);
+        navigate("/prestador/servicios");
+      },
     });
   };
 
@@ -274,6 +283,29 @@ const ServiceDetail = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Reject Confirmation Dialog */}
+      <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Rechazar esta solicitud?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Al rechazar, esta solicitud quedará disponible para otros prestadores. No podrás enviar un presupuesto después.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmReject}
+              disabled={updateStatus.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <XCircle className="h-4 w-4 mr-1" />}
+              Sí, rechazar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -105,19 +105,19 @@ const ProviderServices = () => {
     setFinishDialogOpen(true);
   };
 
-  const handleConfirmFinish = async () => {
+  const handleConfirmFinish = () => {
     if (!finishServiceId) return;
     setFinishing(true);
-    try {
-      updateStatus.mutate({ id: finishServiceId, status: "finalizado_prestador" }, {
-        onSuccess: () => {
-          setFinishDialogOpen(false);
-          setFinishServiceId(null);
-        },
-      });
-    } finally {
-      setFinishing(false);
-    }
+    updateStatus.mutate({ id: finishServiceId, status: "finalizado_prestador" }, {
+      onSuccess: () => {
+        setFinishDialogOpen(false);
+        setFinishServiceId(null);
+        setFinishing(false);
+      },
+      onError: () => {
+        setFinishing(false);
+      },
+    });
   };
 
   const handleRequestExtra = (serviceId: string) => {
@@ -129,12 +129,17 @@ const ProviderServices = () => {
 
   const handleSubmitExtra = async () => {
     if (!extraServiceId || !extraDesc || !extraAmount) return;
+    const parsedAmount = parseFloat(extraAmount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast.error("El monto debe ser un número mayor a 0");
+      return;
+    }
     setSubmittingExtra(true);
     try {
       const { error } = await supabase.from("extra_charges").insert({
         service_request_id: extraServiceId,
-        description: extraDesc,
-        amount: parseFloat(extraAmount),
+        description: extraDesc.trim(),
+        amount: parsedAmount,
       });
       if (error) throw error;
 
@@ -173,10 +178,18 @@ const ProviderServices = () => {
             <TabsTrigger value="presupuestado">Aguardando</TabsTrigger>
             <TabsTrigger value="aceptado">Aceptados</TabsTrigger>
             <TabsTrigger value="en_progreso">En Progreso</TabsTrigger>
+            <TabsTrigger value="finalizado_prestador">
+              Pend. Cliente
+              {(services || []).filter(s => s.status === "finalizado_prestador").length > 0 && (
+                <span className="ml-1 h-5 min-w-[20px] px-1 text-xs rounded-full bg-warning/20 text-warning inline-flex items-center justify-center">
+                  {(services || []).filter(s => s.status === "finalizado_prestador").length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="completado">Completados</TabsTrigger>
           </TabsList>
 
-          {["todos", "nuevo", "presupuestado", "aceptado", "en_progreso", "completado"].map((tab) => (
+          {["todos", "nuevo", "presupuestado", "aceptado", "en_progreso", "finalizado_prestador", "completado"].map((tab) => (
             <TabsContent key={tab} value={tab} className="space-y-4">
               {filterServices(tab).length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">No hay servicios en esta categoría</div>
