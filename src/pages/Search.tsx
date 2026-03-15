@@ -1,23 +1,25 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { 
-  Search, 
-  MapPin, 
-  Star, 
-  ShieldCheck, 
-  Briefcase, 
-  Clock, 
+import {
+  Search,
+  MapPin,
+  Star,
+  ShieldCheck,
+  Briefcase,
+  Clock,
   Filter,
   ChevronDown,
   Wrench,
   Sparkles,
   Zap,
   TreePine,
-  LayoutGrid
+  LayoutGrid,
+  Heart
 } from "lucide-react";
 import { CATEGORIES } from "@/constants/categories";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchSkeleton } from "@/components/skeletons/SearchSkeleton";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface ProviderProfile {
   id: string;
@@ -40,6 +42,8 @@ export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [providers, setProviders] = useState<ProviderProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<"rating" | "jobs" | "recommended">("rating");
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   // Configuração visual dinâmica para cada categoria (Adaptação do modelo original)
   const categoriasConfig: Record<string, any> = {
@@ -106,12 +110,28 @@ export default function SearchPage() {
   }, [categoriaActiva]);
 
   const prestadoresFiltrados = useMemo(() => {
-    return providers.filter((p) => {
+    const filtered = providers.filter((p) => {
       if (searchQuery && !p.full_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          !(p.provider_category || "").toLowerCase().includes(searchQuery.toLowerCase())) return false;
+          !(p.provider_category || "").toLowerCase().includes(searchQuery.toLowerCase()) &&
+          !(p.bio || "").toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     });
-  }, [providers, searchQuery]);
+
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "rating":
+          return (b.rating_avg || 0) - (a.rating_avg || 0);
+        case "jobs":
+          return (b.completed_jobs || 0) - (a.completed_jobs || 0);
+        case "recommended":
+          const scoreA = (a.rating_avg || 0) * Math.log2((a.review_count || 0) + 1) + (a.completed_jobs || 0) * 0.1;
+          const scoreB = (b.rating_avg || 0) * Math.log2((b.review_count || 0) + 1) + (b.completed_jobs || 0) * 0.1;
+          return scoreB - scoreA;
+        default:
+          return 0;
+      }
+    });
+  }, [providers, searchQuery, sortBy]);
 
   const getCategoryName = (slug: string | null) => CATEGORIES.find(c => c.slug === slug)?.name || slug || "";
 
@@ -211,10 +231,14 @@ export default function SearchPage() {
           {/* Ordenação Simples */}
           <div className="flex items-center gap-2 text-sm bg-card px-3 py-1.5 rounded-lg border border-border">
             <span className="text-muted-foreground">Ordenar por:</span>
-            <select className="bg-transparent font-semibold text-foreground cursor-pointer outline-none">
-              <option>Mejor calificación</option>
-              <option>Recomendados</option>
-              <option>Más trabajos</option>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-transparent font-semibold text-foreground cursor-pointer outline-none"
+            >
+              <option value="rating">Mejor calificación</option>
+              <option value="recommended">Recomendados</option>
+              <option value="jobs">Más trabajos</option>
             </select>
           </div>
         </div>
@@ -253,7 +277,7 @@ export default function SearchPage() {
                           <div className="absolute bottom-0 right-0 w-4 h-4 bg-success border-2 border-card rounded-full" title="En línea ahora"></div>
                         )}
                       </div>
-                      
+
                       {/* Info Principal */}
                       <div className="flex-1 pt-1 min-w-0">
                         <div className="flex items-center gap-1.5 mb-1">
@@ -269,11 +293,37 @@ export default function SearchPage() {
                         </span>
                       </div>
                     </div>
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(prestador.id); }}
+                      className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-secondary transition-colors"
+                      title={isFavorite(prestador.id) ? "Quitar de favoritos" : "Agregar a favoritos"}
+                    >
+                      <Heart size={18} className={isFavorite(prestador.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"} />
+                    </button>
                   </div>
 
                   {/* Corpo do Cartão */}
                   <div className="p-6 bg-muted/20 flex-1 flex flex-col gap-4">
-                    
+
+                    {/* Social Proof Badges */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {prestador.rating_avg >= 4.5 && prestador.completed_jobs >= 5 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-yellow-500/10 text-yellow-600 text-[10px] font-bold">
+                          🏆 Top Prestador
+                        </span>
+                      )}
+                      {prestador.completed_jobs >= 10 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold">
+                          🔥 Alta demanda
+                        </span>
+                      )}
+                      {prestador.review_count >= 5 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 text-[10px] font-bold">
+                          💬 Muy recomendado
+                        </span>
+                      )}
+                    </div>
+
                     {prestador.bio && <p className="text-sm text-muted-foreground line-clamp-2">{prestador.bio}</p>}
 
                     <div className="flex justify-between items-center mt-auto">

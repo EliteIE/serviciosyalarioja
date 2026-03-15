@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
-import { CheckCircle2, MessageSquare, Loader2, Play, Eye, Plus, DollarSign, KeyRound } from "lucide-react";
+import { CheckCircle2, MessageSquare, Loader2, Play, Eye, Plus, DollarSign, KeyRound, Star, X, Check } from "lucide-react";
 import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
 import { useSendMessage } from "@/hooks/useMessages";
+import { useCreateReview, useMyReviewedServiceIds } from "@/hooks/useReviews";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +22,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 const ProviderServices = () => {
   const { data: services, isLoading } = useProviderRequests();
   const updateStatus = useUpdateServiceStatus();
+  const createReview = useCreateReview();
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -29,6 +31,57 @@ const ProviderServices = () => {
   // Unread messages tracking
   const serviceIds = (services || []).filter(s => s.provider_id).map(s => s.id);
   const { unreadServiceIds } = useUnreadMessages(serviceIds);
+
+  // Check which completed services the provider already reviewed
+  const completedServiceIds = useMemo(
+    () => (services || []).filter(s => s.status === "completado").map(s => s.id),
+    [services]
+  );
+  const { data: reviewedIds } = useMyReviewedServiceIds(completedServiceIds);
+
+  // Review modal state
+  const [reviewService, setReviewService] = useState<any>(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHover, setReviewHover] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSent, setReviewSent] = useState(false);
+
+  const openReviewModal = (service: any) => {
+    setReviewService(service);
+    setReviewRating(0);
+    setReviewHover(0);
+    setReviewComment("");
+    setReviewSent(false);
+  };
+
+  const closeReviewModal = () => {
+    setReviewService(null);
+    setReviewRating(0);
+    setReviewHover(0);
+    setReviewComment("");
+    setReviewSent(false);
+    setReviewSubmitting(false);
+  };
+
+  const handleSubmitReview = async () => {
+    if (reviewRating === 0 || !reviewService) return;
+    setReviewSubmitting(true);
+    try {
+      await createReview.mutateAsync({
+        service_request_id: reviewService.id,
+        reviewed_id: reviewService.client_id,
+        rating: reviewRating,
+        comment: reviewComment.trim() || undefined,
+      });
+      setReviewSent(true);
+      setTimeout(() => closeReviewModal(), 2000);
+    } catch {
+      toast.error("Error al enviar la reseña. Intentá de nuevo.");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
 
   // Fetch approved extra charges for total display
   const { data: extraCharges } = useQuery({
@@ -198,8 +251,12 @@ const ProviderServices = () => {
                   <Card key={service.id}>
                     <CardContent className="p-5">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                        <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
-                          {service.client_name?.[0] || "?"}
+                        <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0 overflow-hidden">
+                          {service.client_avatar ? (
+                            <img src={service.client_avatar} alt={service.client_name || ""} className="h-full w-full object-cover" />
+                          ) : (
+                            service.client_name?.[0] || "?"
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -245,6 +302,14 @@ const ProviderServices = () => {
                                 <CheckCircle2 className="h-3 w-3" /> Finalizar
                               </Button>
                             </div>
+                          )}
+                          {service.status === "completado" && !reviewedIds?.has(service.id) && (
+                            <Button size="sm" variant="outline" className="gap-1 rounded-lg" onClick={() => openReviewModal(service)}>
+                              <Star className="h-3 w-3 text-yellow-500" /> Calificar Cliente
+                            </Button>
+                          )}
+                          {service.status === "completado" && reviewedIds?.has(service.id) && (
+                            <Badge className="bg-success/10 text-success border-success/20">✓ Calificado</Badge>
                           )}
                           {service.provider_id && (
                             <Button size="sm" variant="ghost" className="gap-1 rounded-lg relative" onClick={() => navigate(`/prestador/chat?service=${service.id}`)}>
@@ -315,6 +380,78 @@ const ProviderServices = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Review modal — provider rates client */}
+      {reviewService && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card rounded-2xl shadow-xl border border-border w-full max-w-md overflow-hidden relative animate-in slide-in-from-bottom-4 duration-300">
+            {!reviewSent && (
+              <button onClick={closeReviewModal} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-secondary p-2 rounded-full transition-colors z-10">
+                <X size={20} />
+              </button>
+            )}
+            {reviewSent ? (
+              <div className="p-10 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 bg-success/20 text-success rounded-full flex items-center justify-center mb-4 animate-bounce">
+                  <Check size={32} strokeWidth={3} />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">¡Gracias!</h3>
+                <p className="text-muted-foreground">Tu opinión ayuda a mejorar la comunidad.</p>
+              </div>
+            ) : (
+              <div className="p-8">
+                <div className="text-center mb-6 mt-2">
+                  <h3 className="text-xl font-bold text-foreground">Calificar al cliente</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ¿Cómo fue tu experiencia con <strong className="text-foreground">{reviewService.client_name}</strong>?
+                  </p>
+                </div>
+                <div className="flex justify-center gap-2 mb-6">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onMouseEnter={() => setReviewHover(star)}
+                      onMouseLeave={() => setReviewHover(0)}
+                      onClick={() => setReviewRating(star)}
+                      className={`transition-all transform hover:scale-110 ${star <= (reviewHover || reviewRating) ? 'text-yellow-400' : 'text-slate-200 dark:text-slate-800'}`}
+                    >
+                      <Star size={40} fill="currentColor" strokeWidth={1} />
+                    </button>
+                  ))}
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-foreground mb-2">
+                    Dejá un comentario <span className="text-muted-foreground font-normal">(Opcional)</span>
+                  </label>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="¿Cómo fue la comunicación, puntualidad, trato?"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none h-24"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={closeReviewModal} className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-xl hover:bg-secondary transition-colors">
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={reviewRating === 0 || reviewSubmitting}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-primary-foreground font-semibold rounded-xl transition-all ${reviewRating === 0 ? 'bg-primary/50 cursor-not-allowed' : reviewSubmitting ? 'bg-primary/80 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg'}`}
+                  >
+                    {reviewSubmitting ? (
+                      <><Loader2 size={18} className="animate-spin" /> Enviando...</>
+                    ) : (
+                      'Enviar Reseña'
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Finish confirmation dialog */}
       <AlertDialog open={finishDialogOpen} onOpenChange={setFinishDialogOpen}>

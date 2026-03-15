@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   TrendingUp,
@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { useMyReviewedServiceIds } from "@/hooks/useReviews";
 
 const ProviderDashboard = () => {
   const { profile, user } = useAuth();
@@ -60,6 +61,15 @@ const ProviderDashboard = () => {
   const pendingServices = services?.filter((s) => s.status === "nuevo") || [];
   const inProgressServices = services?.filter((s) => s.status === "presupuestado" || s.status === "aceptado" || s.status === "en_progreso") || [];
   const awaitingClientServices = services?.filter((s) => s.status === "finalizado_prestador") || [];
+  const completedServices = services?.filter((s) => s.status === "completado") || [];
+
+  // Check which completed services the provider already reviewed
+  const completedServiceIds = useMemo(
+    () => completedServices.map(s => s.id),
+    [completedServices]
+  );
+  const { data: reviewedIds } = useMyReviewedServiceIds(completedServiceIds);
+  const pendingReviewServices = completedServices.filter(s => !reviewedIds?.has(s.id));
 
   const toggleAvailability = async () => {
     const newVal = !available;
@@ -196,6 +206,27 @@ const ProviderDashboard = () => {
         </div>
       )}
 
+      {/* Pending review banner */}
+      {pendingReviewServices.length > 0 && (
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+              <Star className="h-5 w-5 text-yellow-500" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">{pendingReviewServices.length} servicio(s) sin calificar al cliente</p>
+              <p className="text-xs text-muted-foreground">Tu opinión ayuda a mejorar la comunidad y a otros profesionales</p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate("/prestador/servicios")}
+            className="text-sm font-semibold text-yellow-600 hover:underline shrink-0"
+          >
+            Calificar ahora
+          </button>
+        </div>
+      )}
+
       {/* GRID DE KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {stats.map((stat, index) => {
@@ -253,8 +284,12 @@ const ProviderDashboard = () => {
               <div className="space-y-4">
                 {pendingServices.map((req) => (
                   <div key={req.id} className="bg-card rounded-2xl border-2 border-primary/20 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-xl flex items-center justify-center flex-shrink-0">
-                      {req.client_name?.charAt(0) || "?"}
+                    <div className="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {req.client_avatar ? (
+                        <img src={req.client_avatar} alt={req.client_name || ""} className="w-full h-full object-cover" />
+                      ) : (
+                        req.client_name?.charAt(0) || "?"
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-1">
@@ -299,8 +334,12 @@ const ProviderDashboard = () => {
                       className="p-5 hover:bg-accent/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground font-bold flex items-center justify-center border border-border">
-                          {trabajo.client_name?.charAt(0) || "?"}
+                        <div className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground font-bold flex items-center justify-center border border-border overflow-hidden">
+                          {trabajo.client_avatar ? (
+                            <img src={trabajo.client_avatar} alt={trabajo.client_name || ""} className="w-full h-full object-cover" />
+                          ) : (
+                            trabajo.client_name?.charAt(0) || "?"
+                          )}
                         </div>
                         <div>
                           <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{trabajo.client_name || "Cliente"}</h4>
@@ -347,8 +386,12 @@ const ProviderDashboard = () => {
                       className="p-5 hover:bg-accent/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-warning/10 text-warning font-bold flex items-center justify-center border border-warning/20">
-                          {trabajo.client_name?.charAt(0) || "?"}
+                        <div className="w-10 h-10 rounded-full bg-warning/10 text-warning font-bold flex items-center justify-center border border-warning/20 overflow-hidden">
+                          {trabajo.client_avatar ? (
+                            <img src={trabajo.client_avatar} alt={trabajo.client_name || ""} className="w-full h-full object-cover" />
+                          ) : (
+                            trabajo.client_name?.charAt(0) || "?"
+                          )}
                         </div>
                         <div>
                           <h4 className="font-bold text-foreground">{trabajo.client_name || "Cliente"}</h4>
@@ -461,6 +504,10 @@ const ProviderDashboard = () => {
                 <span className={`font-semibold ${available ? 'text-success' : 'text-muted-foreground'}`}>
                   {available ? 'Activo' : 'Oculto'}
                 </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Completados</span>
+                <span className="font-semibold">{completedCount}</span>
               </div>
             </div>
           </section>

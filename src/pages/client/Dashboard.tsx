@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ClipboardList, MessageSquare, Clock, CheckCircle2, AlertCircle, Loader2, DollarSign, KeyRound, ShieldCheck, Plus, X, Banknote, CreditCard, Smartphone, ArrowRightLeft, Copy, Check, ListTodo, TrendingUp, ArrowRight } from "lucide-react";
+import { ClipboardList, MessageSquare, Clock, CheckCircle2, AlertCircle, Loader2, DollarSign, KeyRound, ShieldCheck, Plus, X, Banknote, CreditCard, Smartphone, ArrowRightLeft, Copy, Check, ListTodo, TrendingUp, ArrowRight, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePayments } from "@/hooks/usePayments";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { useMyReviewedServiceIds } from "@/hooks/useReviews";
 
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -57,6 +58,14 @@ const ClientDashboard = () => {
   // Unread messages tracking
   const chatServiceIds = (services || []).filter(s => s.provider_id && s.status !== "completado" && s.status !== "cancelado").map(s => s.id);
   const { unreadServiceIds } = useUnreadMessages(chatServiceIds);
+
+  // Check which completed services the client already reviewed
+  const completedServiceIds = useMemo(
+    () => completedServices.map(s => s.id),
+    [completedServices]
+  );
+  const { data: reviewedIds } = useMyReviewedServiceIds(completedServiceIds);
+  const pendingReviewServices = completedServices.filter(s => !reviewedIds?.has(s.id));
 
   // Fetch extra charges for active services
   const activeIds = activeServices.map((s) => s.id);
@@ -333,6 +342,24 @@ const ClientDashboard = () => {
         </div>
       )}
 
+      {/* Pending review banner */}
+      {pendingReviewServices.length > 0 && (
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4 flex items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+              <Star className="h-5 w-5 text-yellow-500" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">{pendingReviewServices.length} servicio(s) sin calificar</p>
+              <p className="text-xs text-muted-foreground">Tu opinión ayuda a mejorar la comunidad y motiva a los profesionales</p>
+            </div>
+          </div>
+          <Link to="/cliente/servicios" className="text-sm font-semibold text-yellow-600 hover:underline shrink-0">
+            Calificar ahora
+          </Link>
+        </div>
+      )}
+
       {/* Grelha de KPIs (Estatísticas) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
         {[
@@ -382,8 +409,12 @@ const ClientDashboard = () => {
                   <div key={service.id} className="p-5 rounded-xl border-2 border-primary/20 bg-primary/[0.02] space-y-4 hover:border-primary/40 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center border border-primary/20">
-                          {service.provider_name?.charAt(0) || "?"}
+                        <div className="w-11 h-11 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center border border-primary/20 overflow-hidden">
+                          {service.provider_avatar ? (
+                            <img src={service.provider_avatar} alt={service.provider_name || ""} className="w-full h-full object-cover" />
+                          ) : (
+                            service.provider_name?.[0] || "?"
+                          )}
                         </div>
                         <div>
                           <h4 className="font-bold text-foreground">{service.title}</h4>
@@ -564,6 +595,21 @@ const ClientDashboard = () => {
                           </Link>
                         )}
                       </div>
+                      {/* Service Progress */}
+                      <div className="w-full mt-2 pl-16 sm:pl-0">
+                        <div className="h-1 bg-border rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-500"
+                            style={{
+                              width: (() => {
+                                const order = ['nuevo', 'presupuestado', 'aceptado', 'en_progreso', 'finalizado_prestador', 'completado'];
+                                const idx = order.indexOf(servicio.status);
+                                return `${Math.max(0, (idx / (order.length - 1)) * 100)}%`;
+                              })()
+                            }}
+                          />
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -580,8 +626,12 @@ const ClientDashboard = () => {
                 <ul className="divide-y divide-border/50">
                   {completedServices.slice(0, 5).map((servicio) => (
                     <li key={servicio.id} className="p-5 hover:bg-accent/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-4 opacity-80 hover:opacity-100">
-                      <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-muted text-muted-foreground font-bold border border-border">
-                        {servicio.provider_name?.[0] || 'C'}
+                      <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-muted text-muted-foreground font-bold border border-border overflow-hidden">
+                        {servicio.provider_avatar ? (
+                          <img src={servicio.provider_avatar} alt={servicio.provider_name || ""} className="w-full h-full object-cover" />
+                        ) : (
+                          servicio.provider_name?.[0] || 'C'
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-base font-semibold text-foreground truncate">{servicio.title}</h4>

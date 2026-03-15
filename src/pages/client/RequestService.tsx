@@ -91,6 +91,7 @@ export default function RequestService() {
         photos: photos.length > 0 ? photos : undefined,
         provider_id: providerIdParam || undefined,
       });
+      localStorage.setItem("last_address", address.trim());
       setIsSuccess(true);
     } catch (err) {
       // error toast already handled globally in hook
@@ -167,6 +168,15 @@ export default function RequestService() {
             </div>
           )}
         </div>
+
+        {/* Zero Risk Bias: reassurance strip */}
+        {!isSuccess && (
+          <div className="border-b border-border bg-success/5 px-6 py-2.5 flex items-center justify-center gap-6 text-xs shrink-0">
+            <span className="flex items-center gap-1.5 text-success font-medium"><ShieldCheck size={14} /> Sin cargo hasta aceptar presupuesto</span>
+            <span className="hidden sm:flex items-center gap-1.5 text-muted-foreground"><X size={12} /> Cancelación gratuita</span>
+            <span className="hidden md:flex items-center gap-1.5 text-muted-foreground"><Clock size={12} /> Respuesta en &lt;2hs</span>
+          </div>
+        )}
 
         {/* Corpo do Formulário ou Animação de Sucesso */}
         <div className="flex-1 lg:overflow-y-auto custom-scrollbar">
@@ -340,6 +350,15 @@ export default function RequestService() {
                         className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                       />
                     </div>
+                    {!address && localStorage.getItem("last_address") && (
+                      <button
+                        type="button"
+                        onClick={() => setAddress(localStorage.getItem("last_address") || "")}
+                        className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+                      >
+                        <MapPin size={10} /> Usar última dirección: {localStorage.getItem("last_address")}
+                      </button>
+                    )}
                   </div>
 
                   {/* Nível de Urgência */}

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -93,14 +94,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
   }, []);
 
-  // Security: Inactivity timeout — auto-logout after 30 min of no interaction
+  // Security: Inactivity timeout — warning at 25 min, auto-logout after 30 min
   useEffect(() => {
+    const WARNING_LIMIT = 25 * 60 * 1000; // 25 minutes
     const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
+    let warningTimer: ReturnType<typeof setTimeout>;
     let inactivityTimer: ReturnType<typeof setTimeout>;
 
     const resetTimer = () => {
+      clearTimeout(warningTimer);
       clearTimeout(inactivityTimer);
       if (user) {
+        warningTimer = setTimeout(() => {
+          toast.warning("Tu sesión se cerrará en 5 minutos por inactividad. Mové el mouse para continuar.");
+        }, WARNING_LIMIT);
         inactivityTimer = setTimeout(() => {
           signOut();
         }, INACTIVITY_LIMIT);
@@ -112,6 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     resetTimer();
 
     return () => {
+      clearTimeout(warningTimer);
       clearTimeout(inactivityTimer);
       events.forEach((ev) => window.removeEventListener(ev, resetTimer));
     };

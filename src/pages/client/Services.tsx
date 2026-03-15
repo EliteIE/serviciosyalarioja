@@ -21,7 +21,7 @@ import {
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
 import { useClientRequests } from "@/hooks/useServiceRequests";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
-import { useCreateReview } from "@/hooks/useReviews";
+import { useCreateReview, useMyReviewedServiceIds } from "@/hooks/useReviews";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -58,6 +58,13 @@ export default function ClientServices() {
   const { data: services, isLoading } = useClientRequests();
   const createReview = useCreateReview();
   const queryClient = useQueryClient();
+
+  // Check which completed services the client already reviewed
+  const completedServiceIds = useMemo(
+    () => (services || []).filter(s => s.status === "completado").map(s => s.id),
+    [services]
+  );
+  const { data: reviewedIds } = useMyReviewedServiceIds(completedServiceIds);
 
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
@@ -251,8 +258,12 @@ export default function ClientServices() {
                   
                   {/* Info do Prestador */}
                   <div className="flex items-center gap-3 bg-secondary/30 p-3 rounded-xl border border-border">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${!solicitud.provider_name ? 'bg-secondary text-muted-foreground' : 'bg-primary/20 text-primary'}`}>
-                      {!solicitud.provider_name ? '?' : solicitud.provider_name.charAt(0)}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${!solicitud.provider_name ? 'bg-secondary text-muted-foreground' : 'bg-primary/20 text-primary'}`}>
+                      {solicitud.provider_avatar ? (
+                        <img src={solicitud.provider_avatar} alt={solicitud.provider_name || ""} className="h-full w-full object-cover" />
+                      ) : (
+                        !solicitud.provider_name ? '?' : solicitud.provider_name.charAt(0)
+                      )}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground leading-none mb-1">
@@ -263,6 +274,47 @@ export default function ClientServices() {
                       )}
                     </div>
                   </div>
+
+                  {/* Goal Gradient: Service Progress Timeline */}
+                  {solicitud.status !== 'cancelado' && (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between mb-1.5">
+                        {[
+                          { key: 'nuevo', label: 'Solicitado' },
+                          { key: 'presupuestado', label: 'Presupuesto' },
+                          { key: 'aceptado', label: 'Aceptado' },
+                          { key: 'en_progreso', label: 'En progreso' },
+                          { key: 'completado', label: 'Completado' },
+                        ].map((step, i, arr) => {
+                          const statusOrder = ['nuevo', 'presupuestado', 'aceptado', 'en_progreso', 'finalizado_prestador', 'completado'];
+                          const currentIndex = statusOrder.indexOf(solicitud.status);
+                          const stepIndex = statusOrder.indexOf(step.key);
+                          const isActive = stepIndex <= currentIndex;
+                          const isCurrent = step.key === solicitud.status || (solicitud.status === 'finalizado_prestador' && step.key === 'en_progreso');
+                          return (
+                            <div key={step.key} className="flex flex-col items-center flex-1">
+                              <div className={`w-3 h-3 rounded-full border-2 transition-all ${isActive ? 'bg-primary border-primary' : 'bg-background border-border'} ${isCurrent ? 'ring-2 ring-primary/30 ring-offset-1' : ''}`} />
+                              <span className={`text-[8px] mt-1 font-medium leading-none ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                                {step.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="h-0.5 bg-border rounded-full -mt-[22px] mb-4 mx-[6%] relative">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all duration-700"
+                          style={{
+                            width: (() => {
+                              const statusOrder = ['nuevo', 'presupuestado', 'aceptado', 'en_progreso', 'finalizado_prestador', 'completado'];
+                              const idx = statusOrder.indexOf(solicitud.status);
+                              return `${Math.max(0, (idx / (statusOrder.length - 1)) * 100)}%`;
+                            })()
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Rodapé do Cartão (Ações) */}
@@ -283,14 +335,19 @@ export default function ClientServices() {
                         </button>
                       </Link>
                     )}
-                    {solicitud.status === 'completado' && (
-                      <button 
+                    {solicitud.status === 'completado' && !reviewedIds?.has(solicitud.id) && (
+                      <button
                         onClick={() => setServicioACalificar(solicitud)}
                         className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:bg-secondary font-semibold text-sm rounded-lg transition-colors shadow-sm"
                       >
                         <Star size={16} className="text-yellow-500" />
                         Calificar
                       </button>
+                    )}
+                    {solicitud.status === 'completado' && reviewedIds?.has(solicitud.id) && (
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 text-success text-sm font-semibold">
+                        <CheckCircle2 size={14} /> Calificado
+                      </span>
                     )}
                     {solicitud.status === 'nuevo' && (
                       <button

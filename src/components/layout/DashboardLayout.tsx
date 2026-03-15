@@ -64,26 +64,48 @@ const DashboardLayout = ({ variant }: DashboardLayoutProps) => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-80 p-0">
-                  <div className="p-3 border-b">
+                  <div className="p-3 border-b flex items-center justify-between">
                     <h4 className="font-semibold text-sm">Notificaciones</h4>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={() => notifications.data?.filter((n: any) => !n.read).forEach((n: any) => markAsRead.mutate(n.id))}
+                        className="text-[10px] text-primary hover:underline font-medium"
+                      >
+                        Marcar todas como leídas
+                      </button>
+                    )}
                   </div>
                   <ScrollArea className="max-h-72">
                     {!notifications.data?.length ? (
                       <p className="text-sm text-muted-foreground text-center py-6">Sin notificaciones</p>
                     ) : (
-                      notifications.data.map((n: any) => (
-                        <div
-                          key={n.id}
-                          className={`p-3 border-b last:border-0 cursor-pointer hover:bg-accent/50 transition-colors ${!n.read ? "bg-primary/5" : ""}`}
-                          onClick={() => markAsRead.mutate(n.id)}
-                        >
-                          <p className="text-sm font-medium">{n.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            {new Date(n.created_at).toLocaleDateString("es-AR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                          </p>
-                        </div>
-                      ))
+                      notifications.data.map((n: any) => {
+                        const getNotificationLink = () => {
+                          const text = `${n.title} ${n.message}`.toLowerCase();
+                          if (text.includes("presupuesto") || text.includes("servicio")) return `${dashboardPath}/servicios`;
+                          if (text.includes("mensaje") || text.includes("chat")) return `${dashboardPath}/chat`;
+                          if (text.includes("reseña") || text.includes("calific")) return `${dashboardPath}/resenas`;
+                          if (text.includes("pago") || text.includes("cobro")) return dashboardPath;
+                          return dashboardPath;
+                        };
+
+                        return (
+                          <div
+                            key={n.id}
+                            className={`p-3 border-b last:border-0 cursor-pointer hover:bg-accent/50 transition-colors ${!n.read ? "bg-primary/5" : ""}`}
+                            onClick={() => {
+                              markAsRead.mutate(n.id);
+                              navigate(getNotificationLink());
+                            }}
+                          >
+                            <p className="text-sm font-medium">{n.title}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              {new Date(n.created_at).toLocaleDateString("es-AR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </div>
+                        );
+                      })
                     )}
                   </ScrollArea>
                 </PopoverContent>

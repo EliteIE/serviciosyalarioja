@@ -60,6 +60,25 @@ export const useReviews = (userId: string | null) => {
   });
 };
 
+/** Check which service_request_ids the current user has already reviewed */
+export const useMyReviewedServiceIds = (serviceRequestIds: string[]) => {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["my-reviews", user?.id, serviceRequestIds],
+    queryFn: async () => {
+      if (serviceRequestIds.length === 0) return new Set<string>();
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("service_request_id")
+        .eq("reviewer_id", user!.id)
+        .in("service_request_id", serviceRequestIds);
+      if (error) throw error;
+      return new Set((data || []).map((r) => r.service_request_id));
+    },
+    enabled: !!user && serviceRequestIds.length > 0,
+  });
+};
+
 export const useCreateReview = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -80,6 +99,7 @@ export const useCreateReview = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["my-reviews"] });
       toast.success("¡Reseña enviada!");
     },
     onError: (err: Error) => toast.error(err.message),
