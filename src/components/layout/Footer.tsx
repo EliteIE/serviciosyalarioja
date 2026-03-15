@@ -38,7 +38,7 @@ const Footer = () => {
             <ul className="space-y-4">
               {CATEGORIES.slice(0, 6).map((cat) => (
                 <li key={cat.id}>
-                  <Link to={`/buscar?cat=${cat.slug}`} className="text-secondary-foreground/80 hover:text-primary transition-colors text-sm font-medium flex items-center gap-2 group">
+                  <Link to={`/buscar?category=${cat.slug}`} className="text-secondary-foreground/80 hover:text-primary transition-colors text-sm font-medium flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-secondary-foreground/30 group-hover:bg-primary transition-colors"></span>
                     {cat.name}
                   </Link>

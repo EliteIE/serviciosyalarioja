@@ -27,12 +27,15 @@ export default function RequestService() {
   const [category, setCategory] = useState(categoryParam || "");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [address, setAddress] = useState("");
+  const [street, setStreet] = useState("");
+  const [streetNumber, setStreetNumber] = useState("");
   const [urgencia, setUrgencia] = useState<'baja' | 'media' | 'alta'>('media');
   const [budget, setBudget] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const address = streetNumber ? `${street.trim()} ${streetNumber.trim()}` : street.trim();
 
   const fileRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -57,16 +60,16 @@ export default function RequestService() {
     if (!category || !title || !description || !address) return;
 
     // Input validation
-    if (title.trim().length < 3 || title.length > 120) {
+    if (title.trim().length < 3 || title.trim().length > 120) {
       toast.error("El título debe tener entre 3 y 120 caracteres");
       return;
     }
-    if (description.trim().length < 10 || description.length > 5000) {
+    if (description.trim().length < 10 || description.trim().length > 5000) {
       toast.error("La descripción debe tener entre 10 y 5000 caracteres");
       return;
     }
-    if (address.trim().length < 5 || address.length > 200) {
-      toast.error("La dirección debe tener entre 5 y 200 caracteres");
+    if (address.length < 3 || address.length > 200) {
+      toast.error("La dirección debe tener entre 3 y 200 caracteres");
       return;
     }
     const budgetNum = budget ? parseFloat(budget) : undefined;
@@ -102,7 +105,8 @@ export default function RequestService() {
     setCategory("");
     setTitle("");
     setDescription("");
-    setAddress("");
+    setStreet("");
+    setStreetNumber("");
     setUrgencia('media');
     setBudget("");
     setPhotos([]);
@@ -113,10 +117,10 @@ export default function RequestService() {
 
   // Neurotécnica: Endowed Progress Effect — barra de progresso do formulário
   const formProgress = useMemo(() => {
-    const fields = [category, title, description, address];
+    const fields = [category, title, description, street, streetNumber];
     const filled = fields.filter(Boolean).length;
     return Math.round((filled / fields.length) * 100);
-  }, [category, title, description, address]);
+  }, [category, title, description, street, streetNumber]);
 
   return (
     <div className="font-sans flex justify-center pb-10 px-4 md:px-8 min-h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.16))]">
@@ -181,23 +185,26 @@ export default function RequestService() {
         {/* Corpo do Formulário ou Animação de Sucesso */}
         <div className="flex-1 lg:overflow-y-auto custom-scrollbar">
           {isSuccess ? (
-            <div className="p-12 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500 lg:h-full">
+            <div className="relative p-12 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500 lg:h-full">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400"></div>
               <div className="relative mb-8">
+                {/* Soft background glow */}
+                <div className="absolute inset-0 w-32 h-32 -m-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-full"></div>
                 {/* Círculo expansivo animado */}
                 <div className="absolute inset-0 bg-success/80 rounded-full animate-ping opacity-40"></div>
                 {/* Ícone de sucesso */}
-                <div className="relative bg-gradient-to-tr from-success to-emerald-400 text-white p-5 rounded-full shadow-lg shadow-success/30 transform transition-transform duration-500 hover:scale-110">
+                <div className="relative bg-gradient-to-tr from-emerald-500 to-green-400 text-white p-5 rounded-full shadow-lg shadow-success/30 transform transition-transform duration-500 hover:scale-110">
                   <Check size={48} strokeWidth={3} />
                 </div>
               </div>
-              
-              <h2 className="text-3xl font-extrabold text-foreground mb-4 tracking-tight">¡Solicitud enviada con éxito!</h2>
-              <p className="text-lg text-muted-foreground max-w-md mb-4 leading-relaxed">
+
+              <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4 tracking-tight">¡Solicitud enviada con éxito!</h2>
+              <p className="text-lg text-foreground/80 max-w-md mb-4 leading-relaxed">
                 Los profesionales de tu zona ya fueron notificados. Muy pronto empezarás a recibir presupuestos en tu panel.
               </p>
               {/* Neurotécnica: Peak-End Rule + Anchoring — timeline de expectativa */}
-              <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl px-5 py-3 mb-8">
-                <Clock size={18} className="text-primary shrink-0" />
+              <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 rounded-xl px-5 py-3 mb-8">
+                <Clock size={18} className="text-amber-500 shrink-0" />
                 <p className="text-sm text-foreground">
                   <strong>Tiempo promedio de respuesta:</strong> menos de 2 horas
                 </p>
@@ -334,32 +341,55 @@ export default function RequestService() {
                     <h2 className="text-xl font-bold text-foreground">Ubicación y Preferencias</h2>
                   </div>
 
-                  {/* Morada */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-foreground">Dirección <span className="text-destructive">*</span></label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <MapPin className="text-muted-foreground" size={18} />
+                  {/* Calle y Número */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-sm font-semibold text-foreground">Calle <span className="text-destructive">*</span></label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <MapPin className="text-muted-foreground" size={18} />
+                        </div>
+                        <input
+                          type="text"
+                          required
+                          value={street}
+                          onChange={(e) => setStreet(e.target.value)}
+                          placeholder="Ej: Av. San Martín"
+                          className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                        />
                       </div>
-                      <input 
-                        type="text" 
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-foreground">Número <span className="text-destructive">*</span></label>
+                      <input
+                        type="text"
                         required
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Dirección donde se realizará el servicio" 
-                        className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                        value={streetNumber}
+                        onChange={(e) => setStreetNumber(e.target.value)}
+                        placeholder="1234"
+                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                       />
                     </div>
-                    {!address && localStorage.getItem("last_address") && (
-                      <button
-                        type="button"
-                        onClick={() => setAddress(localStorage.getItem("last_address") || "")}
-                        className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
-                      >
-                        <MapPin size={10} /> Usar última dirección: {localStorage.getItem("last_address")}
-                      </button>
-                    )}
                   </div>
+                  {!street && localStorage.getItem("last_address") && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const lastAddr = localStorage.getItem("last_address") || "";
+                        // Try to split last address into street and number
+                        const match = lastAddr.match(/^(.+?)\s+(\d+\S*)$/);
+                        if (match) {
+                          setStreet(match[1]);
+                          setStreetNumber(match[2]);
+                        } else {
+                          setStreet(lastAddr);
+                        }
+                      }}
+                      className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+                    >
+                      <MapPin size={10} /> Usar última dirección: {localStorage.getItem("last_address")}
+                    </button>
+                  )}
 
                   {/* Nível de Urgência */}
                   <div className="space-y-3">

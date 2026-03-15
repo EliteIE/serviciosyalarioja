@@ -1,21 +1,102 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Shield, Star } from "lucide-react";
+
+// Barrios de La Rioja Capital y alrededores
+const BARRIOS_LA_RIOJA = [
+  "Centro", "Barrio Norte", "Barrio Sur", "Villa Unión",
+  "Parque Industrial", "Faldeo del Velazco", "Ciudad del Este",
+  "Villa Bustos", "Residencial del Sur", "Las Padercitas",
+  "El Quebrachal", "Barrio Vespucio", "Barrio CGT",
+  "Barrio Evita", "Villa Gobernador Gordillo", "Barrio ISSARA",
+  "Villa Sanagasta", "Vargas", "Barrio Yacampis",
+  "Barrio Libertador", "Barrio 25 de Mayo", "Santa Florentina",
+  "Barrio Juan XXIII", "Barrio Alberdi", "Barrio Parque",
+  "Chilecito", "Chamical", "Chepes", "Aimogasta",
+  "Nonogasta", "Famatina", "Sanagasta", "La Banda",
+  "Anillaco", "Villa Castelli"
+];
+
+// Smart keyword mapping: user search terms → provider category slugs
+const KEYWORD_MAP: Record<string, string> = {
+  // Plomería
+  "caño": "plomeria", "cañería": "plomeria", "agua": "plomeria",
+  "canilla": "plomeria", "grifo": "plomeria", "baño": "plomeria",
+  "inodoro": "plomeria", "ducha": "plomeria", "pérdida": "plomeria",
+  "desagüe": "plomeria", "cloaca": "plomeria", "tanque": "plomeria",
+  "termotanque": "plomeria", "calefón": "plomeria",
+  "plomero": "plomeria", "plomería": "plomeria",
+  // Gasista
+  "gas": "gasista", "garrafa": "gasista", "gasista": "gasista",
+  // Electricidad
+  "enchufe": "electricidad", "cable": "electricidad", "luz": "electricidad",
+  "electricista": "electricidad", "corto": "electricidad",
+  "tablero": "electricidad", "térmica": "electricidad", "cortocircuito": "electricidad",
+  "instalación eléctrica": "electricidad", "lamparita": "electricidad",
+  "ventilador": "electricidad", "toma corriente": "electricidad",
+  // Limpieza
+  "limpieza": "limpieza", "limpiar": "limpieza", "limpia": "limpieza",
+  "desinfección": "limpieza", "post obra": "limpieza", "post-obra": "limpieza",
+  "departamento": "limpieza", "oficina": "limpieza", "edificio": "limpieza",
+  // Jardinería
+  "poda": "jardineria", "césped": "jardineria", "pasto": "jardineria",
+  "jardín": "jardineria", "jardinero": "jardineria", "árbol": "jardineria",
+  "plantas": "jardineria", "paisajismo": "jardineria", "riego": "jardineria",
+  // Aire Acondicionado
+  "aire": "aire-acondicionado", "aire acondicionado": "aire-acondicionado", "split": "aire-acondicionado",
+  "calefacción": "aire-acondicionado", "estufa": "aire-acondicionado", "refrigeración": "aire-acondicionado",
+  // Pintura
+  "pintura": "pintura", "pintar": "pintura", "pintor": "pintura",
+  "empapelar": "pintura",
+  // Albañilería
+  "albañil": "albanileria", "obra": "albanileria", "pared": "albanileria",
+  "revoque": "albanileria", "cemento": "albanileria", "ladrillo": "albanileria",
+  "construcción": "albanileria", "mampostería": "albanileria",
+  // Cerrajería
+  "cerradura": "cerrajeria", "llave": "cerrajeria", "cerrajero": "cerrajeria",
+  "puerta": "cerrajeria", "candado": "cerrajeria",
+  // Mudanzas
+  "mudanza": "mudanzas", "flete": "mudanzas", "mover": "mudanzas",
+  "trasladar": "mudanzas",
+  // Carpintería
+  "carpintero": "carpinteria", "mueble": "carpinteria", "madera": "carpinteria",
+};
 
 export const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
+  const [showBarrios, setShowBarrios] = useState(false);
   const navigate = useNavigate();
+
+  const filteredBarrios = useMemo(() => {
+    if (!locationQuery.trim()) return BARRIOS_LA_RIOJA.slice(0, 8);
+    return BARRIOS_LA_RIOJA.filter(b =>
+      b.toLowerCase().includes(locationQuery.toLowerCase())
+    ).slice(0, 6);
+  }, [locationQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim() && !locationQuery.trim()) return;
-    
-    // Construct search URL
+
     const params = new URLSearchParams();
+    const query = searchQuery.trim().toLowerCase();
+
+    // Smart keyword → category mapping
+    let matchedCategory = "";
+    for (const [keyword, category] of Object.entries(KEYWORD_MAP)) {
+      if (query.includes(keyword)) {
+        matchedCategory = category;
+        break;
+      }
+    }
+
+    if (matchedCategory) {
+      params.append("category", matchedCategory);
+    }
     if (searchQuery.trim()) params.append("q", searchQuery.trim());
     if (locationQuery.trim()) params.append("location", locationQuery.trim());
-    
+
     navigate(`/buscar?${params.toString()}`);
   };
 
@@ -61,15 +142,36 @@ export const Hero = () => {
             />
           </div>
 
-          <div className="flex-1 flex items-center w-full px-4 py-3 md:py-2">
-            <MapPin className="text-muted-foreground mr-3 flex-shrink-0" size={24} />
-            <input 
-              type="text" 
-              value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
-              placeholder="Tu zona o barrio" 
-              className="w-full bg-transparent border-none text-foreground focus:outline-none text-lg md:text-base placeholder:text-muted-foreground"
-            />
+          <div className="flex-1 relative w-full">
+            <div className="flex items-center w-full px-4 py-3 md:py-2">
+              <MapPin className="text-muted-foreground mr-3 flex-shrink-0" size={24} />
+              <input
+                type="text"
+                value={locationQuery}
+                onChange={(e) => { setLocationQuery(e.target.value); setShowBarrios(true); }}
+                onFocus={() => setShowBarrios(true)}
+                onBlur={() => setTimeout(() => setShowBarrios(false), 200)}
+                placeholder="Tu zona o barrio"
+                className="w-full bg-transparent border-none text-foreground focus:outline-none text-lg md:text-base placeholder:text-muted-foreground"
+                autoComplete="off"
+              />
+            </div>
+            {showBarrios && filteredBarrios.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+                {filteredBarrios.map((barrio) => (
+                  <button
+                    key={barrio}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setLocationQuery(barrio); setShowBarrios(false); }}
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-primary/5 text-foreground flex items-center gap-2 transition-colors"
+                  >
+                    <MapPin size={14} className="text-muted-foreground shrink-0" />
+                    {barrio}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <button 
@@ -90,7 +192,11 @@ export const Hero = () => {
             {['Plomería', 'Electricista', 'Limpieza', 'Aire Acondicionado'].map((categoria) => (
               <button 
                 key={categoria}
-                onClick={() => navigate(`/buscar?q=${categoria.toLowerCase()}`)}
+                onClick={() => {
+                  const catMap: Record<string, string> = { 'plomería': 'plomeria', 'electricista': 'electricidad', 'limpieza': 'limpieza', 'aire acondicionado': 'aire-acondicionado' };
+                  const slug = catMap[categoria.toLowerCase()] || categoria.toLowerCase();
+                  navigate(`/buscar?q=${encodeURIComponent(categoria)}&category=${slug}`);
+                }}
                 className="px-4 py-1.5 rounded-full bg-secondary-foreground/5 text-secondary-foreground/80 text-sm border border-secondary-foreground/10 hover:bg-secondary-foreground/10 hover:text-secondary-foreground transition-all cursor-pointer"
               >
                 {categoria}
@@ -100,27 +206,29 @@ export const Hero = () => {
         </div>
 
         {/* Benefícios em miniatura abaixo do hero */}
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl w-full border-t border-secondary-foreground/10 pt-10">
-          <div className="flex flex-col items-center justify-center text-center group">
-            <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
-              <Shield size={28} />
+        <div className="mt-16 max-w-4xl w-full border-t border-secondary-foreground/10 pt-10">
+          <div className="flex sm:grid sm:grid-cols-3 gap-6 overflow-x-auto sm:overflow-visible snap-x snap-mandatory pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+            <div className="flex flex-col items-center justify-center text-center group min-w-[200px] snap-center shrink-0 sm:min-w-0 sm:shrink">
+              <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
+                <Shield size={28} />
+              </div>
+              <h3 className="text-secondary-foreground font-semibold text-base mb-1">Perfiles Verificados</h3>
+              <p className="text-secondary-foreground/60 text-sm">Identidad y antecedentes revisados.</p>
             </div>
-            <h3 className="text-secondary-foreground font-semibold text-base mb-1">Perfiles Verificados</h3>
-            <p className="text-secondary-foreground/60 text-sm">Identidad y antecedentes revisados.</p>
-          </div>
-          <div className="flex flex-col items-center justify-center text-center group">
-            <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
-              <Star size={28} />
+            <div className="flex flex-col items-center justify-center text-center group min-w-[200px] snap-center shrink-0 sm:min-w-0 sm:shrink">
+              <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
+                <Star size={28} />
+              </div>
+              <h3 className="text-secondary-foreground font-semibold text-base mb-1">Reseñas Reales</h3>
+              <p className="text-secondary-foreground/60 text-sm">Opiniones 100% de clientes.</p>
             </div>
-            <h3 className="text-secondary-foreground font-semibold text-base mb-1">Reseñas Reales</h3>
-            <p className="text-secondary-foreground/60 text-sm">Opiniones 100% de clientes.</p>
-          </div>
-          <div className="flex flex-col items-center justify-center text-center group">
-            <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
-              <Search size={28} />
+            <div className="flex flex-col items-center justify-center text-center group min-w-[200px] snap-center shrink-0 sm:min-w-0 sm:shrink">
+              <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
+                <Search size={28} />
+              </div>
+              <h3 className="text-secondary-foreground font-semibold text-base mb-1">Presupuesto Rápido</h3>
+              <p className="text-secondary-foreground/60 text-sm">Compará precios sin compromiso.</p>
             </div>
-            <h3 className="text-secondary-foreground font-semibold text-base mb-1">Presupuesto Rápido</h3>
-            <p className="text-secondary-foreground/60 text-sm">Compará precios sin compromiso.</p>
           </div>
         </div>
 

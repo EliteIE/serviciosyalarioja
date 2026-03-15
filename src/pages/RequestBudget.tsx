@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
   Star, 
@@ -25,19 +25,11 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CATEGORIES } from "@/constants/categories";
 import { useCreateServiceRequest, useUploadFile } from "@/hooks/useServiceRequests";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-
-const TIME_SLOTS = [
-  "08:00 - 10:00",
-  "10:00 - 12:00",
-  "12:00 - 14:00",
-  "14:00 - 16:00",
-  "16:00 - 18:00",
-  "18:00 - 20:00",
-  "A coordinar",
-];
+import { useProviderSchedulePublic } from "@/hooks/useProviderSchedule";
 
 export default function RequestBudget() {
   const { providerId } = useParams();
@@ -58,20 +50,66 @@ export default function RequestBudget() {
     enabled: !!providerId,
   });
 
+  const { data: schedule } = useProviderSchedulePublic(providerId || null);
+
   const getCategoryName = (slug: string | null) =>
     CATEGORIES.find((c) => c.slug === slug)?.name || slug || "";
 
   const [description, setDescription] = useState("");
-  const [address, setAddress] = useState("");
+  const [street, setStreet] = useState("");
+  const [streetNumber, setStreetNumber] = useState("");
   const [urgency, setUrgency] = useState<"baja" | "media" | "alta">("media");
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [preferredDate, setPreferredDate] = useState<Date>();
   const [preferredTime, setPreferredTime] = useState("");
+  const address = streetNumber ? `${street.trim()} ${streetNumber.trim()}` : street.trim();
+
   const fileRef = useRef<HTMLInputElement>(null);
   const createRequest = useCreateServiceRequest();
   const uploadFile = useUploadFile();
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const availableTimeSlots = useMemo(() => {
+    if (!schedule || schedule.length === 0) return ["A coordinar"];
+
+    if (!preferredDate) {
+      // Show all possible slots from all active days
+      const allSlots = new Set<string>();
+      schedule.forEach((slot) => {
+        const start = parseInt(slot.start_time.split(":")[0], 10);
+        const end = parseInt(slot.end_time.split(":")[0], 10);
+        for (let h = start; h < end; h += 2) {
+          const slotEnd = Math.min(h + 2, end);
+          allSlots.add(`${String(h).padStart(2, "0")}:00 - ${String(slotEnd).padStart(2, "0")}:00`);
+        }
+      });
+      return [...Array.from(allSlots).sort(), "A coordinar"];
+    }
+
+    // Filter by selected day of week
+    const dayOfWeek = preferredDate.getDay(); // 0=Sun
+    const daySchedule = schedule.find((s) => s.day_of_week === dayOfWeek);
+    if (!daySchedule) return ["A coordinar"];
+
+    const start = parseInt(daySchedule.start_time.split(":")[0], 10);
+    const end = parseInt(daySchedule.end_time.split(":")[0], 10);
+    const slots: string[] = [];
+    for (let h = start; h < end; h += 2) {
+      const slotEnd = Math.min(h + 2, end);
+      slots.push(`${String(h).padStart(2, "0")}:00 - ${String(slotEnd).padStart(2, "0")}:00`);
+    }
+    return [...slots, "A coordinar"];
+  }, [schedule, preferredDate]);
+
+  const activeDays = useMemo(() => {
+    if (!schedule) return new Set<number>();
+    return new Set(schedule.map((s) => s.day_of_week));
+  }, [schedule]);
+
+  useEffect(() => {
+    setPreferredTime("");
+  }, [preferredDate]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -98,6 +136,14 @@ export default function RequestBudget() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !address || !provider) return;
+    if (description.trim().length < 10) {
+      toast.error("La descripción debe tener al menos 10 caracteres");
+      return;
+    }
+    if (address.length < 3) {
+      toast.error("Completá la dirección correctamente");
+      return;
+    }
 
     const categoryName = getCategoryName(provider.provider_category);
     const title = `Solicitud de presupuesto: ${categoryName}`;
@@ -321,20 +367,30 @@ export default function RequestBudget() {
 
                 <hr className="border-border" />
 
-                {/* Endereço */}
+                {/* Calle y Número */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-foreground">Dirección donde se realizará el servicio <span className="text-destructive">*</span></label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MapPin className="text-muted-foreground" size={20} />
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="col-span-2 relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <MapPin className="text-muted-foreground" size={20} />
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        value={street}
+                        onChange={(e) => setStreet(e.target.value)}
+                        placeholder="Ej: Av. San Martín"
+                        className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                      />
                     </div>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Ej: Av. San Martín 1234, La Rioja" 
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                      value={streetNumber}
+                      onChange={(e) => setStreetNumber(e.target.value)}
+                      placeholder="Número"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                     />
                   </div>
                 </div>
@@ -364,7 +420,11 @@ export default function RequestBudget() {
                             mode="single"
                             selected={preferredDate}
                             onSelect={setPreferredDate}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => {
+                              if (date < new Date(new Date().setHours(0, 0, 0, 0))) return true;
+                              if (schedule && schedule.length > 0 && !activeDays.has(date.getDay())) return true;
+                              return false;
+                            }}
                             initialFocus
                           />
                         </PopoverContent>
@@ -384,7 +444,7 @@ export default function RequestBudget() {
                         className="w-full appearance-none rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium font-normal cursor-pointer"
                       >
                         <option value="" disabled>Seleccionar horario</option>
-                        {TIME_SLOTS.map((slot) => (
+                        {availableTimeSlots.map((slot) => (
                            <option key={slot} value={slot}>{slot}</option>
                         ))}
                       </select>

@@ -45,6 +45,14 @@ export default function SearchPage() {
   const [sortBy, setSortBy] = useState<"rating" | "jobs" | "recommended">("rating");
   const { toggleFavorite, isFavorite } = useFavorites();
 
+  // Sync URL params on mount and navigation
+  useEffect(() => {
+    const urlCategory = searchParams.get("category");
+    if (urlCategory && urlCategory !== categoriaActiva) {
+      setCategoriaActiva(urlCategory);
+    }
+  }, [searchParams]);
+
   // Configuração visual dinâmica para cada categoria (Adaptação do modelo original)
   const categoriasConfig: Record<string, any> = {
     todas: {
@@ -110,10 +118,12 @@ export default function SearchPage() {
   }, [categoriaActiva]);
 
   const prestadoresFiltrados = useMemo(() => {
+    const locationFilter = searchParams.get("location")?.toLowerCase() || "";
     const filtered = providers.filter((p) => {
       if (searchQuery && !p.full_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
           !(p.provider_category || "").toLowerCase().includes(searchQuery.toLowerCase()) &&
           !(p.bio || "").toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (locationFilter && !(p.location || "").toLowerCase().includes(locationFilter)) return false;
       return true;
     });
 
@@ -131,7 +141,7 @@ export default function SearchPage() {
           return 0;
       }
     });
-  }, [providers, searchQuery, sortBy]);
+  }, [providers, searchQuery, sortBy, searchParams]);
 
   const getCategoryName = (slug: string | null) => CATEGORIES.find(c => c.slug === slug)?.name || slug || "";
 

@@ -30,19 +30,14 @@ export const useReviews = (userId: string | null) => {
       if (error) throw error;
 
       const reviewerIds = [...new Set(data.map((r) => r.reviewer_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .in("id", reviewerIds);
+      const requestIds = [...new Set(data.map((r) => r.service_request_id).filter(Boolean))];
+
+      const [{ data: profiles }, { data: requests }] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, avatar_url").in("id", reviewerIds),
+        supabase.from("service_requests").select("id, title, category").in("id", requestIds),
+      ]);
 
       const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
-
-      const requestIds = [...new Set(data.map((r) => r.service_request_id).filter(Boolean))];
-      const { data: requests } = await supabase
-        .from("service_requests")
-        .select("id, title, category")
-        .in("id", requestIds);
-
       const requestMap = new Map(requests?.map((req) => [req.id, req]) || []);
 
       return data.map((r) => {
@@ -57,6 +52,8 @@ export const useReviews = (userId: string | null) => {
       }) as Review[];
     },
     enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,   // 10 minutes cache
   });
 };
 
@@ -76,6 +73,8 @@ export const useMyReviewedServiceIds = (serviceRequestIds: string[]) => {
       return new Set((data || []).map((r) => r.service_request_id));
     },
     enabled: !!user && serviceRequestIds.length > 0,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 

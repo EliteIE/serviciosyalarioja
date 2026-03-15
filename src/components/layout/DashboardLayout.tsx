@@ -32,7 +32,7 @@ const DashboardLayout = ({ variant }: DashboardLayoutProps) => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/");
+    window.location.href = "/";
   };
 
   return (
