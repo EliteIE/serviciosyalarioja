@@ -54,7 +54,7 @@ const RegisterClient = () => {
       email: formData.email, 
       password: formData.password,
       options: { 
-        emailRedirectTo: `${window.location.origin.includes('localhost') ? 'https://serviciosyslr.com' : window.location.origin}/login?confirmed=true`, 
+        emailRedirectTo: `${window.location.origin}/login?confirmed=true`,
         data: { 
           full_name: formData.nombre, 
           phone: formData.telefono, 

@@ -97,7 +97,7 @@ const RegisterProvider = () => {
         email: formData.email.trim(),
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin.includes('localhost') ? 'https://serviciosyslr.com' : window.location.origin}/login?confirmed=true`,
+          emailRedirectTo: `${window.location.origin}/login?confirmed=true`,
           data: {
             full_name: formData.nombre.trim(),
             phone: formData.telefono.trim(),
@@ -119,8 +119,7 @@ const RegisterProvider = () => {
             provider_doc_urls: docUrls,
             provider_verification_status: "pending",
           }).eq("id", authData.user.id);
-        } catch (uploadErr) {
-          console.warn("Doc upload failed (expected if email confirmation required):", uploadErr);
+        } catch {
           toast.warning("Los documentos se podrán subir después de confirmar tu email.");
         }
       }

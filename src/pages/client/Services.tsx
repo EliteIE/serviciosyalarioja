@@ -22,6 +22,8 @@ import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
 import { useClientRequests } from "@/hooks/useServiceRequests";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useCreateReview } from "@/hooks/useReviews";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 // Mapeamento de icones por categoria
@@ -45,6 +47,7 @@ const getCategoryColor = (category: string) => {
 export default function ClientServices() {
   const { data: services, isLoading } = useClientRequests();
   const createReview = useCreateReview();
+  const queryClient = useQueryClient();
 
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
@@ -243,13 +246,7 @@ export default function ClientServices() {
                         {solicitud.provider_name || 'Sin asignar'}
                       </p>
                       {solicitud.status === 'completado' && (
-                        <div className="flex items-center gap-0.5 text-yellow-500">
-                          <Star size={10} fill="currentColor" />
-                          <Star size={10} fill="currentColor" />
-                          <Star size={10} fill="currentColor" />
-                          <Star size={10} fill="currentColor" />
-                          <Star size={10} fill="currentColor" />
-                        </div>
+                        <p className="text-xs text-muted-foreground">Servicio completado</p>
                       )}
                     </div>
                   </div>
@@ -257,9 +254,9 @@ export default function ClientServices() {
 
                 {/* Rodapé do Cartão (Ações) */}
                 <div className="px-5 py-4 bg-secondary/10 border-t border-border flex items-center justify-between gap-3 mt-auto">
-                  <button className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                  <Link to={`/cliente/chat?service=${solicitud.id}`} className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
                     Ver detalles
-                  </button>
+                  </Link>
                   
                   <div className="flex gap-2">
                     {(solicitud.status === 'aceptado' || solicitud.status === 'en_progreso') && (
@@ -283,7 +280,23 @@ export default function ClientServices() {
                       </button>
                     )}
                     {solicitud.status === 'nuevo' && (
-                      <button className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10 font-semibold text-sm rounded-lg transition-colors shadow-sm">
+                      <button
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase
+                              .from("service_requests")
+                              .update({ status: "cancelado" as any })
+                              .eq("id", solicitud.id);
+                            if (error) throw error;
+                            toast.success("Solicitud cancelada");
+                            queryClient.invalidateQueries({ queryKey: ["service-requests"] });
+                          } catch {
+                            toast.error("Error al cancelar");
+                          }
+                        }}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10 font-semibold text-sm rounded-lg transition-colors shadow-sm"
+                      >
+                        <X size={14} />
                         Cancelar
                       </button>
                     )}

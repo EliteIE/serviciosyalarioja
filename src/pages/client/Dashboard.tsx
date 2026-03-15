@@ -78,17 +78,14 @@ const ClientDashboard = () => {
   // Fetch provider profile for transfer details when needed
   const completionService = services?.find((s) => s.id === completionServiceId);
   const { data: providerProfile } = useQuery({
-    queryKey: ["provider-bank-details", completionService?.provider_id],
+    queryKey: ["provider-bank-details", completionServiceId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name, bank_alias, bank_cvu")
-        .eq("id", completionService!.provider_id!)
-        .single();
+        .rpc("get_provider_bank_details", { p_service_request_id: completionServiceId! });
       if (error) throw error;
-      return data;
+      return (data as any)?.[0] || null;
     },
-    enabled: !!completionService?.provider_id && (transferDialogOpen || selectedPaymentMethod === "transferencia"),
+    enabled: !!completionServiceId && (transferDialogOpen || selectedPaymentMethod === "transferencia"),
   });
 
   const pendingExtras = extraCharges?.filter((e: any) => e.status === "pendiente") || [];
