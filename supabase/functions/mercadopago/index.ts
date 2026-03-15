@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
-const PROD_ORIGINS = ["https://serviciosyslr.com", "https://www.serviciosyslr.com", "https://serviciosyalr.lovable.app"];
+const PROD_ORIGINS = ["https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:8080"];
 const ALLOWED_ORIGINS = Deno.env.get("ENVIRONMENT") === "production"
   ? PROD_ORIGINS
