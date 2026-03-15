@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const path = url.pathname.split("/").pop();
 
-  const appUrl = "https://serviciosyslr.com";
+  const appUrl = "https://serviciosyalr.com";
 
   try {
     // POST /mercadopago - Create preference (checkout)

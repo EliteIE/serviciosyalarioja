@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
 
   const MP_APP_ID = Deno.env.get("MERCADOPAGO_APP_ID");
   const MP_CLIENT_SECRET = Deno.env.get("MERCADOPAGO_CLIENT_SECRET");
-  const appUrl = "https://serviciosyslr.com";
+  const appUrl = "https://serviciosyalr.com";
 
   if (!MP_APP_ID || !MP_CLIENT_SECRET) {
     return new Response(JSON.stringify({ error: "MP OAuth not configured" }), {
