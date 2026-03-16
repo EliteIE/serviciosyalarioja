@@ -179,11 +179,11 @@ const AdminDashboard = () => {
 
   const growthPercent = (current: number, previous: number) => {
     if (previous === 0) return current > 0 ? 100 : 0;
-    return ((current - previous) / previous * 100).toFixed(0);
+    return Math.round(((current - previous) / previous) * 100);
   };
 
-  const userGrowth = Number(growthPercent(stats?.recentUsers || 0, stats?.prevUsers || 0));
-  const requestGrowth = Number(growthPercent(stats?.recentRequests || 0, stats?.prevRequests || 0));
+  const userGrowth = growthPercent(stats?.recentUsers || 0, stats?.prevUsers || 0);
+  const requestGrowth = growthPercent(stats?.recentRequests || 0, stats?.prevRequests || 0);
 
   // Security alerts
   const alerts: { text: string; type: "error" | "warning" | "info" }[] = [];

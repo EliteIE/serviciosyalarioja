@@ -19,6 +19,7 @@ import { useMessages, useSendMessage } from "@/hooks/useMessages";
 import { useClientRequests, useProviderRequests, useUploadFile } from "@/hooks/useServiceRequests";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -30,6 +31,7 @@ export default function ChatPage() {
   const location = useLocation();
   const serviceId = searchParams.get("service");
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Detect if provider or client based on route
   const isProvider = location.pathname.startsWith("/prestador");
@@ -174,8 +176,9 @@ export default function ChatPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
+                  queryClient.invalidateQueries({ queryKey: ["messages"] });
+                  queryClient.invalidateQueries({ queryKey: ["service-requests"] });
                   toast.success("Conversaciones actualizadas");
-                  window.location.reload();
                 }}
               >
                 <Archive className="mr-2 h-4 w-4" /> Actualizar conversaciones

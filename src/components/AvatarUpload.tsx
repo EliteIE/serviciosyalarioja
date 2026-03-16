@@ -37,6 +37,7 @@ export default function AvatarUpload({ currentUrl, initials, onUploaded, onRemov
     }
 
     // Show instant preview (Neurotécnica: feedback imediato)
+    if (previewUrl && previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
     setUploading(true);
@@ -73,6 +74,9 @@ export default function AvatarUpload({ currentUrl, initials, onUploaded, onRemov
         .eq("id", user.id);
       if (updateError) throw updateError;
 
+      // Revoke the blob preview now that we have the real URL
+      if (previewUrl && previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
       toast.success("¡Foto de perfil actualizada!");
       onUploaded?.(publicUrl);
       queryClient.invalidateQueries({ queryKey: ["profile"] });
@@ -182,7 +186,7 @@ export default function AvatarUpload({ currentUrl, initials, onUploaded, onRemov
         )}
       </div>
 
-      <p className="text-[10px] text-muted-foreground">JPG, PNG o WebP · Máx. 2 MB</p>
+      <p className="text-[10px] text-muted-foreground">JPG, PNG, WebP o GIF · Máx. 2 MB</p>
     </div>
   );
 }

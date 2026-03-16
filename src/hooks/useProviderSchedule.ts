@@ -152,14 +152,17 @@ export const useAddService = () => {
 };
 
 export const useDeleteService = () => {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!user) throw new Error("No autenticado");
       const { error } = await supabase
         .from("provider_services" as any)
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .eq("provider_id", user.id);
       if (error) throw error;
     },
     onSuccess: () => {

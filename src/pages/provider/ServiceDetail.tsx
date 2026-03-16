@@ -104,6 +104,11 @@ const ServiceDetail = () => {
 
   const confirmReject = () => {
     if (!service) return;
+    // SECURITY: Verify ownership — only assigned provider or unassigned service
+    if (service.provider_id && service.provider_id !== user?.id) {
+      toast.error("No tienes permiso para rechazar esta solicitud");
+      return;
+    }
     updateStatus.mutate({ id: service.id, status: "cancelado" }, {
       onSuccess: () => {
         setRejectDialogOpen(false);
@@ -127,7 +132,7 @@ const ServiceDetail = () => {
     );
   }
 
-  const parsed = parseDescription(service.description);
+  const parsed = parseDescription(service.description || "");
   const displayTitle = `Solicitud de presupuesto: ${getCategoryName(service.category)}`;
 
   return (

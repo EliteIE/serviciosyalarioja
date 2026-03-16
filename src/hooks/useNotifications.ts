@@ -49,6 +49,7 @@ export const useNotifications = () => {
 
   const markAsRead = useMutation({
     mutationFn: async (id: string) => {
+      if (!user) return;
       const { error } = await supabase
         .from("notifications")
         .update({ read: true })

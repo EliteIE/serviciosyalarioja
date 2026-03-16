@@ -92,6 +92,7 @@ export const useMessages = (serviceRequestId: string | null) => {
 };
 
 export const useSendMessage = () => {
+  const { user } = useAuth();
   const lastSentRef = { current: 0 };
   const MAX_MESSAGE_LENGTH = 5000;
   const MIN_INTERVAL_MS = 800; // anti-spam: min 800ms between messages
@@ -99,7 +100,7 @@ export const useSendMessage = () => {
   return useMutation({
     mutationFn: async ({
       service_request_id,
-      sender_id,
+      sender_id: _sender_id,
       content,
       message_type = "text",
       metadata,
@@ -110,6 +111,10 @@ export const useSendMessage = () => {
       message_type?: string;
       metadata?: Record<string, unknown>;
     }) => {
+      // SECURITY: Always use authenticated user's ID, never trust caller-supplied sender_id
+      if (!user) throw new Error("No autenticado");
+      const authenticatedSenderId = user.id;
+
       // Rate limiting
       const now = Date.now();
       if (now - lastSentRef.current < MIN_INTERVAL_MS) {
@@ -127,7 +132,7 @@ export const useSendMessage = () => {
 
       const { error } = await supabase.from("messages").insert({
         service_request_id,
-        sender_id,
+        sender_id: authenticatedSenderId,
         content: content.trim(),
         message_type,
         metadata: (metadata || null) as import("@/integrations/supabase/types").Json,

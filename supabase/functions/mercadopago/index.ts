@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
         p_max_requests: 20,
         p_window_seconds: 60,
       });
-      if (allowed === false) {
+      if (allowed !== true) {
         return new Response(JSON.stringify({ error: "Demasiadas solicitudes. Intentá en un minuto." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -284,6 +284,16 @@ Deno.serve(async (req) => {
       if (!ts || !v1) {
         console.error("Webhook signature missing ts or v1");
         return new Response(JSON.stringify({ error: "Invalid signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // SECURITY: Validate timestamp freshness to prevent replay attacks (5 min window)
+      const tsNum = parseInt(ts, 10);
+      if (isNaN(tsNum) || Math.abs(Date.now() / 1000 - tsNum) > 300) {
+        console.error("Webhook timestamp expired or invalid:", ts);
+        return new Response(JSON.stringify({ error: "Timestamp expired" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

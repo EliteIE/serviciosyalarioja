@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -11,6 +11,9 @@ import { useAuth } from "@/contexts/AuthContext";
 export const useUnreadMessages = (serviceRequestIds: string[]) => {
   const { user } = useAuth();
   const [unreadServiceIds, setUnreadServiceIds] = useState<Set<string>>(new Set());
+
+  // Memoize the joined string to stabilize dependencies across renders
+  const idsKey = useMemo(() => serviceRequestIds.join(","), [serviceRequestIds.join(",")]);
 
   const checkUnread = useCallback(async () => {
     if (!user || serviceRequestIds.length === 0) {
@@ -54,17 +57,18 @@ export const useUnreadMessages = (serviceRequestIds: string[]) => {
     }
 
     setUnreadServiceIds(unread);
-  }, [user, serviceRequestIds.join(",")]);
+  }, [user, idsKey]);
 
   useEffect(() => {
     checkUnread();
 
     if (!user || serviceRequestIds.length === 0) return;
 
-    // Listen for new messages in real-time — scoped per service request to avoid receiving all messages
-    const channelName = `unread-msgs-${user.id}-${serviceRequestIds.slice(0, 5).join("-")}`;
+    // Use a hash of all IDs for the channel name to keep it short but unique
+    const channelName = `unread-msgs-${user.id}-${idsKey.length}-${idsKey.slice(0, 64)}`;
     const channel = supabase.channel(channelName);
 
+    // Register listeners for ALL IDs, not just the first 5
     for (const srId of serviceRequestIds) {
       channel.on(
         "postgres_changes",

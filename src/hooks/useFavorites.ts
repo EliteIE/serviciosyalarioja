@@ -1,27 +1,37 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
-const STORAGE_KEY = "favorites_providers";
+function getStorageKey(userId: string | null): string {
+  return userId ? `favorites_providers_${userId}` : "favorites_providers_anonymous";
+}
 
-function getStoredFavorites(): string[] {
+function getStoredFavorites(userId: string | null): string[] {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return JSON.parse(localStorage.getItem(getStorageKey(userId)) || "[]");
   } catch {
     return [];
   }
 }
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<string[]>(getStoredFavorites);
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+  const [favorites, setFavorites] = useState<string[]>(() => getStoredFavorites(userId));
+
+  // Re-load favorites when user changes (login/logout)
+  useEffect(() => {
+    setFavorites(getStoredFavorites(userId));
+  }, [userId]);
 
   const toggleFavorite = useCallback((providerId: string) => {
     setFavorites((prev) => {
       const next = prev.includes(providerId)
         ? prev.filter((id) => id !== providerId)
         : [...prev, providerId];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      localStorage.setItem(getStorageKey(userId), JSON.stringify(next));
       return next;
     });
-  }, []);
+  }, [userId]);
 
   const isFavorite = useCallback(
     (providerId: string) => favorites.includes(providerId),

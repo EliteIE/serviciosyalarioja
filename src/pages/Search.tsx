@@ -51,7 +51,7 @@ export default function SearchPage() {
     if (urlCategory && urlCategory !== categoriaActiva) {
       setCategoriaActiva(urlCategory);
     }
-  }, [searchParams]);
+  }, [searchParams, categoriaActiva]);
 
   // Configuração visual dinâmica para cada categoria (Adaptação do modelo original)
   const categoriasConfig: Record<string, any> = {

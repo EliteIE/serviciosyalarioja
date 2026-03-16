@@ -133,16 +133,20 @@ export const useCreateServiceRequest = () => {
 
 export const useUpdateServiceStatus = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async ({ id, status, provider_id }: { id: string; status: ServiceStatus; provider_id?: string }) => {
+      if (!user) throw new Error("No autenticado");
+
       const update: { status: ServiceStatus; provider_id?: string } = { status };
       if (provider_id) update.provider_id = provider_id;
 
       const { error } = await supabase
         .from("service_requests")
         .update(update)
-        .eq("id", id);
+        .eq("id", id)
+        .or(`client_id.eq.${user.id},provider_id.eq.${user.id}`);
       if (error) throw error;
     },
     onSuccess: () => {

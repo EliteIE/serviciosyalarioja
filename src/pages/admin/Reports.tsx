@@ -80,8 +80,7 @@ const AdminReports = () => {
       }
       const { error } = await supabase
         .from("platform_settings")
-        .update({ value: String(numValue) })
-        .eq("key", key);
+        .upsert({ key, value: String(numValue) }, { onConflict: "key" });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -132,7 +131,7 @@ const AdminReports = () => {
       statusLabel[p.status] || p.status,
       new Date(p.created_at).toLocaleDateString("es-AR"),
     ]);
-    const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n");
+    const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

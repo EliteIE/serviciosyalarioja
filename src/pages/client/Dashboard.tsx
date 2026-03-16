@@ -34,6 +34,7 @@ const ClientDashboard = () => {
   const queryClient = useQueryClient();
   const sendMessage = useSendMessage();
   const [accepting, setAccepting] = useState<string | null>(null);
+  const [rejecting, setRejecting] = useState<string | null>(null);
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
   const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
@@ -89,10 +90,21 @@ const ClientDashboard = () => {
   const { data: providerProfile } = useQuery({
     queryKey: ["provider-bank-details", completionServiceId],
     queryFn: async () => {
+      // Try RPC first, fallback to direct profile query if function doesn't exist
       const { data, error } = await supabase
         .rpc("get_provider_bank_details", { p_service_request_id: completionServiceId! });
-      if (error) throw error;
-      return (data as any)?.[0] || null;
+      if (!error && data) return (data as any)?.[0] || data || null;
+
+      // Fallback: get bank details from provider profile directly
+      console.warn("get_provider_bank_details RPC failed, using fallback:", error?.message);
+      const service = services?.find((s) => s.id === completionServiceId);
+      if (!service?.provider_id) return null;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, bank_alias, bank_cvu")
+        .eq("id", service.provider_id)
+        .single();
+      return profile || null;
     },
     enabled: !!completionServiceId && (transferDialogOpen || selectedPaymentMethod === "transferencia"),
   });
@@ -122,6 +134,8 @@ const ClientDashboard = () => {
   };
 
   const handleRejectBudget = async (serviceId: string) => {
+    if (rejecting) return;
+    setRejecting(serviceId);
     try {
       const { error } = await supabase
         .from("service_requests")
@@ -132,6 +146,8 @@ const ClientDashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["service-requests"] });
     } catch (err: any) {
       toast.error(err.message || "Error");
+    } finally {
+      setRejecting(null);
     }
   };
 
@@ -229,11 +245,12 @@ const ClientDashboard = () => {
       setPaymentMethodDialogOpen(false);
       setConfirming(true);
       try {
-        await supabase
+        const { error: statusError } = await supabase
           .from("service_requests")
           .update({ status: "completado" as any })
           .eq("id", completionServiceId!);
-        
+        if (statusError) throw new Error("Error al completar el servicio: " + statusError.message);
+
         await sendMessage.mutateAsync({
           service_request_id: completionServiceId!,
           sender_id: user!.id,
@@ -268,10 +285,11 @@ const ClientDashboard = () => {
     try {
       const service = services?.find((s) => s.id === completionServiceId);
 
-      await supabase
+      const { error: statusError } = await supabase
         .from("service_requests")
         .update({ status: "completado" as any })
         .eq("id", completionServiceId!);
+      if (statusError) throw new Error("Error al completar el servicio: " + statusError.message);
 
       await sendMessage.mutateAsync({
         service_request_id: completionServiceId!,
@@ -443,7 +461,8 @@ const ClientDashboard = () => {
                         {accepting === service.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                         Aceptar Presupuesto
                       </Button>
-                      <Button variant="outline" className="gap-2 rounded-xl" onClick={() => handleRejectBudget(service.id)}>
+                      <Button variant="outline" className="gap-2 rounded-xl" onClick={() => handleRejectBudget(service.id)} disabled={rejecting === service.id}>
+                        {rejecting === service.id ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                         Rechazar
                       </Button>
                     </div>

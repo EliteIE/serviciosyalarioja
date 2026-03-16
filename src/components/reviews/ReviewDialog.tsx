@@ -7,6 +7,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCreateReview } from "@/hooks/useReviews";
+import { toast } from "sonner";
 
 const MERIT_TAGS = ["Puntual", "Precio Justo", "Prolijo", "Amable", "Rápido", "Recomendado"];
 
@@ -31,17 +32,22 @@ const ReviewDialog = ({ serviceRequestId, reviewedId, reviewedName, children }: 
 
   const handleSubmit = async () => {
     if (rating === 0) return;
-    await createReview.mutateAsync({
-      service_request_id: serviceRequestId,
-      reviewed_id: reviewedId,
-      rating,
-      comment: comment || undefined,
-      tags: tags.length > 0 ? tags : undefined,
-    });
-    setOpen(false);
-    setRating(0);
-    setComment("");
-    setTags([]);
+    if (createReview.isPending) return;
+    try {
+      await createReview.mutateAsync({
+        service_request_id: serviceRequestId,
+        reviewed_id: reviewedId,
+        rating,
+        comment: comment || undefined,
+        tags: tags.length > 0 ? tags : undefined,
+      });
+      setOpen(false);
+      setRating(0);
+      setComment("");
+      setTags([]);
+    } catch (err: any) {
+      toast.error(err.message || "Error al enviar la reseña");
+    }
   };
 
   return (

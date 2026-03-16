@@ -18,7 +18,8 @@ const ProviderPortfolio = () => {
   const [title, setTitle] = useState("");
   const [beforeUrl, setBeforeUrl] = useState("");
   const [afterUrl, setAfterUrl] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [uploadingBefore, setUploadingBefore] = useState(false);
+  const [uploadingAfter, setUploadingAfter] = useState(false);
   const [saving, setSaving] = useState(false);
   const [addSuccess, setAddSuccess] = useState(false);
   const uploadFile = useUploadFile();
@@ -39,15 +40,15 @@ const ProviderPortfolio = () => {
     enabled: !!user,
   });
 
-  const handleUpload = async (file: File, setter: (url: string) => void) => {
-    setUploading(true);
+  const handleUpload = async (file: File, setter: (url: string) => void, setUploadingState: (v: boolean) => void) => {
+    setUploadingState(true);
     try {
       const url = await uploadFile(file, "portfolio");
       setter(url);
     } catch {
       toast.error("Error al subir la imagen");
     }
-    setUploading(false);
+    setUploadingState(false);
   };
 
   const handleAdd = async () => {
@@ -117,7 +118,7 @@ const ProviderPortfolio = () => {
             Los perfiles con fotos reciben un <span className="font-semibold text-orange-600">40% más</span> de solicitudes de presupuesto.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setAddSuccess(false); } }}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setAddSuccess(false); setTitle(""); setBeforeUrl(""); setAfterUrl(""); } }}>
           <DialogTrigger asChild>
             <Button className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-600/20 hover:shadow-xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
               <Plus className="h-4 w-4" /> Agregar Trabajo
@@ -165,7 +166,7 @@ const ProviderPortfolio = () => {
                     {/* Before zone */}
                     <div className="space-y-2">
                       <Label className="text-sm font-semibold">Foto Antes</Label>
-                      <input type="file" ref={beforeRef} className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0], setBeforeUrl)} />
+                      <input type="file" ref={beforeRef} className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0], setBeforeUrl, setUploadingBefore)} />
                       {beforeUrl ? (
                         <div className="relative group cursor-pointer rounded-xl overflow-hidden" onClick={() => beforeRef.current?.click()}>
                           <img src={beforeUrl} className="h-36 w-full object-cover rounded-xl" />
@@ -176,10 +177,10 @@ const ProviderPortfolio = () => {
                       ) : (
                         <button
                           onClick={() => beforeRef.current?.click()}
-                          disabled={uploading}
+                          disabled={uploadingBefore}
                           className="w-full h-36 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/20 dark:hover:border-orange-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-slate-400"
                         >
-                          {uploading ? (
+                          {uploadingBefore ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
                           ) : (
                             <>
@@ -194,7 +195,7 @@ const ProviderPortfolio = () => {
                     {/* After zone */}
                     <div className="space-y-2">
                       <Label className="text-sm font-semibold">Foto Después</Label>
-                      <input type="file" ref={afterRef} className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0], setAfterUrl)} />
+                      <input type="file" ref={afterRef} className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0], setAfterUrl, setUploadingAfter)} />
                       {afterUrl ? (
                         <div className="relative group cursor-pointer rounded-xl overflow-hidden" onClick={() => afterRef.current?.click()}>
                           <img src={afterUrl} className="h-36 w-full object-cover rounded-xl" />
@@ -205,10 +206,10 @@ const ProviderPortfolio = () => {
                       ) : (
                         <button
                           onClick={() => afterRef.current?.click()}
-                          disabled={uploading}
+                          disabled={uploadingAfter}
                           className="w-full h-36 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:bg-green-50 hover:border-green-400 dark:hover:bg-green-950/20 dark:hover:border-green-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-slate-400"
                         >
-                          {uploading ? (
+                          {uploadingAfter ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
                           ) : (
                             <>

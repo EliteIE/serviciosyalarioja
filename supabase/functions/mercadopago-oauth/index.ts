@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
       p_max_requests: 10,
       p_window_seconds: 60,
     });
-    if (allowed === false) {
+    if (allowed !== true) {
       return new Response(JSON.stringify({ error: "Demasiadas solicitudes. Intentá en un minuto." }), {
         status: 429,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

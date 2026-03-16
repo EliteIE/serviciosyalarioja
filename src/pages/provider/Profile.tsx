@@ -224,6 +224,7 @@ const ProviderProfile = () => {
       if (error) throw error;
       toast.success("Perfil actualizado");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["provider-profile", user?.id] });
     } catch (err: any) {
       toast.error(err.message || "Error al guardar");
     } finally {

@@ -53,7 +53,9 @@ const AdminDisputes = () => {
       });
 
       const [profilesRes, srRes] = await Promise.all([
-        supabase.from("profiles").select("id, full_name").in("id", Array.from(userIds)),
+        userIds.size > 0
+          ? supabase.from("profiles").select("id, full_name").in("id", Array.from(userIds))
+          : Promise.resolve({ data: [] }),
         srIds.size > 0
           ? supabase.from("service_requests").select("id, title, status, client_id, provider_id").in("id", Array.from(srIds))
           : Promise.resolve({ data: [] }),
@@ -74,7 +76,6 @@ const AdminDisputes = () => {
     mutationFn: async ({ id, status, resolutionText }: { id: string; status: string; resolutionText?: string }) => {
       const updateData: Record<string, any> = {
         status: status as any,
-        updated_at: new Date().toISOString(),
       };
       if (resolutionText) updateData.resolution = resolutionText;
 

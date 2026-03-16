@@ -35,6 +35,22 @@ const AdminModeration = () => {
           .order("created_at", { ascending: false })
           .limit(100);
         if (e2) throw e2;
+
+        // Enrich fallback reviews with profile names
+        if (fallback && fallback.length > 0) {
+          const profileIds = [...new Set(fallback.flatMap(r => [r.reviewer_id, r.reviewed_id].filter(Boolean)))];
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", profileIds);
+          const profileMap: Record<string, string> = {};
+          profiles?.forEach(p => { profileMap[p.id] = p.full_name; });
+          fallback.forEach((r: any) => {
+            r.reviewer = { full_name: profileMap[r.reviewer_id] || null };
+            r.reviewed = { full_name: profileMap[r.reviewed_id] || null };
+          });
+        }
+
         return fallback;
       }
       return data;

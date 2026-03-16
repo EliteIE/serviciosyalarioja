@@ -212,6 +212,10 @@ const ProviderServices = () => {
       toast.error("El monto debe ser un número mayor a 0");
       return;
     }
+    if (parsedAmount > 1000000) {
+      toast.error("El monto máximo es $1.000.000");
+      return;
+    }
     setSubmittingExtra(true);
     try {
       const { error } = await supabase.from("extra_charges").insert({
