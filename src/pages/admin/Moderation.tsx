@@ -67,6 +67,7 @@ const AdminModeration = () => {
         .select("*")
         .eq("is_provider", true)
         .eq("provider_verified", false)
+        .or("provider_verification_status.eq.pending,provider_verification_status.is.null")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;

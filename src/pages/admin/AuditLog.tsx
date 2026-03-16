@@ -66,12 +66,15 @@ const AdminAuditLog = () => {
   const [page, setPage] = useState(0);
 
   const { data: auditData, isLoading } = useQuery({
-    queryKey: ["admin-audit-log"],
+    queryKey: ["admin-audit-log", tableFilter, actionFilter],
     staleTime: 15_000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("audit_log")
-        .select("*")
+        .select("*");
+      if (tableFilter !== "all") query = query.eq("table_name", tableFilter);
+      if (actionFilter !== "all") query = query.eq("action", actionFilter);
+      const { data, error } = await query
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) {

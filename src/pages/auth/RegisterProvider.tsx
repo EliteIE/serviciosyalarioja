@@ -27,6 +27,20 @@ import logo from "@/assets/logo.png";
 const MAX_DOC_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
+const validateMagicBytes = async (file: File): Promise<boolean> => {
+  const buffer = await file.slice(0, 4).arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  // PDF: %PDF
+  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) return true;
+  // JPEG: FF D8 FF
+  if (bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) return true;
+  // PNG: 89 50 4E 47
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) return true;
+  // WebP: RIFF....WEBP (bytes 0-3 = RIFF)
+  if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) return true;
+  return false;
+};
+
 const RegisterProvider = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +64,7 @@ const RegisterProvider = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const valid: File[] = [];
     for (const f of files) {
@@ -60,6 +74,11 @@ const RegisterProvider = () => {
       }
       if (f.size > MAX_DOC_SIZE) {
         toast.error(`${f.name} supera los 5MB.`);
+        continue;
+      }
+      const validBytes = await validateMagicBytes(f);
+      if (!validBytes) {
+        toast.error(`${f.name} no parece ser un archivo válido. Verificá que sea JPG, PNG, WEBP o PDF.`);
         continue;
       }
       valid.push(f);

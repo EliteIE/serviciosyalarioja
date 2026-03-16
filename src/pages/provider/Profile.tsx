@@ -172,15 +172,17 @@ const ProviderProfile = () => {
   const { data: signedDocs } = useQuery({
     queryKey: ["provider-docs-signed", user?.id, docPaths.length],
     queryFn: async () => {
-      const urls: { path: string; url: string; name: string }[] = [];
-      for (const path of docPaths) {
-        const { data } = await supabase.storage.from("provider-docs").createSignedUrl(path, 3600);
-        if (data?.signedUrl) {
-          const name = path.split("/").pop() || "Documento";
-          urls.push({ path, url: data.signedUrl, name });
-        }
-      }
-      return urls;
+      const results = await Promise.all(
+        docPaths.map(async (path) => {
+          const { data } = await supabase.storage.from("provider-docs").createSignedUrl(path, 3600);
+          if (data?.signedUrl) {
+            const name = path.split("/").pop() || "Documento";
+            return { path, url: data.signedUrl, name };
+          }
+          return null;
+        })
+      );
+      return results.filter((r): r is { path: string; url: string; name: string } => r !== null);
     },
     enabled: !!user && docPaths.length > 0,
   });

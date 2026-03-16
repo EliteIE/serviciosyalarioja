@@ -160,7 +160,7 @@ const ProviderFinance = () => {
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
+                <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v}`} />
                 <Tooltip formatter={(value: number) => [`$${value.toLocaleString()}`, ""]} />
                 <Line type="monotone" dataKey="revenue" stroke="hsl(25, 100%, 50%)" strokeWidth={2} dot={{ fill: "hsl(25, 100%, 50%)" }} name="Neto" />
                 <Line type="monotone" dataKey="commission" stroke="hsl(213, 80%, 15%)" strokeWidth={2} dot={{ fill: "hsl(213, 80%, 15%)" }} name="Comisión" />

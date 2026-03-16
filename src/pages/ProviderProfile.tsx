@@ -67,6 +67,7 @@ export default function ProviderProfilePage() {
   });
 
   // Check if provider is currently within their schedule hours
+  // Note: assumes DB times (start_time, end_time) are stored in the same local timezone as the client
   const now = new Date();
   const currentDay = now.getDay();
   const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;

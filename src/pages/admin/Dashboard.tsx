@@ -251,7 +251,7 @@ const AdminDashboard = () => {
 
       {/* Security Alerts */}
       {alerts.length > 0 && (
-        <div className="rounded-3xl bg-gradient-to-br from-red-50 via-orange-50 to-amber-50 dark:from-red-500/5 dark:via-orange-500/5 dark:to-amber-500/5 border border-red-200/60 dark:border-red-500/20 border-t-4 border-t-red-500 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="rounded-3xl bg-gradient-to-br from-red-50 via-orange-50 to-amber-50 dark:from-red-500/5 dark:via-orange-500/5 dark:to-amber-500/5 border-x border-b border-red-200/60 dark:border-red-500/20 border-t-4 border-t-red-500 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center shadow-sm">
               <Bell className="h-5 w-5 text-red-500" />

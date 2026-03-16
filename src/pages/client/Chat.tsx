@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useSearchParams, useLocation } from "react-router-dom";
 import { 
   Search, 
@@ -58,15 +58,6 @@ export default function ChatPage() {
       .map(s => s.id);
   }, [services]);
   const { unreadServiceIds } = useUnreadMessages(activeServiceIds);
-
-  const markAllAsRead = useCallback(() => {
-    // Clear local unread state by re-fetching
-    // This just marks the UI as read; actual read receipts happen on opening each chat
-    if (activeServiceIds.length > 0 && selectedService === null) {
-      // Select the first one to trigger mark-as-read
-      toast.success("Conversaciones marcadas como leídas");
-    }
-  }, [activeServiceIds, selectedService]);
 
   const currentService = services?.find((s) => s.id === selectedService);
 

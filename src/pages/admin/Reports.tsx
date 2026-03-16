@@ -53,7 +53,8 @@ const AdminReports = () => {
       const { data } = await supabase
         .from("payments")
         .select("amount, platform_fee, created_at, status")
-        .eq("status", "completed");
+        .eq("status", "completed")
+        .gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString());
       const months: Record<string, { revenue: number; fee: number }> = {};
       const now = new Date();
       for (let i = 5; i >= 0; i--) {
@@ -309,7 +310,7 @@ const AdminReports = () => {
               <BarChart data={monthlyRevenue} barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-20" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} fontSize={12} tick={{ fill: '#94a3b8' }} />
-                <YAxis axisLine={false} tickLine={false} fontSize={12} tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
+                <YAxis axisLine={false} tickLine={false} fontSize={12} tick={{ fill: '#94a3b8' }} tickFormatter={(v) => v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v}`} />
                 <Tooltip
                   formatter={(v: number) => [`$${v.toLocaleString()}`, ""]}
                   contentStyle={{
