@@ -303,6 +303,10 @@ export type Database = {
           bio: string | null
           completed_jobs: number
           created_at: string
+          criminal_record_url: string | null
+          criminal_record_status: string
+          criminal_record_notes: string | null
+          criminal_record_expiry: string | null
           full_name: string
           id: string
           is_provider: boolean
@@ -328,6 +332,10 @@ export type Database = {
           bio?: string | null
           completed_jobs?: number
           created_at?: string
+          criminal_record_url?: string | null
+          criminal_record_status?: string
+          criminal_record_notes?: string | null
+          criminal_record_expiry?: string | null
           full_name?: string
           id: string
           is_provider?: boolean
@@ -353,6 +361,10 @@ export type Database = {
           bio?: string | null
           completed_jobs?: number
           created_at?: string
+          criminal_record_url?: string | null
+          criminal_record_status?: string
+          criminal_record_notes?: string | null
+          criminal_record_expiry?: string | null
           full_name?: string
           id?: string
           is_provider?: boolean

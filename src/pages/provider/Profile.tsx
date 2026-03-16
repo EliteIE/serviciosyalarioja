@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import {
   User, Phone, MapPin, FileText, Upload, X, Loader2, CheckCircle2,
   Clock, XCircle, Save, CreditCard, Link2, Unlink, Trash2, Mail,
-  Plus, Calendar, DollarSign, Briefcase, Globe, Tag, UploadCloud
+  Plus, Calendar, DollarSign, Briefcase, Globe, Tag, UploadCloud, ShieldAlert
 } from "lucide-react";
 import AvatarUpload from "@/components/AvatarUpload";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -43,6 +43,7 @@ const ProviderProfile = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const criminalFileInputRef = useRef<HTMLInputElement>(null);
   const [searchParams] = useSearchParams();
 
   // ─── Basic Info State ───────────────────────────────
@@ -58,6 +59,7 @@ const ProviderProfile = () => {
   const [uploading, setUploading] = useState(false);
   const [connectingMP, setConnectingMP] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [criminalUploading, setCriminalUploading] = useState(false);
   const [bankAlias, setBankAlias] = useState("");
   const [bankCvu, setBankCvu] = useState("");
 
@@ -339,6 +341,59 @@ const ProviderProfile = () => {
     } catch (err: any) { toast.error(err.message || "Error al eliminar la cuenta"); }
     finally { setDeleting(false); }
   };
+
+  // ─── Criminal Record Upload Handler ──────────────
+  const handleCriminalFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    const accepted = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+    if (!accepted.includes(file.type)) { toast.error("Formato no soportado. Usá JPG, PNG, WEBP o PDF."); return; }
+    if (file.size > MAX_DOC_SIZE) { toast.error("El archivo supera los 5MB"); return; }
+    setCriminalUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/criminal-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("provider-docs").upload(path, file);
+      if (uploadErr) throw uploadErr;
+      const { error: updateErr } = await supabase
+        .from("profiles")
+        .update({ criminal_record_url: path, criminal_record_status: "pending" } as any)
+        .eq("id", user.id);
+      if (updateErr) throw updateErr;
+      toast.success("Antecedentes penales subidos. Serán revisados por nuestro equipo.");
+      refetchProfile();
+    } catch (err: any) {
+      toast.error(err.message || "Error al subir el archivo");
+    } finally {
+      setCriminalUploading(false);
+      if (criminalFileInputRef.current) criminalFileInputRef.current.value = "";
+    }
+  };
+
+  // Criminal record helpers
+  const criminalRecordUrl = (fullProfile as any)?.criminal_record_url || null;
+  const criminalRecordStatus: string = (fullProfile as any)?.criminal_record_status || "not_submitted";
+  const criminalRecordNotes: string | null = (fullProfile as any)?.criminal_record_notes || null;
+  const criminalRecordExpiry: string | null = (fullProfile as any)?.criminal_record_expiry || null;
+
+  const criminalStatusConfig: Record<string, { label: string; color: string }> = {
+    not_submitted: { label: "Pendiente de envío", color: "bg-orange-100 text-orange-700" },
+    pending: { label: "En revisión", color: "bg-yellow-100 text-yellow-700" },
+    approved: { label: "Aprobado", color: "bg-green-100 text-green-700" },
+    rejected: { label: "Rechazado", color: "bg-red-100 text-red-700" },
+    expired: { label: "Vencido", color: "bg-red-100 text-red-700" },
+  };
+  const criminalStatus = criminalStatusConfig[criminalRecordStatus] || criminalStatusConfig.not_submitted;
+
+  const { data: signedCriminalUrl } = useQuery({
+    queryKey: ["criminal-record-signed", user?.id, criminalRecordUrl],
+    queryFn: async () => {
+      if (!criminalRecordUrl) return null;
+      const { data } = await supabase.storage.from("provider-docs").createSignedUrl(criminalRecordUrl, 3600);
+      return data?.signedUrl || null;
+    },
+    enabled: !!user && !!criminalRecordUrl,
+  });
 
   const statusConfig = {
     pending: { label: "Pendiente de revisión", icon: Clock, color: "bg-warning/10 text-warning" },
@@ -751,6 +806,75 @@ const ProviderProfile = () => {
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Datos Bancarios
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* ─── Antecedentes Penales ────────────── */}
+      <Card className="rounded-3xl">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2"><ShieldAlert className="h-5 w-5" /> Antecedentes Penales</CardTitle>
+              <CardDescription>Requerido para completar la verificación de tu perfil</CardDescription>
+            </div>
+            <Badge className={`gap-1 rounded-full ${criminalStatus.color}`}>{criminalStatus.label}</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Approved expiry date */}
+          {criminalRecordStatus === "approved" && criminalRecordExpiry && (
+            <div className="rounded-xl bg-green-50 dark:bg-green-950/10 border border-green-200 dark:border-green-800 p-4">
+              <p className="text-sm text-green-700 dark:text-green-400">Válido hasta: <span className="font-semibold">{criminalRecordExpiry}</span></p>
+            </div>
+          )}
+
+          {/* Rejected notes */}
+          {criminalRecordStatus === "rejected" && criminalRecordNotes && (
+            <div className="rounded-xl bg-destructive/5 border border-destructive/20 p-4">
+              <p className="text-sm font-medium text-destructive mb-1">Motivo del rechazo:</p>
+              <p className="text-sm text-destructive/80">{criminalRecordNotes}</p>
+            </div>
+          )}
+
+          {/* Preview of uploaded document */}
+          {signedCriminalUrl && (
+            <div className="space-y-2">
+              <Label>Documento subido</Label>
+              <div className="flex items-center gap-3 rounded-lg border p-3">
+                <FileText className="h-5 w-5 text-primary shrink-0" />
+                <a href={signedCriminalUrl} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm font-medium hover:underline truncate">
+                  Ver antecedentes penales
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Upload zone */}
+          <div>
+            <input ref={criminalFileInputRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleCriminalFileSelect} />
+            <div
+              onClick={() => !criminalUploading && criminalFileInputRef.current?.click()}
+              className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/10 dark:hover:border-orange-700 transition-colors"
+            >
+              {criminalUploading ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">Subiendo documento...</p>
+                </div>
+              ) : (
+                <>
+                  <UploadCloud className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-sm font-medium">{criminalRecordUrl ? "Subir nuevo documento" : "Hacé clic para subir"}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Imagen o PDF — máx. 5MB</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Info note */}
+          <p className="text-xs text-slate-400">
+            Certificado de antecedentes penales emitido en los últimos 6 meses. Será revisado por nuestro equipo.
+          </p>
         </CardContent>
       </Card>
 
