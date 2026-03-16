@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { STATUS_LABELS, STATUS_COLORS, URGENCY_LABELS, CATEGORIES } from "@/constants/categories";
-import { ArrowLeft, Calendar, MapPin, AlertTriangle, Image as ImageIcon, Send, XCircle, Loader2, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, AlertTriangle, Image as ImageIcon, Send, XCircle, Loader2, Clock, ShieldCheck, CheckCircle2, DollarSign } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
 import { useAuth } from "@/contexts/AuthContext";
@@ -61,6 +61,7 @@ const ServiceDetail = () => {
   const [budgetMessage, setBudgetMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [budgetSent, setBudgetSent] = useState(false);
 
   const service = services?.find((s) => s.id === id);
 
@@ -89,7 +90,7 @@ const ServiceDetail = () => {
         return;
       }
       toast.success("¡Presupuesto enviado al cliente!");
-      navigate("/prestador/servicios");
+      setBudgetSent(true);
     } catch (err: any) {
       toast.error(err.message || "Error al enviar presupuesto");
     } finally {
@@ -130,159 +131,225 @@ const ServiceDetail = () => {
   const displayTitle = `Solicitud de presupuesto: ${getCategoryName(service.category)}`;
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-6xl">
       <Button variant="ghost" className="gap-2" onClick={() => navigate("/prestador/servicios")}>
         <ArrowLeft className="h-4 w-4" /> Volver a Servicios
       </Button>
 
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold">{displayTitle}</h1>
-        <Badge className={STATUS_COLORS[service.status]}>{STATUS_LABELS[service.status]}</Badge>
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        {/* Left column - Service details (2/3) */}
+        <div className="flex-1 lg:w-2/3 space-y-6">
+          {/* Unified card: header + client info + metadata */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              {/* Service header */}
+              <div className="flex items-start justify-between gap-3">
+                <h1 className="text-2xl font-bold">{displayTitle}</h1>
+                <Badge className={STATUS_COLORS[service.status]}>{STATUS_LABELS[service.status]}</Badge>
+              </div>
+
+              {/* Client info */}
+              <div className="flex items-center gap-4">
+                <Avatar className="h-12 w-12 rounded-xl">
+                  {service.client_avatar && <AvatarImage src={service.client_avatar} alt={service.client_name || "Cliente"} />}
+                  <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-bold text-lg">
+                    {service.client_name?.[0] || "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold">{service.client_name || "Cliente"}</p>
+                  <p className="text-sm text-muted-foreground">Cliente</p>
+                </div>
+              </div>
+
+              {/* Metadata grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Dirección</span>
+                  </div>
+                  <span className="text-sm font-medium">{service.address}</span>
+                </div>
+
+                {parsed.preferredDate && (
+                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Fecha Pref.</span>
+                    </div>
+                    <span className="text-sm font-medium">{parsed.preferredDate}</span>
+                  </div>
+                )}
+
+                {parsed.preferredTime && (
+                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Horario</span>
+                    </div>
+                    <span className="text-sm font-medium">{parsed.preferredTime}</span>
+                  </div>
+                )}
+
+                <div className={`flex flex-col gap-1 p-3 rounded-xl border ${URGENCY_BG[service.urgency]}`}>
+                  <div className="flex items-center gap-1.5">
+                    <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${URGENCY_COLORS[service.urgency]}`} />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Urgencia</span>
+                  </div>
+                  <span className={`text-sm font-medium ${URGENCY_COLORS[service.urgency]}`}>{URGENCY_LABELS[service.urgency]}</span>
+                </div>
+
+                {!parsed.preferredDate && !parsed.preferredTime && (
+                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Creado</span>
+                    </div>
+                    <span className="text-sm font-medium">{new Date(service.created_at).toLocaleDateString("es-AR")}</span>
+                  </div>
+                )}
+
+                {service.budget && (
+                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Presup. Ref.</span>
+                    </div>
+                    <span className="text-sm font-medium">${service.budget.toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Description */}
+          <div className="rounded-xl bg-accent/50 p-5">
+            <p className="text-sm font-medium text-muted-foreground mb-2">Descripción del problema</p>
+            <p className="text-sm whitespace-pre-wrap leading-relaxed">{parsed.description}</p>
+          </div>
+
+          {/* Photos */}
+          {service.photos && service.photos.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-base font-semibold flex items-center gap-2">
+                <ImageIcon className="h-4 w-4" /> Fotos del problema
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {service.photos.map((photo, idx) => (
+                  <a key={idx} href={photo} target="_blank" rel="noopener noreferrer" className="block group">
+                    <img
+                      src={photo}
+                      alt={`Foto ${idx + 1}`}
+                      className="w-full h-40 object-cover rounded-xl border transition-opacity duration-200 group-hover:opacity-75"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right column - Budget form (1/3) */}
+        {service.status === "nuevo" && (
+          <div className="lg:w-1/3">
+            <div className="lg:sticky lg:top-6">
+              {budgetSent ? (
+                /* Success state */
+                <Card className="overflow-hidden">
+                  <div className="h-2 bg-gradient-to-r from-green-400 to-green-600" />
+                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4 py-12">
+                    <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                      <CheckCircle2 className="h-9 w-9 text-green-600" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-xl font-bold">¡Presupuesto Enviado!</h3>
+                      <p className="text-sm text-muted-foreground">
+                        El cliente recibirá tu presupuesto y podrá aceptarlo o rechazarlo.
+                      </p>
+                    </div>
+                    <Button
+                      className="w-full gap-2 rounded-xl mt-4"
+                      onClick={() => navigate("/prestador/servicios")}
+                    >
+                      <ArrowLeft className="h-4 w-4" /> Volver a mis servicios
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                /* Budget form */
+                <Card className="overflow-hidden shadow-lg">
+                  <div className="h-2 bg-gradient-to-r from-orange-400 to-orange-600" />
+                  <CardContent className="p-6 space-y-5">
+                    {/* Header */}
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                        <Send className="h-5 w-5 text-orange-600" />
+                      </div>
+                      <h3 className="text-lg font-bold">Enviar Presupuesto</h3>
+                    </div>
+
+                    {/* Price input */}
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Monto del presupuesto</label>
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          type="number"
+                          placeholder="15000"
+                          value={budgetAmount}
+                          onChange={(e) => setBudgetAmount(e.target.value)}
+                          min={0}
+                          className="pl-10 text-2xl font-extrabold h-14"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Message */}
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Mensaje al cliente (opcional)</label>
+                      <Textarea
+                        placeholder="Describí qué incluye tu presupuesto, tiempos estimados, etc."
+                        value={budgetMessage}
+                        onChange={(e) => setBudgetMessage(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+
+                    {/* Security note */}
+                    <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground">
+                      <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5 text-green-600" />
+                      <span>
+                        Tu información está protegida. El cliente solo verá tu presupuesto y mensaje. Los datos de contacto se comparten al aceptar.
+                      </span>
+                    </div>
+
+                    {/* Submit button */}
+                    <Button
+                      className="w-full gap-2 rounded-xl h-12 text-base font-semibold bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-lg shadow-orange-500/25 transition-all"
+                      onClick={handleSendBudget}
+                      disabled={!budgetAmount || sending}
+                    >
+                      {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                      Enviar Presupuesto
+                    </Button>
+
+                    {/* Reject button */}
+                    <button
+                      type="button"
+                      className="w-full text-sm text-muted-foreground hover:text-destructive transition-colors py-1"
+                      onClick={handleReject}
+                      disabled={updateStatus.isPending}
+                    >
+                      Rechazar solicitud
+                    </button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Client info */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Información del Cliente</CardTitle></CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 rounded-xl">
-              {service.client_avatar && <AvatarImage src={service.client_avatar} alt={service.client_name || "Cliente"} />}
-              <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-bold text-lg">
-                {service.client_name?.[0] || "?"}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-semibold">{service.client_name || "Cliente"}</p>
-              <p className="text-sm text-muted-foreground">Cliente</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Service details */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Detalles de la Solicitud</CardTitle></CardHeader>
-        <CardContent className="space-y-5">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Descripción del problema</p>
-            <p className="text-sm whitespace-pre-wrap">{parsed.description}</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex items-center gap-2.5 text-sm p-3 rounded-xl bg-accent/50">
-              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span>{service.address}</span>
-            </div>
-            <div className="flex items-center gap-2.5 text-sm p-3 rounded-xl bg-accent/50">
-              <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span>Creado: {new Date(service.created_at).toLocaleDateString("es-AR")}</span>
-            </div>
-
-            {parsed.preferredDate && (
-              <div className="flex items-center gap-2.5 text-sm p-3 rounded-xl bg-accent/50">
-                <Calendar className="h-4 w-4 text-primary shrink-0" />
-                <span>Fecha preferida: {parsed.preferredDate}</span>
-              </div>
-            )}
-            {parsed.preferredTime && (
-              <div className="flex items-center gap-2.5 text-sm p-3 rounded-xl bg-accent/50">
-                <Clock className="h-4 w-4 text-primary shrink-0" />
-                <span>Horario: {parsed.preferredTime}</span>
-              </div>
-            )}
-
-            {/* Urgency with color */}
-            <div className={`flex items-center gap-2.5 text-sm p-3 rounded-xl border ${URGENCY_BG[service.urgency]}`}>
-              <AlertTriangle className={`h-4 w-4 shrink-0 ${URGENCY_COLORS[service.urgency]}`} />
-              <span className="font-medium">Urgencia: <span className={URGENCY_COLORS[service.urgency]}>{URGENCY_LABELS[service.urgency]}</span></span>
-            </div>
-
-            {service.budget && (
-              <div className="flex items-center gap-2.5 text-sm p-3 rounded-xl bg-accent/50">
-                <span className="text-muted-foreground">💰</span>
-                <span>Presupuesto ref: ${service.budget.toLocaleString()}</span>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Photos */}
-      {service.photos && service.photos.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <ImageIcon className="h-4 w-4" /> Fotos del problema
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {service.photos.map((photo, idx) => (
-                <a key={idx} href={photo} target="_blank" rel="noopener noreferrer" className="block">
-                  <img
-                    src={photo}
-                    alt={`Foto ${idx + 1}`}
-                    className="w-full h-40 object-cover rounded-xl border hover:opacity-90 transition-opacity"
-                  />
-                </a>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Send budget form - only for new requests */}
-      {service.status === "nuevo" && (
-        <Card className="border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Send className="h-4 w-4 text-primary" /> Enviar Presupuesto
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Ingresá el monto que cobrarías por este trabajo. El cliente recibirá tu presupuesto y podrá aceptarlo o rechazarlo. Si acepta, se abrirá un chat para coordinar detalles.
-            </p>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Monto del presupuesto ($)</label>
-              <Input
-                type="number"
-                placeholder="Ej: 15000"
-                value={budgetAmount}
-                onChange={(e) => setBudgetAmount(e.target.value)}
-                min={0}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Mensaje al cliente (opcional)</label>
-              <Textarea
-                placeholder="Describí qué incluye tu presupuesto, tiempos estimados, etc."
-                value={budgetMessage}
-                onChange={(e) => setBudgetMessage(e.target.value)}
-                rows={3}
-              />
-            </div>
-            <div className="flex gap-3">
-              <Button
-                className="flex-1 gap-2 rounded-xl"
-                onClick={handleSendBudget}
-                disabled={!budgetAmount || sending}
-              >
-                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                Enviar Presupuesto
-              </Button>
-              <Button
-                variant="outline"
-                className="gap-2 rounded-xl"
-                onClick={handleReject}
-                disabled={updateStatus.isPending}
-              >
-                <XCircle className="h-4 w-4" /> Rechazar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Reject Confirmation Dialog */}
       <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>

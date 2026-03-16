@@ -1,13 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
-import { CheckCircle2, MessageSquare, Loader2, Play, Eye, Plus, DollarSign, KeyRound, Star, X, Check } from "lucide-react";
+import { CheckCircle2, MessageSquare, Loader2, Play, Eye, Plus, DollarSign, KeyRound, Star, X, Check, Search, ShieldCheck, Calendar, Clock, MapPin } from "lucide-react";
 import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
 import { useSendMessage } from "@/hooks/useMessages";
 import { useCreateReview, useMyReviewedServiceIds } from "@/hooks/useReviews";
@@ -108,9 +107,11 @@ const ProviderServices = () => {
   };
 
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
-  const [codeInput, setCodeInput] = useState("");
+  const [codeDigits, setCodeDigits] = useState<string[]>(["", "", "", "", "", ""]);
   const [codeServiceId, setCodeServiceId] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [codeVerified, setCodeVerified] = useState(false);
+  const digitRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const [extraDialogOpen, setExtraDialogOpen] = useState(false);
   const [extraServiceId, setExtraServiceId] = useState<string | null>(null);
@@ -122,17 +123,40 @@ const ProviderServices = () => {
   const [finishServiceId, setFinishServiceId] = useState<string | null>(null);
   const [finishing, setFinishing] = useState(false);
 
+  // Filter tab + search state
+  const [activeTab, setActiveTab] = useState("todos");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const handleStartWithCode = (serviceId: string) => {
     setCodeServiceId(serviceId);
-    setCodeInput("");
+    setCodeDigits(["", "", "", "", "", ""]);
+    setCodeVerified(false);
     setCodeDialogOpen(true);
   };
 
+  const handleDigitChange = (index: number, value: string) => {
+    if (value.length > 1) value = value.slice(-1);
+    const upper = value.toUpperCase();
+    const newDigits = [...codeDigits];
+    newDigits[index] = upper;
+    setCodeDigits(newDigits);
+    if (upper && index < 5) {
+      digitRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !codeDigits[index] && index > 0) {
+      digitRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const codeInput = codeDigits.join("");
+
   const handleVerifyCode = async () => {
-    if (!codeServiceId || !codeInput.trim()) return;
+    if (!codeServiceId || codeInput.length < 6) return;
     setVerifying(true);
     try {
-      // Server-side code verification — code never leaves the database
       const { data, error } = await supabase.rpc("verify_and_start_service", {
         p_request_id: codeServiceId,
         p_code: codeInput.trim(),
@@ -143,9 +167,10 @@ const ProviderServices = () => {
         toast.error(result.error || "Error al verificar código");
         return;
       }
+      setCodeVerified(true);
       toast.success("¡Trabajo iniciado!");
       queryClient.invalidateQueries({ queryKey: ["service-requests"] });
-      setCodeDialogOpen(false);
+      setTimeout(() => setCodeDialogOpen(false), 1800);
     } catch (err: any) {
       toast.error(err.message || "Error al verificar código");
     } finally {
@@ -214,8 +239,31 @@ const ProviderServices = () => {
     }
   };
 
-  const filterServices = (tab: string) =>
-    (services || []).filter((s) => tab === "todos" || s.status === tab);
+  const tabs = [
+    { key: "todos", label: "Todos", count: services?.length || 0 },
+    { key: "nuevo", label: "Nuevos" },
+    { key: "presupuestado", label: "Aguardando" },
+    { key: "aceptado", label: "Aceptados" },
+    { key: "en_progreso", label: "En Progreso" },
+    { key: "finalizado_prestador", label: "Pend. Cliente", badge: (services || []).filter(s => s.status === "finalizado_prestador").length },
+    { key: "completado", label: "Completados" },
+  ];
+
+  const filteredServices = useMemo(() => {
+    let list = services || [];
+    if (activeTab !== "todos") {
+      list = list.filter(s => s.status === activeTab);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(s =>
+        (s.title?.toLowerCase().includes(q)) ||
+        (s.client_name?.toLowerCase().includes(q)) ||
+        (s.address?.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [services, activeTab, searchQuery]);
 
   return (
     <div className="space-y-6">
@@ -224,134 +272,227 @@ const ProviderServices = () => {
       {isLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
       ) : (
-        <Tabs defaultValue="todos">
-          <TabsList className="flex-wrap">
-            <TabsTrigger value="todos">Todos ({services?.length || 0})</TabsTrigger>
-            <TabsTrigger value="nuevo">Nuevos</TabsTrigger>
-            <TabsTrigger value="presupuestado">Aguardando</TabsTrigger>
-            <TabsTrigger value="aceptado">Aceptados</TabsTrigger>
-            <TabsTrigger value="en_progreso">En Progreso</TabsTrigger>
-            <TabsTrigger value="finalizado_prestador">
-              Pend. Cliente
-              {(services || []).filter(s => s.status === "finalizado_prestador").length > 0 && (
-                <span className="ml-1 h-5 min-w-[20px] px-1 text-xs rounded-full bg-warning/20 text-warning inline-flex items-center justify-center">
-                  {(services || []).filter(s => s.status === "finalizado_prestador").length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="completado">Completados</TabsTrigger>
-          </TabsList>
+        <div className="space-y-5">
+          {/* Toolbar bar */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            {/* Filter pills */}
+            <div className="flex-1 overflow-x-auto no-scrollbar">
+              <div className="flex gap-2">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      activeTab === tab.key
+                        ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
+                        : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                    }`}
+                  >
+                    {tab.label}
+                    {tab.count !== undefined && ` (${tab.count})`}
+                    {tab.badge && tab.badge > 0 ? (
+                      <span className="ml-1.5 h-5 min-w-[20px] px-1.5 text-xs rounded-full bg-orange-500 text-white inline-flex items-center justify-center">
+                        {tab.badge}
+                      </span>
+                    ) : null}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Search bar */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Buscar servicio..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+              />
+            </div>
+          </div>
 
-          {["todos", "nuevo", "presupuestado", "aceptado", "en_progreso", "finalizado_prestador", "completado"].map((tab) => (
-            <TabsContent key={tab} value={tab} className="space-y-4">
-              {filterServices(tab).length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">No hay servicios en esta categoría</div>
-              ) : (
-                filterServices(tab).map((service) => (
-                  <Card key={service.id}>
+          {/* Service cards */}
+          <div className="space-y-4">
+            {filteredServices.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">No hay servicios en esta categoría</div>
+            ) : (
+              filteredServices.map((service) => {
+                const { base, extras, total } = getServiceTotal(service);
+                return (
+                  <Card key={service.id} className="overflow-hidden border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
+                    {/* Card header */}
+                    <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shrink-0 overflow-hidden">
+                        {service.client_avatar ? (
+                          <img src={service.client_avatar} alt={service.client_name || ""} className="h-full w-full object-cover" />
+                        ) : (
+                          service.client_name?.[0] || "?"
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{service.client_name}</span>
+                      <Badge className={`${STATUS_COLORS[service.status]} ml-auto`}>{STATUS_LABELS[service.status]}</Badge>
+                    </div>
+
+                    {/* Card body */}
                     <CardContent className="p-5">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                        <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0 overflow-hidden">
-                          {service.client_avatar ? (
-                            <img src={service.client_avatar} alt={service.client_name || ""} className="h-full w-full object-cover" />
-                          ) : (
-                            service.client_name?.[0] || "?"
-                          )}
-                        </div>
+                      <div className="flex flex-col md:flex-row gap-4">
+                        {/* Left side */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold">{service.title}</h3>
-                            <Badge className={STATUS_COLORS[service.status]}>{STATUS_LABELS[service.status]}</Badge>
-                          </div>
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 hover:text-orange-500 transition-colors cursor-default">
+                            {service.title}
+                          </h3>
                           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{service.description}</p>
-                          <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-                            <span>{service.client_name}</span>
-                            {service.budget_amount && (() => {
-                              const { base, extras, total } = getServiceTotal(service);
-                              return (
-                                <span className="font-bold text-orange-500">
-                                  ${total.toLocaleString()}
-                                  {extras > 0 && <span className="font-normal text-xs ml-1">(Base: ${base.toLocaleString()} + Extras: ${extras.toLocaleString()})</span>}
-                                </span>
-                              );
-                            })()}
-                            <span>{new Date(service.created_at).toLocaleDateString("es-AR")}</span>
-                            <span>{service.address}</span>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {new Date(service.created_at).toLocaleDateString("es-AR")}
+                            </span>
+                            {service.scheduled_date && (
+                              <span className="flex items-center gap-1.5">
+                                <Clock className="h-3.5 w-3.5" />
+                                {service.scheduled_date}
+                              </span>
+                            )}
+                            {service.address && (
+                              <span className="flex items-center gap-1.5">
+                                <MapPin className="h-3.5 w-3.5" />
+                                {service.address}
+                              </span>
+                            )}
                           </div>
                         </div>
-                        <div className="flex gap-2 shrink-0 flex-wrap">
-                          {service.status === "nuevo" && (
-                            <Button size="sm" className="gap-1 rounded-lg" onClick={() => navigate(`/prestador/servicios/${service.id}`)}>
-                              <Eye className="h-3 w-3" /> Ver Detalles
-                            </Button>
-                          )}
-                          {service.status === "presupuestado" && (
-                            <Badge className="bg-warning/10 text-warning border-warning/20">⏳ Esperando al cliente</Badge>
-                          )}
-                          {service.status === "aceptado" && (
-                            <Button size="sm" className="gap-1 rounded-lg" onClick={() => handleStartWithCode(service.id)} disabled={verifying}>
-                              <KeyRound className="h-3 w-3" /> Iniciar con Código
-                            </Button>
-                          )}
-                          {service.status === "en_progreso" && (
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="outline" className="gap-1 rounded-lg" onClick={() => handleRequestExtra(service.id)}>
-                                <Plus className="h-3 w-3" /> Cargo Extra
-                              </Button>
-                              <Button size="sm" className="gap-1 rounded-lg bg-success hover:bg-success/90" onClick={() => handleComplete(service.id)} disabled={updateStatus.isPending}>
-                                <CheckCircle2 className="h-3 w-3" /> Finalizar
-                              </Button>
-                            </div>
-                          )}
-                          {service.status === "completado" && !reviewedIds?.has(service.id) && (
-                            <Button size="sm" variant="outline" className="gap-1 rounded-lg" onClick={() => openReviewModal(service)}>
-                              <Star className="h-3 w-3 text-yellow-500" /> Calificar Cliente
-                            </Button>
-                          )}
-                          {service.status === "completado" && reviewedIds?.has(service.id) && (
-                            <Badge className="bg-success/10 text-success border-success/20">✓ Calificado</Badge>
-                          )}
-                          {service.provider_id && (
-                            <Button size="sm" variant="ghost" className="gap-1 rounded-lg relative" onClick={() => navigate(`/prestador/chat?service=${service.id}`)}>
-                              <MessageSquare className="h-3 w-3" /> Chat
-                              {unreadServiceIds.has(service.id) && (
-                                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-destructive border-2 border-card" />
+
+                        {/* Right side */}
+                        <div className="flex flex-col items-end justify-between gap-3 shrink-0">
+                          {service.budget_amount ? (
+                            <div className="text-right">
+                              <span className="text-2xl font-extrabold text-slate-900 dark:text-white">${total.toLocaleString()}</span>
+                              {extras > 0 && (
+                                <p className="text-xs text-slate-400 mt-0.5">Base: ${base.toLocaleString()} + Extras: ${extras.toLocaleString()}</p>
                               )}
-                            </Button>
+                            </div>
+                          ) : (
+                            <div />
                           )}
+                          <div className="flex gap-2 flex-wrap justify-end">
+                            {service.status === "nuevo" && (
+                              <Button size="sm" className="gap-1.5 rounded-xl" onClick={() => navigate(`/prestador/servicios/${service.id}`)}>
+                                <Eye className="h-3.5 w-3.5" /> Ver Detalles
+                              </Button>
+                            )}
+                            {service.status === "presupuestado" && (
+                              <Badge className="bg-warning/10 text-warning border-warning/20">Esperando al cliente</Badge>
+                            )}
+                            {service.status === "aceptado" && (
+                              <Button
+                                size="sm"
+                                className="gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-500/20"
+                                onClick={() => handleStartWithCode(service.id)}
+                                disabled={verifying}
+                              >
+                                <KeyRound className="h-3.5 w-3.5" /> Iniciar con Código
+                              </Button>
+                            )}
+                            {service.status === "en_progreso" && (
+                              <>
+                                <Button size="sm" variant="outline" className="gap-1.5 rounded-xl" onClick={() => handleRequestExtra(service.id)}>
+                                  <Plus className="h-3.5 w-3.5" /> Cargo Extra
+                                </Button>
+                                <Button size="sm" className="gap-1.5 rounded-xl bg-success hover:bg-success/90" onClick={() => handleComplete(service.id)} disabled={updateStatus.isPending}>
+                                  <CheckCircle2 className="h-3.5 w-3.5" /> Finalizar
+                                </Button>
+                              </>
+                            )}
+                            {service.status === "completado" && !reviewedIds?.has(service.id) && (
+                              <Button size="sm" variant="outline" className="gap-1.5 rounded-xl" onClick={() => openReviewModal(service)}>
+                                <Star className="h-3.5 w-3.5 text-yellow-500" /> Calificar Cliente
+                              </Button>
+                            )}
+                            {service.status === "completado" && reviewedIds?.has(service.id) && (
+                              <Badge className="bg-success/10 text-success border-success/20">Calificado</Badge>
+                            )}
+                            {service.provider_id && (
+                              <Button size="sm" variant="ghost" className="gap-1.5 rounded-xl relative" onClick={() => navigate(`/prestador/chat?service=${service.id}`)}>
+                                <MessageSquare className="h-3.5 w-3.5" /> Chat
+                                {unreadServiceIds.has(service.id) && (
+                                  <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-destructive border-2 border-card" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                ))
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+                );
+              })
+            )}
+          </div>
+        </div>
       )}
 
-      {/* Code verification dialog */}
-      <Dialog open={codeDialogOpen} onOpenChange={setCodeDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><KeyRound className="h-5 w-5 text-primary" /> Código de Verificación</DialogTitle>
-            <DialogDescription>
-              Ingresá el código de 6 dígitos que el cliente recibió al aceptar el presupuesto. Esto confirma que estás en el lugar correcto.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="Ej: ABC123"
-              value={codeInput}
-              onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
-              maxLength={6}
-              className="text-center text-2xl tracking-widest font-mono"
-            />
-            <Button className="w-full gap-2 rounded-xl" onClick={handleVerifyCode} disabled={verifying || codeInput.length < 6}>
-              {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-              Verificar e Iniciar Trabajo
-            </Button>
-          </div>
+      {/* OTP-style code verification dialog */}
+      <Dialog open={codeDialogOpen} onOpenChange={(open) => { setCodeDialogOpen(open); if (!open) setCodeVerified(false); }}>
+        <DialogContent className="sm:max-w-md overflow-hidden p-0">
+          {/* Orange gradient top border */}
+          <div className="h-1.5 w-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" />
+
+          {codeVerified ? (
+            <div className="p-10 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center mb-4 animate-bounce">
+                <CheckCircle2 size={32} strokeWidth={2.5} />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-1">¡Código verificado!</h3>
+              <p className="text-sm text-muted-foreground">El trabajo ha sido iniciado exitosamente.</p>
+            </div>
+          ) : (
+            <div className="p-6 space-y-5">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-3">
+                  <KeyRound className="h-7 w-7 text-orange-500" />
+                </div>
+                <DialogHeader className="space-y-1">
+                  <DialogTitle className="text-lg">Código de Verificación</DialogTitle>
+                  <DialogDescription className="text-sm">
+                    Ingresá el código de 6 dígitos que el cliente recibió al aceptar el presupuesto.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+
+              {/* Individual digit boxes */}
+              <div className="flex justify-center gap-2">
+                {codeDigits.map((digit, i) => (
+                  <input
+                    key={i}
+                    ref={el => { digitRefs.current[i] = el; }}
+                    type="text"
+                    inputMode="text"
+                    maxLength={1}
+                    value={digit}
+                    onChange={e => handleDigitChange(i, e.target.value)}
+                    onKeyDown={e => handleDigitKeyDown(i, e)}
+                    className="w-10 h-14 text-center text-xl font-bold font-mono rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all text-foreground"
+                  />
+                ))}
+              </div>
+
+              <Button
+                className="w-full gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-500/20"
+                onClick={handleVerifyCode}
+                disabled={verifying || codeInput.length < 6}
+              >
+                {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                Verificar e Iniciar Trabajo
+              </Button>
+
+              {/* Security note */}
+              <div className="flex items-center gap-2 text-xs text-slate-400 justify-center">
+                <ShieldCheck className="h-4 w-4" />
+                <span>El código se verifica de forma segura en el servidor</span>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 

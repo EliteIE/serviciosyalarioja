@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import {
   User, Phone, MapPin, FileText, Upload, X, Loader2, CheckCircle2,
   Clock, XCircle, Save, CreditCard, Link2, Unlink, Trash2, Mail,
-  Plus, Calendar, DollarSign, Briefcase, Globe, Tag
+  Plus, Calendar, DollarSign, Briefcase, Globe, Tag, UploadCloud
 } from "lucide-react";
 import AvatarUpload from "@/components/AvatarUpload";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -350,44 +350,68 @@ const ProviderProfile = () => {
   const initials = fullName?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "P";
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-6xl">
       <div>
-        <h1 className="text-2xl font-bold">Mi Perfil Profesional</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">Mi Perfil Profesional</h1>
         <p className="text-muted-foreground">Gestioná tu información, servicios y disponibilidad</p>
       </div>
 
-      {/* ─── Profile Completeness ─────────────────── */}
-      {profileCompleteness.percent < 100 && (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-semibold text-foreground">
-                Perfil {profileCompleteness.percent}% completo
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
+        {/* ─── Left Column: Progress Widget (Sticky) ─── */}
+        <div className="w-full lg:w-1/3 lg:sticky lg:top-6 space-y-5">
+          {/* Profile Completeness Widget */}
+          <Card className="rounded-3xl shadow-xl shadow-slate-200/40 dark:shadow-none overflow-hidden">
+            <div className="h-1 bg-muted">
+              <div className="h-full bg-gradient-to-r from-primary to-orange-400 transition-all duration-500" style={{ width: `${profileCompleteness.percent}%` }} />
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-end justify-between mb-4">
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Progreso</p>
+                  <h3 className="text-2xl font-extrabold">{profileCompleteness.percent}% <span className="text-lg text-muted-foreground font-medium">completo</span></h3>
+                </div>
+                <span className="text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-950/30 px-2.5 py-1 rounded-lg">{profileCompleteness.completed}/{profileCompleteness.total} Pasos</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-5">
+                Los perfiles completos reciben hasta un <strong className="text-foreground">80% más de solicitudes</strong>.
               </p>
-              <span className="text-xs text-muted-foreground">{profileCompleteness.completed}/{profileCompleteness.total}</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden mb-3">
-              <div className="h-full bg-gradient-to-r from-primary to-orange-400 rounded-full transition-all duration-500" style={{ width: `${profileCompleteness.percent}%` }} />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {profileCompleteness.fields.map((f) => (
-                <span key={f.name} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${f.done ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
-                  {f.done && <CheckCircle2 className="h-3 w-3" />}
-                  {f.name}
-                </span>
-              ))}
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-2">
-              Los perfiles completos reciben hasta un 80% más de solicitudes.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+              <div className="space-y-2.5">
+                {profileCompleteness.fields.map((f) => (
+                  <div key={f.name} className={`flex items-center gap-3 text-sm font-medium p-2 rounded-lg transition-colors ${
+                    f.done ? "bg-success/10 text-success" : "border border-border hover:border-orange-200 dark:hover:border-orange-800 text-muted-foreground cursor-pointer"
+                  }`}>
+                    {f.done ? (
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    ) : (
+                      <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 shrink-0" />
+                    )}
+                    {f.name}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Save button (desktop only) */}
+          <Button
+            onClick={handleSaveProfile}
+            disabled={saving}
+            className="w-full gap-2 rounded-2xl h-12 text-base font-bold hidden lg:flex bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Guardar Cambios
+          </Button>
+        </div>
+
+        {/* ─── Right Column: All Form Sections ─── */}
+        <div className="w-full lg:w-2/3 space-y-6">
 
       {/* ─── Avatar & Email ──────────────────────── */}
-      <Card>
+      <Card className="rounded-3xl">
         <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
-          <AvatarUpload currentUrl={profile?.avatar_url} initials={initials} />
+          <div className="shrink-0 [&_span]:!h-32 [&_span]:!w-32 [&_.h-24]:!h-32 [&_.w-24]:!w-32">
+            <AvatarUpload currentUrl={profile?.avatar_url} initials={initials} />
+          </div>
           <div className="text-center sm:text-left">
             <p className="font-semibold text-lg">{fullName || "Sin nombre"}</p>
             <p className="text-sm text-muted-foreground flex items-center gap-1 justify-center sm:justify-start">
@@ -403,7 +427,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Personal Info + Category + Bio ────── */}
-      <Card>
+      <Card className="rounded-3xl">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2"><User className="h-5 w-5" /> Información Personal</CardTitle>
         </CardHeader>
@@ -413,14 +437,14 @@ const ProviderProfile = () => {
               <Label>Nombre completo</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                <Input className="pl-9 rounded-xl bg-slate-50 focus:border-orange-500" value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Teléfono</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 380 123-4567" />
+                <Input className="pl-9 rounded-xl bg-slate-50 focus:border-orange-500" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 380 123-4567" />
               </div>
             </div>
           </div>
@@ -430,7 +454,7 @@ const ProviderProfile = () => {
               <Label>Ubicación</Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="La Rioja, Capital" />
+                <Input className="pl-9 rounded-xl bg-slate-50 focus:border-orange-500" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="La Rioja, Capital" />
               </div>
             </div>
             <div className="space-y-2">
@@ -440,7 +464,7 @@ const ProviderProfile = () => {
                 <select
                   value={providerCategory}
                   onChange={(e) => setProviderCategory(e.target.value)}
-                  className="w-full h-10 pl-9 pr-4 rounded-md border border-input bg-background text-sm font-medium appearance-none cursor-pointer"
+                  className="w-full h-10 pl-9 pr-4 rounded-xl border border-input bg-slate-50 text-sm font-medium appearance-none cursor-pointer focus:border-orange-500 focus:outline-none"
                 >
                   <option value="">Seleccionar categoría</option>
                   {CATEGORIES.map((cat) => (
@@ -462,6 +486,7 @@ const ProviderProfile = () => {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Describí tu experiencia, qué servicios ofrecés, años de experiencia, certificaciones..."
+              className="rounded-xl bg-slate-50 focus:border-orange-500"
             />
             {bio.length > 0 && bio.length < 50 && (
               <p className="text-[11px] text-amber-600 flex items-center gap-1">
@@ -479,6 +504,7 @@ const ProviderProfile = () => {
                 onChange={(e) => setCoverageInput(e.target.value)}
                 placeholder="Ej: Capital, Sanagasta..."
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddCoverage(); } }}
+                className="rounded-xl bg-slate-50 focus:border-orange-500"
               />
               <Button type="button" variant="outline" size="sm" onClick={handleAddCoverage}>
                 <Plus className="h-4 w-4" />
@@ -505,25 +531,11 @@ const ProviderProfile = () => {
               value={priceRange}
               onChange={(e) => setPriceRange(e.target.value)}
               placeholder="Ej: $5.000 - $50.000 según el trabajo"
+              className="rounded-xl bg-slate-50 focus:border-orange-500"
             />
           </div>
 
-          {/* Bank Details */}
-          <div className="pt-2 border-t space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground">Datos Bancarios (para cobros por transferencia)</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Alias</Label>
-                <Input value={bankAlias} onChange={(e) => setBankAlias(e.target.value)} placeholder="mi.alias.mp" />
-              </div>
-              <div className="space-y-2">
-                <Label>CVU</Label>
-                <Input value={bankCvu} onChange={(e) => setBankCvu(e.target.value)} placeholder="0000003100000000000000" />
-              </div>
-            </div>
-          </div>
-
-          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-xl">
+          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-xl lg:hidden">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Información
           </Button>
@@ -531,19 +543,19 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Schedule / Availability ──────────── */}
-      <Card>
+      <Card className="rounded-3xl">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2"><Calendar className="h-5 w-5" /> Horarios de Disponibilidad</CardTitle>
           <CardDescription>Configurá los días y horarios en que atendés. Los clientes verán esto en tu perfil público.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {schedule.map((slot, i) => (
-            <div key={slot.day_of_week} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${slot.is_active ? "bg-card border-primary/20" : "bg-muted/30 border-transparent"}`}>
+            <div key={slot.day_of_week} className={`flex items-center gap-3 p-3 rounded-2xl border transition-colors ${slot.is_active ? "bg-orange-50/30 dark:bg-orange-950/10 border-orange-200 dark:border-orange-800" : "bg-muted/30 border-transparent"}`}>
               {/* Toggle */}
               <button
                 type="button"
                 onClick={() => setSchedule((prev) => prev.map((s, j) => j === i ? { ...s, is_active: !s.is_active } : s))}
-                className={`w-10 h-6 rounded-full relative transition-colors shrink-0 ${slot.is_active ? "bg-primary" : "bg-muted-foreground/20"}`}
+                className={`w-11 h-6 rounded-full relative transition-colors shrink-0 ${slot.is_active ? "bg-orange-500" : "bg-muted-foreground/20"}`}
               >
                 <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${slot.is_active ? "left-[18px]" : "left-0.5"}`} />
               </button>
@@ -588,7 +600,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Services Offered ──────────────────── */}
-      <Card>
+      <Card className="rounded-3xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -675,47 +687,75 @@ const ProviderProfile = () => {
         </CardContent>
       </Card>
 
-      {/* ─── MercadoPago ─────────────────────── */}
-      <Card>
+      {/* ─── Finanzas y Cobros ──────────────── */}
+      <Card className="rounded-3xl">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg flex items-center gap-2"><CreditCard className="h-5 w-5" /> Cuenta de Cobro (MercadoPago)</CardTitle>
-              <CardDescription>Conectá tu cuenta para recibir pagos automáticamente</CardDescription>
-            </div>
-            {mpAccount && <Badge className="bg-success/10 text-success gap-1"><CheckCircle2 className="h-3 w-3" /> Conectada</Badge>}
-          </div>
+          <CardTitle className="text-lg flex items-center gap-2"><CreditCard className="h-5 w-5" /> Finanzas y Cobros</CardTitle>
+          <CardDescription>Configurá tus métodos de cobro para recibir pagos</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {mpLoading ? (
-            <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Cargando...</div>
-          ) : mpAccount ? (
-            <>
-              <div className="rounded-xl bg-success/5 border border-success/20 p-4 space-y-2">
-                <p className="text-sm font-medium">Tu cuenta de MercadoPago está conectada</p>
-                {mpAccount.mp_email && <p className="text-sm text-muted-foreground">Email: <span className="font-medium">{mpAccount.mp_email}</span></p>}
+        <CardContent className="space-y-6">
+          {/* Bank Details */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">Datos Bancarios (para cobros por transferencia)</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Alias</Label>
+                <Input value={bankAlias} onChange={(e) => setBankAlias(e.target.value)} placeholder="mi.alias.mp" className="rounded-xl bg-slate-50 focus:border-orange-500" />
               </div>
-              <Button variant="outline" size="sm" onClick={handleDisconnectMP} className="gap-2 text-destructive hover:text-destructive">
-                <Unlink className="h-4 w-4" /> Desconectar cuenta
-              </Button>
-            </>
-          ) : (
-            <>
-              <div className="rounded-xl bg-warning/5 border border-warning/20 p-4 space-y-2">
-                <p className="text-sm font-medium text-warning">Cuenta no conectada</p>
-                <p className="text-xs text-muted-foreground">Para recibir pagos, necesitás conectar tu cuenta de MercadoPago.</p>
+              <div className="space-y-2">
+                <Label>CVU</Label>
+                <Input value={bankCvu} onChange={(e) => setBankCvu(e.target.value)} placeholder="0000003100000000000000" className="rounded-xl bg-slate-50 focus:border-orange-500" />
               </div>
-              <Button onClick={handleConnectMP} disabled={connectingMP} className="gap-2 rounded-xl">
-                {connectingMP ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
-                Conectar MercadoPago
-              </Button>
-            </>
-          )}
+            </div>
+          </div>
+
+          {/* MercadoPago Integration */}
+          <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-blue-600" /> MercadoPago
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Conectá tu cuenta para recibir pagos automáticamente</p>
+              </div>
+              {mpAccount && <Badge className="bg-success/10 text-success gap-1"><CheckCircle2 className="h-3 w-3" /> Conectada</Badge>}
+            </div>
+
+            {mpLoading ? (
+              <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Cargando...</div>
+            ) : mpAccount ? (
+              <>
+                <div className="rounded-xl bg-success/5 border border-success/20 p-4 space-y-2">
+                  <p className="text-sm font-medium">Tu cuenta de MercadoPago está conectada</p>
+                  {mpAccount.mp_email && <p className="text-sm text-muted-foreground">Email: <span className="font-medium">{mpAccount.mp_email}</span></p>}
+                </div>
+                <Button variant="outline" size="sm" onClick={handleDisconnectMP} className="gap-2 text-destructive hover:text-destructive rounded-xl">
+                  <Unlink className="h-4 w-4" /> Desconectar cuenta
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="rounded-xl bg-warning/5 border border-warning/20 p-4 space-y-2">
+                  <p className="text-sm font-medium text-warning">Cuenta no conectada</p>
+                  <p className="text-xs text-muted-foreground">Para recibir pagos, necesitás conectar tu cuenta de MercadoPago.</p>
+                </div>
+                <Button onClick={handleConnectMP} disabled={connectingMP} className="gap-2 rounded-xl">
+                  {connectingMP ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
+                  Conectar MercadoPago
+                </Button>
+              </>
+            )}
+          </div>
+
+          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-xl lg:hidden">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Guardar Datos Bancarios
+          </Button>
         </CardContent>
       </Card>
 
       {/* ─── Documents & Verification ────────── */}
-      <Card>
+      <Card className="rounded-3xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -751,7 +791,7 @@ const ProviderProfile = () => {
           {docPaths.length < 3 && (
             <div>
               <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple className="hidden" onChange={handleFileSelect} />
-              <div onClick={() => !uploading && fileInputRef.current?.click()} className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
+              <div onClick={() => !uploading && fileInputRef.current?.click()} className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/10 dark:hover:border-orange-700 transition-colors">
                 {uploading ? (
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -759,7 +799,7 @@ const ProviderProfile = () => {
                   </div>
                 ) : (
                   <>
-                    <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <UploadCloud className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                     <p className="text-sm font-medium">Hacé clic para subir documentos</p>
                     <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF — máx. 5MB — {3 - docPaths.length} restante(s)</p>
                   </>
@@ -771,13 +811,13 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Danger Zone ─────────────────────── */}
-      <Card className="border-destructive/30">
+      <Card className="border-destructive/30 bg-red-50/50 dark:bg-red-950/10 rounded-3xl">
         <CardHeader>
           <CardTitle className="text-lg text-destructive flex items-center gap-2"><Trash2 className="h-5 w-5" /> Zona de Peligro</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Al eliminar tu cuenta, se borrarán permanentemente todos tus datos, servicios, portafolio, reseñas y documentación.
+            Al eliminar tu cuenta, se borrarán permanentemente todos tus datos, servicios, portafolio, reseñas y documentación. Esta acción no se puede deshacer.
           </p>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -799,6 +839,21 @@ const ProviderProfile = () => {
           </AlertDialog>
         </CardContent>
       </Card>
+
+      {/* Mobile save button */}
+      <div className="block lg:hidden sticky bottom-4 z-10 pt-4 pb-2">
+        <Button
+          onClick={handleSaveProfile}
+          disabled={saving}
+          className="w-full gap-2 rounded-2xl h-12 text-base font-bold bg-orange-600 hover:bg-orange-500 shadow-lg"
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Guardar Cambios
+        </Button>
+      </div>
+
+        </div>{/* End right column */}
+      </div>{/* End two-column layout */}
     </div>
   );
 };
