@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 25;
 
@@ -75,6 +76,7 @@ const AdminAuditLog = () => {
         .limit(500);
       if (error) {
         console.error("Error fetching audit log:", error);
+        toast.error("Error al cargar auditoría");
         return [];
       }
       return data;
@@ -101,14 +103,14 @@ const AdminAuditLog = () => {
         return `Eliminado: ${Object.keys(oldData).slice(0, 3).join(", ")}...`;
       }
       if (entry.action === "INSERT" && newData) {
-        const preview = Object.entries(newData).slice(0, 3).map(([k, v]) => `${k}: ${String(v).slice(0, 30)}`).join(", ");
+        const preview = Object.entries(newData).slice(0, 3).map(([k, v]) => `${k}: ${(typeof v === "object" && v !== null ? JSON.stringify(v) : String(v)).slice(0, 30)}`).join(", ");
         return preview;
       }
       if (entry.action === "UPDATE" && oldData && newData) {
         const changes: string[] = [];
         for (const key of Object.keys(newData)) {
           if (JSON.stringify(oldData[key]) !== JSON.stringify(newData[key])) {
-            changes.push(`${key}: ${String(oldData[key]).slice(0, 15)} → ${String(newData[key]).slice(0, 15)}`);
+            changes.push(`${key}: ${(typeof oldData[key] === "object" && oldData[key] !== null ? JSON.stringify(oldData[key]) : String(oldData[key])).slice(0, 15)} → ${(typeof newData[key] === "object" && newData[key] !== null ? JSON.stringify(newData[key]) : String(newData[key])).slice(0, 15)}`);
           }
         }
         return changes.slice(0, 3).join(", ") || "Sin cambios detectados";

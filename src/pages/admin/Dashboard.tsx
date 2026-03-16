@@ -48,29 +48,52 @@ const AdminDashboard = () => {
         supabase.from("reviews").select("id", { count: "exact", head: true }).lte("rating", 2).gte("created_at", thirtyDaysAgo),
       ]);
 
-      const payments = paymentsRes.data || [];
+      // Log errors from parallel queries and default to 0 on failure
+      const allResults = [
+        { name: "users", res: usersRes },
+        { name: "providers", res: providersRes },
+        { name: "requests", res: requestsRes },
+        { name: "payments", res: paymentsRes },
+        { name: "disputes", res: disputesRes },
+        { name: "verified", res: verifiedRes },
+        { name: "recentUsers", res: recentUsersRes },
+        { name: "prevUsers", res: prevUsersRes },
+        { name: "recentRequests", res: recentRequestsRes },
+        { name: "prevRequests", res: prevRequestsRes },
+        { name: "failedPayments", res: failedPaymentsRes },
+        { name: "badReviews", res: badReviewsRes },
+      ];
+      for (const { name, res } of allResults) {
+        if (res.error) {
+          console.error(`Admin stats query error [${name}]:`, res.error);
+        }
+      }
+
+      const safeCount = (res: { count: number | null; error: any }) => res.error ? 0 : (res.count || 0);
+
+      const payments = paymentsRes.error ? [] : (paymentsRes.data || []);
       const completedPayments = payments.filter(p => p.status === "completed");
       const totalRevenue = completedPayments.reduce((s, p) => s + Number(p.amount), 0);
       const totalFees = completedPayments.reduce((s, p) => s + Number(p.platform_fee), 0);
       const avgTicket = completedPayments.length > 0 ? totalRevenue / completedPayments.length : 0;
 
       return {
-        users: usersRes.count || 0,
-        providers: providersRes.count || 0,
-        verified: verifiedRes.count || 0,
-        requests: requestsRes.count || 0,
-        disputes: disputesRes.count || 0,
+        users: safeCount(usersRes),
+        providers: safeCount(providersRes),
+        verified: safeCount(verifiedRes),
+        requests: safeCount(requestsRes),
+        disputes: safeCount(disputesRes),
         totalRevenue,
         totalFees,
         payments: payments.length,
         completedPayments: completedPayments.length,
         avgTicket,
-        recentUsers: recentUsersRes.count || 0,
-        prevUsers: prevUsersRes.count || 0,
-        recentRequests: recentRequestsRes.count || 0,
-        prevRequests: prevRequestsRes.count || 0,
-        failedPayments: failedPaymentsRes.count || 0,
-        badReviews: badReviewsRes.count || 0,
+        recentUsers: safeCount(recentUsersRes),
+        prevUsers: safeCount(prevUsersRes),
+        recentRequests: safeCount(recentRequestsRes),
+        prevRequests: safeCount(prevRequestsRes),
+        failedPayments: safeCount(failedPaymentsRes),
+        badReviews: safeCount(badReviewsRes),
       };
     },
   });

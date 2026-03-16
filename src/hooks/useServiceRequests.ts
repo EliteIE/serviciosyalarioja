@@ -86,10 +86,16 @@ export const useProviderRequests = () => {
 
       // Build query with separate filters instead of string interpolation
       const userId = user!.id;
+
+      // If category is empty/null, only show requests already assigned to this provider
+      const filterStr = category
+        ? `provider_id.eq.${userId},and(status.eq.nuevo,category.eq.${category}),and(status.eq.presupuestado,provider_id.eq.${userId})`
+        : `provider_id.eq.${userId}`;
+
       const { data, error } = await supabase
         .from("service_requests")
         .select("*")
-        .or(`provider_id.eq.${userId},and(status.eq.nuevo,category.eq.${category}),and(status.eq.presupuestado,provider_id.eq.${userId})`)
+        .or(filterStr)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return enrichWithProfiles(data);

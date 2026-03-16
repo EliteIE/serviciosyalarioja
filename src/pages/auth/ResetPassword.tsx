@@ -15,10 +15,17 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsRecovery(true);
+      }
+    });
+    // Also check hash as fallback
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) {
       setIsRecovery(true);
     }
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleReset = async (e: React.FormEvent) => {
@@ -67,7 +74,7 @@ const ResetPassword = () => {
               <Label>Nueva contraseña</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input type="password" placeholder="Mínimo 6 caracteres" className="pl-9" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input type="password" placeholder="Mínimo 8 caracteres, 1 mayúscula y 1 número" className="pl-9" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
             </div>
             <Button className="w-full rounded-xl" size="lg" type="submit" disabled={loading}>

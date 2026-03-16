@@ -136,6 +136,11 @@ export default function RequestBudget() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !address || !provider) return;
+    const category = provider.provider_category;
+    if (!category) {
+      toast.error("El prestador no tiene categoría definida");
+      return;
+    }
     if (description.trim().length < 10) {
       toast.error("La descripción debe tener al menos 10 caracteres");
       return;
@@ -145,7 +150,7 @@ export default function RequestBudget() {
       return;
     }
 
-    const categoryName = getCategoryName(provider.provider_category);
+    const categoryName = getCategoryName(category);
     const title = `Solicitud de presupuesto: ${categoryName}`;
 
     const parts = [description];
@@ -154,7 +159,7 @@ export default function RequestBudget() {
 
     try {
       await createRequest.mutateAsync({
-        category: provider.provider_category || "",
+        category,
         title,
         description: parts.join("\n"),
         address,

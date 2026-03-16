@@ -28,6 +28,16 @@ interface Profile {
   review_count: number;
   bank_alias: string | null;
   bank_cvu: string | null;
+  provider_coverage_area: string | null;
+  provider_doc_urls: string[] | null;
+  provider_price_range: string | null;
+  provider_verification_notes: string | null;
+  provider_verification_status: string | null;
+  response_time: string | null;
+  criminal_record_url: string | null;
+  criminal_record_status: string | null;
+  criminal_record_notes: string | null;
+  criminal_record_expiry: string | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -60,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setProfile(null);
       return null;
     }
-    setProfile({ ...data, bank_alias: null, bank_cvu: null });
+    setProfile({ ...data, bank_alias: null, bank_cvu: null, provider_coverage_area: null, provider_doc_urls: null, provider_price_range: null, provider_verification_notes: null, provider_verification_status: null, response_time: null, criminal_record_url: null, criminal_record_status: null, criminal_record_notes: null, criminal_record_expiry: null });
     return data;
   };
 
@@ -116,12 +126,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const events = ["mousemove", "keydown", "mousedown", "touchstart", "scroll"];
     events.forEach((ev) => window.addEventListener(ev, resetTimer, { passive: true }));
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") resetTimer();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     resetTimer();
 
     return () => {
       clearTimeout(warningTimer);
       clearTimeout(inactivityTimer);
       events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [user, signOut]);
 

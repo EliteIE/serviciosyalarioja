@@ -67,17 +67,26 @@ export const useSaveSchedule = () => {
 
   return useMutation({
     mutationFn: async (slots: { day_of_week: number; start_time: string; end_time: string; is_active: boolean }[]) => {
+      if (!user) throw new Error("No autenticado");
+
+      // Fetch existing slots before deleting so we can restore on insert failure
+      const { data: existingSlots, error: fetchError } = await supabase
+        .from("provider_schedule" as any)
+        .select("*")
+        .eq("provider_id", user.id);
+      if (fetchError) throw fetchError;
+
       // Delete existing slots and re-insert all
       const { error: delError } = await supabase
         .from("provider_schedule" as any)
         .delete()
-        .eq("provider_id", user!.id);
+        .eq("provider_id", user.id);
       if (delError) throw delError;
 
       if (slots.length === 0) return;
 
       const rows = slots.map((s) => ({
-        provider_id: user!.id,
+        provider_id: user.id,
         day_of_week: s.day_of_week,
         start_time: s.start_time,
         end_time: s.end_time,
@@ -87,13 +96,21 @@ export const useSaveSchedule = () => {
       const { error } = await supabase
         .from("provider_schedule" as any)
         .insert(rows);
-      if (error) throw error;
+      if (error) {
+        // Attempt to restore previous slots since insert failed after delete
+        if (existingSlots && existingSlots.length > 0) {
+          await supabase
+            .from("provider_schedule" as any)
+            .insert(existingSlots);
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["provider-schedule"] });
       toast.success("Horarios guardados correctamente");
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error("Error al guardar horarios: " + err.message),
   });
 };
 

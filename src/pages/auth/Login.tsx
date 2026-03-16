@@ -42,7 +42,7 @@ const Login = () => {
   }, [confirmed, setSearchParams]);
 
   // Validate redirect is a safe relative path (prevent open redirect attacks)
-  const isSafeRedirect = redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//") && !redirectTo.startsWith("/\\");
+  const isSafeRedirect = redirectTo && /^\/[a-zA-Z0-9\-_\/\?=&%]+$/.test(redirectTo);
 
   if (user) {
     if (isSafeRedirect) return <Navigate to={redirectTo} replace />;
