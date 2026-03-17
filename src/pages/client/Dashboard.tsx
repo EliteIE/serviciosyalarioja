@@ -241,15 +241,33 @@ const ClientDashboard = () => {
       setPaymentMethodDialogOpen(false);
       setTransferDialogOpen(true);
     } else if (method === "efectivo") {
-      // For cash payment, mark as completed directly with a message
+      // For cash payment, mark as completed and create payment record
       setPaymentMethodDialogOpen(false);
       setConfirming(true);
       try {
+        const service = services?.find((s) => s.id === completionServiceId);
+        const total = getServiceTotal(completionServiceId!);
+
         const { error: statusError } = await supabase
           .from("service_requests")
           .update({ status: "completado" as any })
           .eq("id", completionServiceId!);
         if (statusError) throw new Error("Error al completar el servicio: " + statusError.message);
+
+        // Create payment record for cash (tracking purposes)
+        if (service) {
+          await supabase.from("payments").insert({
+            service_request_id: completionServiceId!,
+            client_id: user!.id,
+            provider_id: service.provider_id || "",
+            amount: total,
+            platform_fee: 0,
+            provider_amount: total,
+            commission_rate: 0,
+            status: "completed",
+            payment_method: "efectivo",
+          });
+        }
 
         await sendMessage.mutateAsync({
           service_request_id: completionServiceId!,

@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       // Fetch the service request
       const { data: sr, error: srError } = await supabase
         .from("service_requests")
-        .select("budget_amount, budget, client_id, provider_id, title, category")
+        .select("budget_amount, budget, client_id, provider_id, title, category, status")
         .eq("id", service_request_id)
         .single();
 
@@ -114,6 +114,14 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Prevent payment for services not in finalizado_prestador status
+      if (sr.status !== "finalizado_prestador") {
+        return new Response(JSON.stringify({ error: "El servicio no está listo para pago" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       const baseAmount = sr.budget_amount ?? sr.budget ?? 0;
 
       // Include approved extra charges
@@ -128,6 +136,33 @@ Deno.serve(async (req) => {
 
       if (!amount || amount <= 0) {
         return new Response(JSON.stringify({ error: "No valid amount found" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Check if payments are enabled
+      const { data: paymentEnabledSetting } = await supabase
+        .from("platform_settings")
+        .select("value")
+        .eq("key", "payment_enabled")
+        .single();
+      if (paymentEnabledSetting?.value === "false") {
+        return new Response(JSON.stringify({ error: "Payments are currently disabled" }), {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Enforce minimum payment amount
+      const { data: minAmountSetting } = await supabase
+        .from("platform_settings")
+        .select("value")
+        .eq("key", "min_payment_amount")
+        .single();
+      const minAmount = parseFloat(minAmountSetting?.value || "500");
+      if (amount < minAmount) {
+        return new Response(JSON.stringify({ error: `El monto mínimo de pago es $${minAmount}` }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -408,6 +443,10 @@ Deno.serve(async (req) => {
             ? "approved"
             : mpPayment.status === "rejected"
             ? "failed"
+            : mpPayment.status === "refunded"
+            ? "refunded"
+            : mpPayment.status === "cancelled"
+            ? "failed"
             : "pending";
 
         // Update payment record — match by service_request_id AND pending/approved status to avoid duplicates
@@ -431,12 +470,13 @@ Deno.serve(async (req) => {
             .eq("id", pendingPayment.id);
         }
 
-        // If approved, mark service as completado
+        // If approved, mark service as completado (only if currently finalizado_prestador)
         if (mpStatus === "approved") {
           await supabase
             .from("service_requests")
             .update({ status: "completado" })
-            .eq("id", serviceRequestId);
+            .eq("id", serviceRequestId)
+            .eq("status", "finalizado_prestador");
 
           // Notify both parties
           const { data: sr } = await supabase
