@@ -98,6 +98,18 @@ const AdminDashboard = () => {
     },
   });
 
+  const { data: commissionStats } = useQuery({
+    queryKey: ["admin-commission-stats"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("commission_balance")
+        .select("total_owed, is_blocked");
+      const totalPending = (data || []).reduce((sum: number, b: any) => sum + Number(b.total_owed || 0), 0);
+      const blockedCount = (data || []).filter((b: any) => b.is_blocked).length;
+      return { totalPending, blockedCount };
+    },
+  });
+
   // Conversion rate: completed / total requests
   const { data: conversionData } = useQuery({
     queryKey: ["admin-conversion"],
@@ -229,6 +241,7 @@ const AdminDashboard = () => {
     { label: "Ticket Promedio", value: `$${Math.round(stats?.avgTicket || 0).toLocaleString()}`, icon: Wallet, bgColor: "bg-violet-500/10", iconColor: "text-violet-500", featured: false },
     { label: "Tasa Conversion", value: `${conversionData?.conversionRate || 0}%`, icon: CheckCircle2, bgColor: "bg-blue-500/10", iconColor: "text-blue-500", featured: false },
     { label: "Pagos Completados", value: stats?.completedPayments || 0, icon: Clock, bgColor: "bg-amber-500/10", iconColor: "text-amber-500", featured: false },
+    { label: "Comisiones Pendientes", value: `$${(commissionStats?.totalPending || 0).toLocaleString()}`, icon: DollarSign, bgColor: "bg-orange-500/10", iconColor: "text-orange-500", featured: false, sublabel: `${commissionStats?.blockedCount || 0} prestadores bloqueados` },
   ];
 
   return (
@@ -317,7 +330,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Revenue + KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-5">
         {kpiCards.map((kpi) => (
           <div
             key={kpi.label}
@@ -334,6 +347,9 @@ const AdminDashboard = () => {
               </div>
               <p className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">{kpi.value}</p>
               <p className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 mt-1.5">{kpi.label}</p>
+              {"sublabel" in kpi && kpi.sublabel && (
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{kpi.sublabel}</p>
+              )}
             </div>
           </div>
         ))}

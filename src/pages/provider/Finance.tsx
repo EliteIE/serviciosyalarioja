@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DollarSign, TrendingUp, Loader2, CreditCard, Download, Filter, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import { DollarSign, TrendingUp, Loader2, CreditCard, Download, Filter, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import CommissionBanner from "@/components/provider/CommissionBanner";
+import { useCommissionBalance } from "@/hooks/useCommissionBalance";
 
 const PAGE_SIZE = 15;
 
 const ProviderFinance = () => {
   const { user } = useAuth();
+  const { balance, entries, totalOwed, unpaidCount, isBlocked } = useCommissionBalance();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
 
@@ -112,6 +115,8 @@ const ProviderFinance = () => {
         </Button>
       </div>
 
+      <CommissionBanner />
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card>
@@ -150,6 +155,66 @@ const ProviderFinance = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Comisiones section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-orange-500" /> Comisiones
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Total owed */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-accent/50">
+            <div>
+              <p className="text-sm text-muted-foreground">Total adeudado</p>
+              <p className={`text-3xl font-extrabold ${totalOwed > 0 ? "text-orange-500" : "text-success"}`}>
+                ${totalOwed.toLocaleString("es-AR")}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Servicios pendientes</p>
+              <p className="text-2xl font-bold">{unpaidCount}</p>
+            </div>
+          </div>
+
+          {/* Commission entries list */}
+          {entries && entries.length > 0 ? (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Detalle de comisiones</p>
+              {entries.map((entry: any) => (
+                <div key={entry.id} className="flex items-center justify-between p-3 rounded-xl bg-accent/50">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${entry.status === "paid" ? "bg-success/10" : "bg-amber-100 dark:bg-amber-900/30"}`}>
+                      {entry.status === "paid" ? (
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                      ) : (
+                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Servicio: ${Number(entry.service_amount || 0).toLocaleString("es-AR")}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(entry.created_at).toLocaleDateString("es-AR")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right flex items-center gap-2">
+                    <span className="font-bold text-sm">
+                      ${Number(entry.commission_amount || 0).toLocaleString("es-AR")}
+                    </span>
+                    <Badge className={`text-xs ${entry.status === "paid" ? "bg-success/10 text-success" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"}`}>
+                      {entry.status === "paid" ? "Pagado" : "Pendiente"}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">Sin comisiones registradas</p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Revenue chart */}
       <Card>

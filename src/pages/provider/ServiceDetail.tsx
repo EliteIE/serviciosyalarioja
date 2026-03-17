@@ -13,6 +13,8 @@ import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceR
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CommissionBanner from "@/components/provider/CommissionBanner";
+import { useCommissionBalance } from "@/hooks/useCommissionBalance";
 
 /** Parse structured description: separates main text from %%FECHA%% and %%HORARIO%% markers */
 function parseDescription(raw: string) {
@@ -57,6 +59,7 @@ const ServiceDetail = () => {
   const { data: services, isLoading } = useProviderRequests();
   const updateStatus = useUpdateServiceStatus();
   const { user } = useAuth();
+  const { isBlocked } = useCommissionBalance();
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgetMessage, setBudgetMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -69,6 +72,10 @@ const ServiceDetail = () => {
     CATEGORIES.find((c) => c.slug === slug)?.name || slug;
 
   const handleSendBudget = async () => {
+    if (isBlocked) {
+      toast.error("No puedes enviar presupuestos hasta pagar tus comisiones pendientes");
+      return;
+    }
     if (!budgetAmount || !service) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount) || amount <= 0) {
@@ -259,6 +266,7 @@ const ServiceDetail = () => {
         {service.status === "nuevo" && (
           <div className="lg:w-1/3">
             <div className="lg:sticky lg:top-6">
+              <CommissionBanner />
               {budgetSent ? (
                 /* Success state */
                 <Card className="overflow-hidden">
@@ -333,7 +341,8 @@ const ServiceDetail = () => {
                     <Button
                       className="w-full gap-2 rounded-xl h-12 text-base font-semibold bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-lg shadow-orange-500/25 transition-all"
                       onClick={handleSendBudget}
-                      disabled={!budgetAmount || sending}
+                      disabled={!budgetAmount || sending || isBlocked}
+                      title={isBlocked ? "Pagá tus comisiones pendientes para enviar presupuestos" : undefined}
                     >
                       {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                       Enviar Presupuesto

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DollarSign, TrendingUp, Settings, Loader2, Save, Download, Filter, ChevronLeft, ChevronRight, AlertTriangle, BarChart3, Receipt, XCircle, Percent, FileSpreadsheet } from "lucide-react";
+import { DollarSign, TrendingUp, Settings, Loader2, Save, Download, Filter, ChevronLeft, ChevronRight, AlertTriangle, BarChart3, Receipt, XCircle, Percent, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,15 +11,47 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PAGE_SIZE = 20;
 
 const AdminReports = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [editingRate, setEditingRate] = useState(false);
   const [newRate, setNewRate] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
+
+  const { data: pendingCommissions } = useQuery({
+    queryKey: ["admin-pending-commissions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("commission_payments")
+        .select("*, profiles:provider_id(full_name, avatar_url)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const confirmCommission = useMutation({
+    mutationFn: async (paymentId: string) => {
+      const { error } = await supabase
+        .from("commission_payments")
+        .update({ status: "completed", confirmed_by: user?.id, confirmed_at: new Date().toISOString() } as any)
+        .eq("id", paymentId);
+      if (error) throw error;
+      // Call the RPC to process the payment
+      await supabase.rpc("process_commission_payment", { p_payment_id: paymentId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-pending-commissions"] });
+      toast.success("Pago de comision confirmado");
+    },
+    onError: () => toast.error("Error al confirmar pago"),
+  });
 
   const { data: settings } = useQuery({
     queryKey: ["platform-settings"],
@@ -442,6 +474,82 @@ const AdminReports = () => {
                 </div>
               )}
             </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pending Commission Payments */}
+      <Card className="rounded-3xl shadow-lg border-t-4 border-amber-500 overflow-hidden dark:bg-slate-900/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+              <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-semibold text-slate-800 dark:text-slate-200">
+                Pagos de Comisiones Pendientes
+              </CardTitle>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {pendingCommissions?.length || 0} pagos pendientes de confirmacion
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {!pendingCommissions?.length ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 mb-4">
+                <CheckCircle2 className="h-8 w-8 text-slate-400 dark:text-slate-500" />
+              </div>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Sin comisiones pendientes</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Todos los pagos de comisiones estan al dia</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50/80 dark:bg-slate-800/40 hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Prestador</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Monto</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Metodo</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Fecha</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Accion</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pendingCommissions.map((payment: any) => (
+                  <TableRow key={payment.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors duration-150">
+                    <TableCell className="font-medium text-slate-800 dark:text-slate-200">
+                      <div className="flex items-center gap-2">
+                        {payment.profiles?.avatar_url ? (
+                          <img src={payment.profiles.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+                        ) : (
+                          <div className="h-7 w-7 rounded-full bg-slate-200 dark:bg-slate-700" />
+                        )}
+                        {payment.profiles?.full_name || "—"}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-semibold text-slate-900 dark:text-white">${Number(payment.amount || 0).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <Badge className="rounded-full px-2.5 py-0.5 text-xs font-medium shadow-none bg-slate-50 text-slate-600 border border-slate-200 dark:bg-slate-800/30 dark:text-slate-400 dark:border-slate-700">
+                        {payment.payment_method || "transferencia"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-slate-500 dark:text-slate-400">{new Date(payment.created_at).toLocaleDateString("es-AR")}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-md text-xs"
+                        disabled={confirmCommission.isPending}
+                        onClick={() => confirmCommission.mutate(payment.id)}
+                      >
+                        {confirmCommission.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <CheckCircle2 className="h-3.5 w-3.5 mr-1" />}
+                        Confirmar
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

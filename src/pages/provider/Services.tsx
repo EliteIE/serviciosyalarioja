@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import CommissionBanner from "@/components/provider/CommissionBanner";
+import { useCommissionBalance } from "@/hooks/useCommissionBalance";
 
 const ProviderServices = () => {
   const { data: services, isLoading } = useProviderRequests();
@@ -26,6 +28,8 @@ const ProviderServices = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const sendMessage = useSendMessage();
+
+  const { isBlocked } = useCommissionBalance();
 
   // Unread messages tracking
   const serviceIds = (services || []).filter(s => s.provider_id).map(s => s.id);
@@ -273,6 +277,8 @@ const ProviderServices = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Gestión de Servicios</h1>
 
+      <CommissionBanner />
+
       {isLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
       ) : (
@@ -381,8 +387,14 @@ const ProviderServices = () => {
                           )}
                           <div className="flex gap-2 flex-wrap justify-end">
                             {service.status === "nuevo" && (
-                              <Button size="sm" className="gap-1.5 rounded-xl" onClick={() => navigate(`/prestador/servicios/${service.id}`)}>
-                                <Eye className="h-3.5 w-3.5" /> Ver Detalles
+                              <Button
+                                size="sm"
+                                className="gap-1.5 rounded-xl"
+                                onClick={() => navigate(`/prestador/servicios/${service.id}`)}
+                                disabled={isBlocked}
+                                title={isBlocked ? "Pagá tus comisiones pendientes para enviar presupuestos" : undefined}
+                              >
+                                <Eye className="h-3.5 w-3.5" /> {isBlocked ? "Bloqueado" : "Ver Detalles"}
                               </Button>
                             )}
                             {service.status === "presupuestado" && (
@@ -393,9 +405,10 @@ const ProviderServices = () => {
                                 size="sm"
                                 className="gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-500/20"
                                 onClick={() => handleStartWithCode(service.id)}
-                                disabled={verifying}
+                                disabled={verifying || isBlocked}
+                                title={isBlocked ? "Pagá tus comisiones pendientes para iniciar servicios" : undefined}
                               >
-                                <KeyRound className="h-3.5 w-3.5" /> Iniciar con Código
+                                <KeyRound className="h-3.5 w-3.5" /> {isBlocked ? "Bloqueado" : "Iniciar con Código"}
                               </Button>
                             )}
                             {service.status === "en_progreso" && (
