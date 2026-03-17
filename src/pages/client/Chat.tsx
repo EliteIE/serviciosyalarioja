@@ -47,6 +47,30 @@ export default function ChatPage() {
   const { data: messages, isLoading: isLoadingMessages } = useMessages(selectedService);
   const sendMessage = useSendMessage();
   const uploadFile = useUploadFile();
+
+  // Fetch last message for each conversation to show preview
+  const [lastMessages, setLastMessages] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const fetchLastMessages = async () => {
+      if (!services || services.length === 0) return;
+      const validIds = services.filter(s => s.status !== 'cancelado').map(s => s.id);
+      if (validIds.length === 0) return;
+      const { data } = await (await import("@/integrations/supabase/client")).supabase
+        .from("messages")
+        .select("service_request_id, content, message_type, created_at")
+        .in("service_request_id", validIds)
+        .order("created_at", { ascending: false });
+      if (!data) return;
+      const map: Record<string, string> = {};
+      for (const msg of data) {
+        if (!map[msg.service_request_id]) {
+          map[msg.service_request_id] = msg.message_type === 'image' ? 'Imagen' : (msg.content || '');
+        }
+      }
+      setLastMessages(map);
+    };
+    fetchLastMessages();
+  }, [services]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -99,14 +123,15 @@ export default function ChatPage() {
     setUploading(true);
     try {
       const url = await uploadFile(file, "chat");
+      const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
       await sendMessage.mutateAsync({
         service_request_id: selectedService,
         sender_id: user.id,
         content: url,
-        message_type: "image",
+        message_type: isPdf ? "file" : "image",
       });
     } catch (err) {
-      toast.error("Error al subir la imagen. Intentá de nuevo.");
+      toast.error("Error al subir el archivo. Intentá de nuevo.");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -204,7 +229,10 @@ export default function ChatPage() {
               const initial = displayName.charAt(0).toUpperCase();
               const hasUnread = unreadServiceIds.has(s.id);
               
-              const previewStatus = s.status === 'completado' ? 'Servicio completado' : 'Chat activo';
+              const lastMsg = lastMessages[s.id];
+              const previewStatus = lastMsg
+                ? (lastMsg.length > 40 ? lastMsg.slice(0, 40) + '...' : lastMsg)
+                : (s.status === 'completado' ? 'Servicio completado' : 'Chat activo');
 
               return (
                 <button
@@ -314,12 +342,6 @@ export default function ChatPage() {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 ml-2">
-              <button className="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors">
-                <Phone size={18} />
-              </button>
-              <button className="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors">
-                <Info size={18} />
-              </button>
             </div>
           </header>
 
@@ -376,7 +398,19 @@ export default function ChatPage() {
 
                       {!isMe && <span className="text-[11px] text-muted-foreground mb-1 ml-1">{msg.sender_name}</span>}
 
-                      {msg.message_type === "image" ? (
+                      {(msg.message_type === "image" || msg.message_type === "file") && msg.content?.toLowerCase().endsWith(".pdf") ? (
+                         <div className={`px-4 py-3 rounded-2xl shadow-sm flex items-center gap-3 ${isMe ? 'bg-orange-600 text-white' : 'bg-card border border-border text-foreground'}`}>
+                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isMe ? 'text-white' : 'text-red-600'}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                           </div>
+                           <div className="min-w-0 flex-1">
+                             <p className={`text-sm font-semibold truncate ${isMe ? 'text-white' : 'text-foreground'}`}>Documento PDF</p>
+                             <a href={msg.content} target="_blank" rel="noopener noreferrer" className={`text-xs font-medium underline underline-offset-2 ${isMe ? 'text-white/80 hover:text-white' : 'text-primary hover:text-primary/80'}`}>
+                               Descargar / Ver
+                             </a>
+                           </div>
+                         </div>
+                      ) : msg.message_type === "image" ? (
                          <div className={`p-1 rounded-2xl shadow-sm ${isMe ? 'bg-orange-600' : 'bg-card border border-border'}`}>
                            <img src={msg.content} alt="Attachment" className="max-w-full sm:max-w-xs rounded-xl self-end" loading="lazy" />
                          </div>
@@ -413,12 +447,12 @@ export default function ChatPage() {
 
           {/* Área de Input de Texto */}
           <div className="p-3 sm:p-4 bg-card border-t border-border">
-            <input 
-              type="file" 
-              ref={fileRef} 
-              className="hidden" 
-              accept="image/*" 
-              onChange={handleFileUpload} 
+            <input
+              type="file"
+              ref={fileRef}
+              className="hidden"
+              accept="image/*,.pdf,application/pdf"
+              onChange={handleFileUpload}
             />
             
             <form onSubmit={handleSend} className="flex items-end gap-2 sm:gap-3 max-w-4xl mx-auto">

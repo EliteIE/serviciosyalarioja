@@ -24,7 +24,7 @@ const ProviderServices = () => {
   const { data: services, isLoading } = useProviderRequests();
   const updateStatus = useUpdateServiceStatus();
   const createReview = useCreateReview();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const sendMessage = useSendMessage();
@@ -276,6 +276,15 @@ const ProviderServices = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Gestión de Servicios</h1>
+
+      {profile?.is_provider && !profile?.provider_verified && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/20 p-4">
+          <ShieldCheck className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            Tu cuenta está en proceso de verificación. Serás visible para los clientes una vez que nuestro equipo apruebe tu perfil y documentación.
+          </p>
+        </div>
+      )}
 
       <CommissionBanner />
 

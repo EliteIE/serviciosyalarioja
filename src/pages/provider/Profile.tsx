@@ -454,7 +454,7 @@ const ProviderProfile = () => {
           <Button
             onClick={handleSaveProfile}
             disabled={saving}
-            className="w-full gap-2 rounded-2xl h-12 text-base font-bold hidden lg:flex bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+            className="w-full gap-2 rounded-2xl h-12 text-base font-bold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Cambios

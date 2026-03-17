@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, MessageSquare, PlusCircle, Briefcase, DollarSign, User, LayoutDashboard, Users, Shield, TrendingUp, FileText, Search } from "lucide-react";
+import { Home, MessageSquare, PlusCircle, Briefcase, DollarSign, User, LayoutDashboard, Users, Shield, TrendingUp, FileText, Search, Camera } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -9,7 +9,7 @@ interface NavItem {
 
 const clientNav: NavItem[] = [
   { label: "Inicio", icon: Home, path: "/cliente" },
-  { label: "Buscar", icon: Search, path: "/cliente/solicitar" },
+  { label: "Buscar", icon: Search, path: "/buscar" },
   { label: "Servicios", icon: Briefcase, path: "/cliente/servicios" },
   { label: "Chat", icon: MessageSquare, path: "/cliente/chat" },
   { label: "Perfil", icon: User, path: "/cliente/perfil" },
@@ -19,7 +19,7 @@ const providerNav: NavItem[] = [
   { label: "Inicio", icon: Home, path: "/prestador" },
   { label: "Servicios", icon: Briefcase, path: "/prestador/servicios" },
   { label: "Chat", icon: MessageSquare, path: "/prestador/chat" },
-  { label: "Finanzas", icon: DollarSign, path: "/prestador/finanzas" },
+  { label: "Portfolio", icon: Camera, path: "/prestador/portafolio" },
   { label: "Perfil", icon: User, path: "/prestador/perfil" },
 ];
 

@@ -16,6 +16,7 @@ const ProviderPortfolio = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [beforeUrl, setBeforeUrl] = useState("");
   const [afterUrl, setAfterUrl] = useState("");
   const [uploadingBefore, setUploadingBefore] = useState(false);
@@ -58,6 +59,7 @@ const ProviderPortfolio = () => {
       const { error } = await supabase.from("portfolio_items").insert({
         user_id: user!.id,
         title,
+        description: description.trim() || null,
         before_url: beforeUrl,
         after_url: afterUrl,
       });
@@ -77,6 +79,7 @@ const ProviderPortfolio = () => {
       const timer = setTimeout(() => {
         setAddSuccess(false);
         setTitle("");
+        setDescription("");
         setBeforeUrl("");
         setAfterUrl("");
         setOpen(false);
@@ -118,7 +121,7 @@ const ProviderPortfolio = () => {
             Los perfiles con fotos reciben un <span className="font-semibold text-orange-600">40% más</span> de solicitudes de presupuesto.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setAddSuccess(false); setTitle(""); setBeforeUrl(""); setAfterUrl(""); } }}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setAddSuccess(false); setTitle(""); setDescription(""); setBeforeUrl(""); setAfterUrl(""); } }}>
           <DialogTrigger asChild>
             <Button className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-600/20 hover:shadow-xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
               <Plus className="h-4 w-4" /> Agregar Trabajo
@@ -158,6 +161,22 @@ const ProviderPortfolio = () => {
                       onChange={e => setTitle(e.target.value)}
                       placeholder="Ej: Reparación de baño completo"
                       className="rounded-xl h-11"
+                    />
+                  </div>
+
+                  {/* Description input */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold flex justify-between">
+                      <span>Descripción</span>
+                      <span className="text-xs font-normal text-slate-400">{description.length}/200 (opcional)</span>
+                    </Label>
+                    <textarea
+                      value={description}
+                      onChange={e => setDescription(e.target.value.slice(0, 200))}
+                      placeholder="Breve descripción del trabajo realizado..."
+                      rows={2}
+                      maxLength={200}
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-background px-4 py-2.5 text-sm text-foreground focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none transition-all"
                     />
                   </div>
 
@@ -317,6 +336,9 @@ const ProviderPortfolio = () => {
               {/* Footer */}
               <div className="px-4 py-3">
                 <h3 className="font-semibold text-sm text-slate-900 dark:text-white truncate">{pair.title}</h3>
+                {pair.description && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{pair.description}</p>
+                )}
                 <p className="text-xs text-slate-400 mt-0.5">{formatDate(pair.created_at)}</p>
               </div>
             </div>

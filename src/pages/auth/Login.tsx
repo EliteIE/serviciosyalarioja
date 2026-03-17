@@ -118,8 +118,8 @@ const Login = () => {
             <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-xl border border-secondary-foreground/20 w-fit backdrop-blur-sm ml-8">
               <Star className="text-yellow-400 fill-yellow-400" size={24} />
               <div>
-                <p className="font-semibold text-sm">+10.000 Reseñas</p>
-                <p className="text-xs text-secondary-foreground/70">De clientes reales</p>
+                <p className="font-semibold text-sm">Presupuestos sin compromiso</p>
+                <p className="text-xs text-secondary-foreground/70">Compará y elegí sin presión</p>
               </div>
             </div>
           </div>
@@ -135,7 +135,7 @@ const Login = () => {
                 </div>
               ))}
             </div>
-            <p className="text-sm text-secondary-foreground/80 font-medium">Únete a más de <strong className="text-secondary-foreground">50.000</strong> usuarios activos.</p>
+            <p className="text-sm text-secondary-foreground/80 font-medium">Profesionales verificados en <strong className="text-secondary-foreground">La Rioja</strong>.</p>
           </div>
         </div>
 

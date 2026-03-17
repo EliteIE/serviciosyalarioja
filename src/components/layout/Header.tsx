@@ -69,6 +69,7 @@ const Header = () => {
             <>
               <Link to="/buscar"><Button variant="ghost" size="sm">Explorar</Button></Link>
               <Link to="/login"><Button variant="ghost" size="sm">Iniciar Sesión</Button></Link>
+              <Link to="/registro/cliente"><Button variant="outline" size="sm">Registrate Gratis</Button></Link>
               <Link to="/registro/prestador"><Button size="sm">Ofrecer Servicios</Button></Link>
             </>
           ) : (

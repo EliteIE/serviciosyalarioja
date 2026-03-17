@@ -45,6 +45,12 @@ export default function SearchPage() {
   const [sortBy, setSortBy] = useState<"rating" | "jobs" | "recommended">("rating");
   const { toggleFavorite, isFavorite } = useFavorites();
 
+  // Filter state
+  const [showFilters, setShowFilters] = useState(false);
+  const [ratingFilter, setRatingFilter] = useState<number>(0);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [availableNow, setAvailableNow] = useState(false);
+
   // Sync URL params on mount and navigation
   useEffect(() => {
     const urlCategory = searchParams.get("category");
@@ -124,6 +130,9 @@ export default function SearchPage() {
           !(p.provider_category || "").toLowerCase().includes(searchQuery.toLowerCase()) &&
           !(p.bio || "").toLowerCase().includes(searchQuery.toLowerCase())) return false;
       if (locationFilter && !(p.location || "").toLowerCase().includes(locationFilter)) return false;
+      if (ratingFilter > 0 && (p.rating_avg || 0) < ratingFilter) return false;
+      if (verifiedOnly && !p.provider_verified) return false;
+      if (availableNow && !p.provider_available) return false;
       return true;
     });
 
@@ -141,7 +150,7 @@ export default function SearchPage() {
           return 0;
       }
     });
-  }, [providers, searchQuery, sortBy, searchParams]);
+  }, [providers, searchQuery, sortBy, searchParams, ratingFilter, verifiedOnly, availableNow]);
 
   const getCategoryName = (slug: string | null) => CATEGORIES.find(c => c.slug === slug)?.name || slug || "";
 
@@ -222,11 +231,97 @@ export default function SearchPage() {
           </div>
 
           {/* Botão Extra Filtros */}
-          <button className="hidden md:flex items-center gap-2 px-6 py-3.5 bg-secondary hover:bg-muted text-secondary-foreground font-semibold rounded-xl transition-colors">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`hidden md:flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-colors ${
+              showFilters || ratingFilter > 0 || verifiedOnly || availableNow
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary hover:bg-muted text-secondary-foreground'
+            }`}
+          >
             <Filter size={20} />
             Filtros
+            {(ratingFilter > 0 || verifiedOnly || availableNow) && (
+              <span className="ml-1 w-5 h-5 rounded-full bg-white/20 text-xs flex items-center justify-center font-bold">
+                {(ratingFilter > 0 ? 1 : 0) + (verifiedOnly ? 1 : 0) + (availableNow ? 1 : 0)}
+              </span>
+            )}
           </button>
         </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="mt-3 bg-card rounded-2xl shadow-lg border border-border p-4 md:p-6 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-wrap items-center gap-6">
+              {/* Rating Filter */}
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-foreground">Calificación mínima</span>
+                <div className="flex gap-2">
+                  {[
+                    { label: "Todos", value: 0 },
+                    { label: "4+", value: 4 },
+                    { label: "4.5+", value: 4.5 },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setRatingFilter(opt.value)}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                        ratingFilter === opt.value
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {opt.value > 0 && <Star size={14} className="inline mr-1 -mt-0.5" fill="currentColor" />}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Verified Toggle */}
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-foreground">Solo verificados</span>
+                <button
+                  onClick={() => setVerifiedOnly(!verifiedOnly)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
+                    verifiedOnly
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                  }`}
+                >
+                  <ShieldCheck size={16} />
+                  {verifiedOnly ? 'Activado' : 'Desactivado'}
+                </button>
+              </div>
+
+              {/* Available Now Toggle */}
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-foreground">Disponible ahora</span>
+                <button
+                  onClick={() => setAvailableNow(!availableNow)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
+                    availableNow
+                      ? 'bg-green-500 text-white'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                  }`}
+                >
+                  <Clock size={16} />
+                  {availableNow ? 'Activado' : 'Desactivado'}
+                </button>
+              </div>
+
+              {/* Clear Filters */}
+              {(ratingFilter > 0 || verifiedOnly || availableNow) && (
+                <button
+                  onClick={() => { setRatingFilter(0); setVerifiedOnly(false); setAvailableNow(false); }}
+                  className="ml-auto px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ÁREA DE RESULTADOS */}

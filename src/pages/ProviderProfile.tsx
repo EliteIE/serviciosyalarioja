@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import {
   Star, MapPin, Clock, ShieldCheck, MessageSquare, Share2,
   CheckCircle2, ThumbsUp, Award, ArrowLeft, Loader2, Briefcase,
-  Calendar, DollarSign, Globe
+  Calendar, DollarSign, Globe, Camera
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -40,6 +40,20 @@ export default function ProviderProfilePage() {
   const { data: reviews } = useReviews(id || null);
   const { data: schedule } = useProviderSchedulePublic(id || null);
   const { data: services } = useProviderServicesPublic(id || null);
+
+  const { data: portfolioItems } = useQuery({
+    queryKey: ["portfolio-public", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("portfolio_items")
+        .select("*")
+        .eq("user_id", id!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
 
   if (isLoading) {
     return <div className="min-h-screen flex justify-center items-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
@@ -218,6 +232,41 @@ export default function ProviderProfilePage() {
                               ? `$${svc.price_from.toLocaleString()} - $${svc.price_to.toLocaleString()}`
                               : svc.price_from ? `Desde $${svc.price_from.toLocaleString()}` : `Hasta $${svc.price_to!.toLocaleString()}`}
                           </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Portfolio */}
+            {portfolioItems && portfolioItems.length > 0 && (
+              <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
+                <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+                  <Camera className="h-5 w-5" /> Portafolio de Trabajos
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {portfolioItems.map((item) => (
+                    <div key={item.id} className="rounded-2xl border border-border bg-muted/20 overflow-hidden">
+                      <div className="grid grid-cols-2 h-40">
+                        <div className="relative overflow-hidden">
+                          <img src={item.before_url} alt="Antes" className="h-full w-full object-cover" />
+                          <span className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            Antes
+                          </span>
+                        </div>
+                        <div className="relative overflow-hidden">
+                          <img src={item.after_url} alt="Después" className="h-full w-full object-cover" />
+                          <span className="absolute bottom-2 left-2 bg-green-500/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            Después
+                          </span>
+                        </div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <p className="font-semibold text-sm text-foreground">{item.title}</p>
+                        {item.description && (
+                          <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
                         )}
                       </div>
                     </div>

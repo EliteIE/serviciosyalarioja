@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, AlertTriangle, TrendingUp,
@@ -10,6 +11,9 @@ import {
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const adminItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
@@ -46,6 +50,26 @@ const AppSidebar = ({ variant }: AppSidebarProps) => {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { user } = useAuth();
+
+  // Fetch active service request IDs for unread badge
+  const [serviceIds, setServiceIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!user || variant === "admin") return;
+    const fetchIds = async () => {
+      const col = variant === "provider" ? "provider_id" : "client_id";
+      const { data } = await supabase
+        .from("service_requests")
+        .select("id")
+        .eq(col, user.id)
+        .not("status", "in", '("cancelado","completado")');
+      setServiceIds((data || []).map((d) => d.id));
+    };
+    fetchIds();
+  }, [user, variant]);
+
+  const { hasUnread, unreadServiceIds } = useUnreadMessages(serviceIds);
+  const unreadCount = unreadServiceIds.size;
 
   const items = variant === "admin" ? adminItems : variant === "provider" ? providerItems : clientItems;
   const label = variant === "admin" ? "Administración" : variant === "provider" ? "Prestador" : "Cliente";
@@ -76,7 +100,14 @@ const AppSidebar = ({ variant }: AppSidebarProps) => {
                       className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
                     >
-                      <item.icon className="mr-2 h-4 w-4" />
+                      <div className="relative mr-2">
+                        <item.icon className="h-4 w-4" />
+                        {item.title === "Chat" && hasUnread && (
+                          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                          </span>
+                        )}
+                      </div>
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>

@@ -38,6 +38,7 @@ import AdminReports from "./pages/admin/Reports";
 import AdminModeration from "./pages/admin/Moderation";
 import AdminAuditLog from "./pages/admin/AuditLog";
 import Contacto from "./pages/Contacto";
+import ComoFunciona from "./pages/ComoFunciona";
 import RequestBudget from "./pages/RequestBudget";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -70,6 +71,7 @@ const App = () => (
               <Route path="/terminos" element={<TermsAndConditions />} />
               <Route path="/privacidad" element={<PrivacyPolicy />} />
               <Route path="/contacto" element={<Contacto />} />
+              <Route path="/como-funciona" element={<ComoFunciona />} />
             </Route>
 
             {/* Standalone pages — protected (user must be logged in to request) */}

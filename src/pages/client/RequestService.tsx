@@ -156,18 +156,12 @@ export default function RequestService() {
             </div>
           )}
 
-          {/* Neurotécnica: Social Proof (Bandwagon Effect) */}
+          {/* Trust badges */}
           {!isSuccess && (
             <div className="mt-4 flex items-center gap-2 relative z-10">
-              <div className="flex -space-x-2">
-                {['bg-blue-500', 'bg-green-500', 'bg-purple-500'].map((color, i) => (
-                  <div key={i} className={`w-6 h-6 rounded-full ${color} border-2 border-slate-900 flex items-center justify-center text-[9px] font-bold text-white`}>
-                    {['M', 'J', 'L'][i]}
-                  </div>
-                ))}
-              </div>
+              <ShieldCheck size={14} className="text-slate-400" />
               <p className="text-xs text-slate-400">
-                <span className="text-slate-300 font-semibold">+12 personas</span> solicitaron servicios hoy en tu zona
+                <span className="text-slate-300 font-semibold">Prestadores verificados</span> en tu zona — presupuestos sin compromiso
               </p>
             </div>
           )}
@@ -496,7 +490,7 @@ export default function RequestService() {
                       </p>
                       <div className="flex items-center justify-center gap-4 text-[10px] text-muted-foreground">
                         <span className="flex items-center gap-1"><ShieldCheck size={12} className="text-green-500" /> 100% Seguro</span>
-                        <span className="flex items-center gap-1"><Users size={12} className="text-blue-500" /> +500 Profesionales</span>
+                        <span className="flex items-center gap-1"><Users size={12} className="text-blue-500" /> Profesionales verificados</span>
                         <span className="flex items-center gap-1"><Check size={12} className="text-primary" /> Sin costo</span>
                       </div>
                     </div>
