@@ -178,6 +178,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        // Handle OAuth provider registration: if ?oauth_role=provider is in URL,
+        // promote this account to provider role (invisible until admin approves)
+        const urlParams = new URLSearchParams(window.location.search);
+        const oauthRole = urlParams.get("oauth_role");
+        if (oauthRole === "provider") {
+          try {
+            // Update profile to provider
+            await supabase.from("profiles").update({
+              is_provider: true,
+              provider_verified: false,
+              provider_available: false,
+              provider_verification_status: "pending",
+            }).eq("id", session.user.id);
+            // Update or insert user_roles to provider
+            await supabase.from("user_roles").upsert({
+              user_id: session.user.id,
+              role: "provider",
+            }, { onConflict: "user_id" });
+            // Clean the URL param
+            urlParams.delete("oauth_role");
+            const cleanUrl = urlParams.toString()
+              ? `${window.location.pathname}?${urlParams.toString()}`
+              : window.location.pathname;
+            window.history.replaceState({}, "", cleanUrl);
+          } catch (err) {
+            console.error("Failed to promote to provider:", err);
+          }
+        }
+
         await Promise.all([
           fetchProfile(session.user.id),
           fetchRole(session.user.id),
