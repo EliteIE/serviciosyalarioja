@@ -80,6 +80,7 @@ ${colorConfig
   .map(([key, itemConfig]) => {
     const safeKey = sanitizeCssIdentifier(key);
     const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+    // eslint-disable-next-line no-useless-escape
     const safeColor = color ? color.replace(/[^a-zA-Z0-9#(),.\s%\/\-]/g, "") : null;
     return safeColor ? `  --color-${safeKey}: ${safeColor};` : null;
   })

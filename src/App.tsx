@@ -67,7 +67,7 @@ const App = () => (
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/buscar" element={<SearchPage />} />
-              <Route path="/prestador/:id" element={<ProviderProfilePage />} />
+              <Route path="/p/:id" element={<ProviderProfilePage />} />
               <Route path="/terminos" element={<TermsAndConditions />} />
               <Route path="/privacidad" element={<PrivacyPolicy />} />
               <Route path="/contacto" element={<Contacto />} />

@@ -17,11 +17,11 @@ import {
 } from "lucide-react";
 import { useProviderRequests } from "@/hooks/useServiceRequests";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { useMyReviewedServiceIds } from "@/hooks/useReviews";
+import { useProviderEarningsSummary } from "@/hooks/usePayments";
+import { useUpdateProfile } from "@/hooks/useProfiles";
 
 const ProviderDashboard = () => {
   const { profile, user } = useAuth();
@@ -29,31 +29,8 @@ const ProviderDashboard = () => {
   const { data: services, isLoading } = useProviderRequests();
   const [available, setAvailable] = useState(profile?.provider_available ?? true);
 
-  // Fetch real earnings data
-  const { data: earnings } = useQuery({
-    queryKey: ["provider-earnings-summary", user?.id],
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select("provider_amount, platform_fee, amount, status, created_at")
-        .eq("provider_id", user!.id);
-      if (error) return { total: 0, thisMonth: 0, count: 0, hasPayments: false };
-
-      const completed = data?.filter(p => p.status === "completed") || [];
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const thisMonth = completed.filter(p => p.created_at >= monthStart);
-
-      return {
-        total: completed.reduce((s, p) => s + Number(p.provider_amount), 0),
-        thisMonth: thisMonth.reduce((s, p) => s + Number(p.provider_amount), 0),
-        count: completed.length,
-        hasPayments: completed.length > 0,
-      };
-    },
-    enabled: !!user,
-  });
+  const { data: earnings } = useProviderEarningsSummary(user?.id);
+  const updateProfile = useUpdateProfile();
 
   const firstName = profile?.full_name?.split(" ")[0] || "Prestador";
   const activeServices = services?.filter((s) => s.status !== "completado" && s.status !== "cancelado") || [];
@@ -61,7 +38,7 @@ const ProviderDashboard = () => {
   const pendingServices = services?.filter((s) => s.status === "nuevo") || [];
   const inProgressServices = services?.filter((s) => s.status === "presupuestado" || s.status === "aceptado" || s.status === "en_progreso") || [];
   const awaitingClientServices = services?.filter((s) => s.status === "finalizado_prestador") || [];
-  const completedServices = services?.filter((s) => s.status === "completado") || [];
+  const completedServices = useMemo(() => services?.filter((s) => s.status === "completado") || [], [services]);
 
   // Check which completed services the provider already reviewed
   const completedServiceIds = useMemo(
@@ -74,15 +51,12 @@ const ProviderDashboard = () => {
   const toggleAvailability = async () => {
     const newVal = !available;
     setAvailable(newVal);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ provider_available: newVal })
-      .eq("id", user!.id);
-    if (error) {
+    try {
+      await updateProfile.mutateAsync({ provider_available: newVal });
+      toast.success(newVal ? "¡Estás disponible para nuevos trabajos!" : "Modo Oculto activado");
+    } catch {
       toast.error("Error al actualizar disponibilidad");
       setAvailable(!newVal);
-    } else {
-      toast.success(newVal ? "¡Estás disponible para nuevos trabajos!" : "Modo Oculto activado");
     }
   };
 
@@ -465,7 +439,7 @@ const ProviderDashboard = () => {
           </section>
 
           {/* Tip */}
-          <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden border border-slate-700/50">
+          <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:to-slate-900 rounded-2xl p-6 text-primary-foreground shadow-lg relative overflow-hidden border border-slate-700/50">
             <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary rounded-full opacity-20 blur-xl pointer-events-none"></div>
             <h3 className="font-bold mb-2 relative z-10 flex items-center gap-2">
               <Zap size={18} className="text-yellow-400" />

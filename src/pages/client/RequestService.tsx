@@ -133,7 +133,7 @@ export default function RequestService() {
           {/* Efeito visual de fundo */}
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary rounded-full opacity-20 blur-[50px] pointer-events-none"></div>
 
-          <h1 className="text-3xl font-extrabold text-white mb-2 relative z-10">
+          <h1 className="text-3xl font-extrabold text-primary-foreground mb-2 relative z-10">
             {isSuccess ? '¡Listo!' : 'Solicitar Servicio'}
           </h1>
           <p className="text-slate-300 relative z-10 text-lg">
@@ -187,7 +187,7 @@ export default function RequestService() {
                 {/* Círculo expansivo animado */}
                 <div className="absolute inset-0 bg-success/80 rounded-full animate-ping opacity-40"></div>
                 {/* Ícone de sucesso */}
-                <div className="relative bg-gradient-to-tr from-emerald-500 to-green-400 text-white p-5 rounded-full shadow-lg shadow-success/30 transform transition-transform duration-500 hover:scale-110">
+                <div className="relative bg-gradient-to-tr from-emerald-500 to-green-400 text-primary-foreground p-5 rounded-full shadow-lg shadow-success/30 transform transition-transform duration-500 hover:scale-110">
                   <Check size={48} strokeWidth={3} />
                 </div>
               </div>

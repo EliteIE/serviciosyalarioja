@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
-import { useClientRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
+import { useClientRequests, useUpdateServiceStatus, useUpdateServiceRequest } from "@/hooks/useServiceRequests";
 import { useSendMessage } from "@/hooks/useMessages";
 import { useAuth } from "@/contexts/AuthContext";
-import { usePayments } from "@/hooks/usePayments";
-import { supabase } from "@/integrations/supabase/client";
+import { usePayments, useProviderBankDetails, useCreatePayment } from "@/hooks/usePayments";
+import { useServiceExtraCharges, useUpdateExtraCharge } from "@/hooks/useExtraCharges";
 import { toast } from "sonner";
 import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,7 +30,10 @@ const ClientDashboard = () => {
   const { profile, user } = useAuth();
   const { data: services, isLoading } = useClientRequests();
   const updateStatus = useUpdateServiceStatus();
+  const updateServiceRequest = useUpdateServiceRequest();
+  const updateExtra = useUpdateExtraCharge();
   const { createCheckout } = usePayments();
+  const createPayment = useCreatePayment();
   const queryClient = useQueryClient();
   const sendMessage = useSendMessage();
   const [accepting, setAccepting] = useState<string | null>(null);
@@ -52,7 +55,7 @@ const ClientDashboard = () => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const activeServices = services?.filter((s) => s.status !== "completado" && s.status !== "cancelado") || [];
-  const completedServices = services?.filter((s) => s.status === "completado") || [];
+  const completedServices = useMemo(() => services?.filter((s) => s.status === "completado") || [], [services]);
   const budgetReceived = services?.filter((s) => s.status === "presupuestado" && s.budget_amount) || [];
   const finalizados = services?.filter((s) => s.status === "finalizado_prestador") || [];
 
@@ -70,46 +73,14 @@ const ClientDashboard = () => {
 
   // Fetch extra charges for active services
   const activeIds = activeServices.map((s) => s.id);
-  const { data: extraCharges } = useQuery({
-    queryKey: ["extra-charges", "client", activeIds],
-    queryFn: async () => {
-      if (activeIds.length === 0) return [];
-      const { data, error } = await supabase
-        .from("extra_charges")
-        .select("*")
-        .in("service_request_id", activeIds)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: activeIds.length > 0,
-  });
+  const { data: extraCharges } = useServiceExtraCharges(activeIds);
 
   // Fetch provider profile for transfer details when needed
   const completionService = services?.find((s) => s.id === completionServiceId);
-  const { data: providerProfile } = useQuery({
-    queryKey: ["provider-bank-details", completionServiceId],
-    queryFn: async () => {
-      // Try RPC first, fallback to direct profile query if function doesn't exist
-      const { data, error } = await supabase
-        .rpc("get_provider_bank_details", { p_service_request_id: completionServiceId! });
-      if (!error && data) return (data as any)?.[0] || data || null;
+  const shouldFetchBankDetails = !!completionServiceId && (transferDialogOpen || selectedPaymentMethod === "transferencia");
+  const { data: providerProfile } = useProviderBankDetails(shouldFetchBankDetails ? completionServiceId : null);
 
-      // Fallback: get bank details from provider profile directly
-      console.warn("get_provider_bank_details RPC failed, using fallback:", error?.message);
-      const service = services?.find((s) => s.id === completionServiceId);
-      if (!service?.provider_id) return null;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, bank_alias, bank_cvu")
-        .eq("id", service.provider_id)
-        .single();
-      return profile || null;
-    },
-    enabled: !!completionServiceId && (transferDialogOpen || selectedPaymentMethod === "transferencia"),
-  });
-
-  const pendingExtras = extraCharges?.filter((e: any) => e.status === "pendiente") || [];
+  const pendingExtras = extraCharges?.filter((e) => e.status === "pendiente") || [];
 
   const firstName = profile?.full_name?.split(" ")[0] || "Usuario";
 
@@ -117,16 +88,15 @@ const ClientDashboard = () => {
     setAccepting(serviceId);
     try {
       const code = generateCode();
-      const { error } = await supabase
-        .from("service_requests")
-        .update({ status: "aceptado" as any, verification_code: code } as any)
-        .eq("id", serviceId);
-      if (error) throw error;
+      await updateServiceRequest.mutateAsync({
+        id: serviceId,
+        data: { status: "aceptado" as never, verification_code: code } as never
+      });
       setGeneratedCode(code);
       setCodeDialogOpen(true);
       toast.success("¡Presupuesto aceptado!");
       queryClient.invalidateQueries({ queryKey: ["service-requests"] });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error al aceptar presupuesto");
     } finally {
       setAccepting(null);
@@ -137,14 +107,13 @@ const ClientDashboard = () => {
     if (rejecting) return;
     setRejecting(serviceId);
     try {
-      const { error } = await supabase
-        .from("service_requests")
-        .update({ status: "nuevo" as any, provider_id: null, budget_amount: null, budget_message: null, verification_code: null } as any)
-        .eq("id", serviceId);
-      if (error) throw error;
+      await updateServiceRequest.mutateAsync({
+        id: serviceId,
+        data: { status: "nuevo" as never, provider_id: null, budget_amount: null, budget_message: null, verification_code: null } as never
+      });
       toast.success("Presupuesto rechazado. Tu solicitud vuelve a estar disponible.");
       queryClient.invalidateQueries({ queryKey: ["service-requests"] });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error");
     } finally {
       setRejecting(null);
@@ -153,9 +122,8 @@ const ClientDashboard = () => {
 
   const handleApproveExtra = async (extraId: string) => {
     try {
-      const extra = extraCharges?.find((e: any) => e.id === extraId);
-      const { error } = await supabase.from("extra_charges").update({ status: "aprobado" }).eq("id", extraId);
-      if (error) throw error;
+      const extra = extraCharges?.find((e) => e.id === extraId);
+      await updateExtra.mutateAsync({ id: extraId, status: "aprobado" });
 
       if (extra) {
         await sendMessage.mutateAsync({
@@ -168,16 +136,15 @@ const ClientDashboard = () => {
 
       toast.success("Cargo extra aprobado");
       queryClient.invalidateQueries({ queryKey: ["extra-charges"] });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error");
     }
   };
 
   const handleRejectExtra = async (extraId: string) => {
     try {
-      const extra = extraCharges?.find((e: any) => e.id === extraId);
-      const { error } = await supabase.from("extra_charges").update({ status: "rechazado" }).eq("id", extraId);
-      if (error) throw error;
+      const extra = extraCharges?.find((e) => e.id === extraId);
+      await updateExtra.mutateAsync({ id: extraId, status: "rechazado" });
 
       if (extra) {
         await sendMessage.mutateAsync({
@@ -190,7 +157,7 @@ const ClientDashboard = () => {
 
       toast.success("Cargo extra rechazado");
       queryClient.invalidateQueries({ queryKey: ["extra-charges"] });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error");
     }
   };
@@ -213,8 +180,8 @@ const ClientDashboard = () => {
   const getServiceTotal = (serviceId: string) => {
     const service = services?.find((s) => s.id === serviceId);
     if (!service) return 0;
-    const approvedExtras = extraCharges?.filter((e: any) => e.service_request_id === serviceId && e.status === "aprobado") || [];
-    const extraTotal = approvedExtras.reduce((sum: number, e: any) => sum + Number(e.amount), 0);
+    const approvedExtras = extraCharges?.filter((e) => e.service_request_id === serviceId && e.status === "aprobado") || [];
+    const extraTotal = approvedExtras.reduce((sum: number, e) => sum + Number(e.amount), 0);
     return (service.budget_amount || 0) + extraTotal;
   };
 
@@ -232,7 +199,7 @@ const ClientDashboard = () => {
         if (total <= 0) throw new Error("No hay monto válido para pagar");
         toast.info("Redirigiendo al pago...");
         await createCheckout(completionServiceId!, total, service.title);
-      } catch (err: any) {
+      } catch (err) {
         toast.error(err.message || "Error al procesar el pago");
       } finally {
         setConfirming(false);
@@ -248,24 +215,15 @@ const ClientDashboard = () => {
         const service = services?.find((s) => s.id === completionServiceId);
         const total = getServiceTotal(completionServiceId!);
 
-        const { error: statusError } = await supabase
-          .from("service_requests")
-          .update({ status: "completado" as any })
-          .eq("id", completionServiceId!);
-        if (statusError) throw new Error("Error al completar el servicio: " + statusError.message);
-
         // Create payment record for cash (tracking purposes)
         if (service) {
-          await supabase.from("payments").insert({
+          await createPayment.mutateAsync({
             service_request_id: completionServiceId!,
             client_id: user!.id,
             provider_id: service.provider_id || "",
             amount: total,
-            platform_fee: 0,
-            provider_amount: total,
-            commission_rate: 0,
-            status: "completed",
             payment_method: "efectivo",
+            status: "completado"
           });
         }
 
@@ -278,7 +236,7 @@ const ClientDashboard = () => {
 
         toast.success("¡Servicio finalizado correctamente!");
         queryClient.invalidateQueries({ queryKey: ["service-requests"] });
-      } catch (err: any) {
+      } catch (err) {
         toast.error(err.message || "Error al finalizar");
       } finally {
         setConfirming(false);
@@ -303,38 +261,22 @@ const ClientDashboard = () => {
     try {
       const service = services?.find((s) => s.id === completionServiceId);
 
-      const { error: statusError } = await supabase
-        .from("service_requests")
-        .update({ status: "completado" as any })
-        .eq("id", completionServiceId!);
-      if (statusError) throw new Error("Error al completar el servicio: " + statusError.message);
-
-      await sendMessage.mutateAsync({
-        service_request_id: completionServiceId!,
-        sender_id: user!.id,
-        content: `🏦 Pago realizado por transferencia bancaria al prestador ${providerProfile?.full_name || ""}. Servicio finalizado.`,
-        message_type: "system",
-      });
-
       // Create payment record for tracking
       if (service) {
         const total = getServiceTotal(completionServiceId!);
-        await supabase.from("payments").insert({
+        await createPayment.mutateAsync({
           service_request_id: completionServiceId!,
           client_id: user!.id,
           provider_id: service.provider_id || "",
           amount: total,
-          platform_fee: 0,
-          provider_amount: total,
-          commission_rate: 0,
-          status: "completed",
           payment_method: "transferencia",
+          status: "completado"
         });
       }
 
       toast.success("¡Servicio finalizado correctamente!");
       queryClient.invalidateQueries({ queryKey: ["service-requests"] });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error al finalizar");
     } finally {
       setConfirming(false);
@@ -499,7 +441,7 @@ const ClientDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {pendingExtras.map((extra: any) => {
+                {pendingExtras.map((extra) => {
                   const service = services?.find((s) => s.id === extra.service_request_id);
                   return (
                     <div key={extra.id} className="p-4 rounded-xl border border-border/50 bg-warning/5 space-y-2">
@@ -535,8 +477,8 @@ const ClientDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {finalizados.map((service) => {
-                  const serviceExtras = extraCharges?.filter((e: any) => e.service_request_id === service.id && e.status === "aprobado") || [];
-                  const extraTotal = serviceExtras.reduce((sum: number, e: any) => sum + Number(e.amount), 0);
+                  const serviceExtras = extraCharges?.filter((e) => e.service_request_id === service.id && e.status === "aprobado") || [];
+                  const extraTotal = serviceExtras.reduce((sum: number, e) => sum + Number(e.amount), 0);
                   const total = (service.budget_amount || 0) + extraTotal;
                   return (
                     <div key={service.id} className="p-4 rounded-xl border border-border/50 bg-success/5 space-y-3">
@@ -694,7 +636,7 @@ const ClientDashboard = () => {
         {/* Coluna Lateral */}
         <div className="hidden xl:block space-y-6">
           {/* CTA Urgente */}
-          <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden sticky top-6">
+          <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl p-6 text-primary-foreground shadow-lg relative overflow-hidden sticky top-6">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
             <h3 className="text-xl font-bold mb-2 relative z-10">¿Necesitás ayuda urgente?</h3>
             <p className="text-orange-100 text-sm mb-6 relative z-10">Tenemos profesionales disponibles 24/7 para emergencias en tu zona.</p>

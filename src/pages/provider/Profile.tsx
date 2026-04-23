@@ -17,9 +17,8 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CATEGORIES } from "@/constants/categories";
 import {
@@ -27,6 +26,18 @@ import {
   useMyServices, useAddService, useDeleteService,
   DAY_NAMES, DAY_NAMES_SHORT,
 } from "@/hooks/useProviderSchedule";
+import { useFullProfile, useUpdateProfile, useDeleteAccount } from "@/hooks/useProfiles";
+import {
+  useMyBankDetails,
+  useMpAccount,
+  useConnectMp,
+  useDisconnectMp,
+  useUploadProviderDocs,
+  useRemoveProviderDoc,
+  useUploadCriminalRecord,
+  useSignedDocs,
+  useSignedCriminalUrl
+} from "@/hooks/useProviderSettings";
 
 const MAX_DOC_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -91,25 +102,14 @@ const ProviderProfile = () => {
   }, [searchParams, queryClient]);
 
   // Fetch full profile with doc info
-  const { data: fullProfile, refetch: refetchProfile } = useQuery({
-    queryKey: ["provider-profile", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user!.id)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
+  const { data: fullProfile, refetch: refetchProfile } = useFullProfile();
 
   // Populate extra fields from full profile
   useEffect(() => {
     if (fullProfile) {
-      setPriceRange((fullProfile as any).provider_price_range || "");
-      setCoverageArea((fullProfile as any).provider_coverage_area || []);
+      const profileData = fullProfile as Record<string, unknown>;
+      setPriceRange((profileData.provider_price_range as string) || "");
+      setCoverageArea((profileData.provider_coverage_area as string[]) || []);
     }
   }, [fullProfile]);
 
@@ -131,18 +131,7 @@ const ProviderProfile = () => {
   }, [savedSchedule]);
 
   // Fetch decrypted bank details from secure view
-  const { data: bankDetails } = useQuery({
-    queryKey: ["my-bank-details", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("my_bank_details" as any)
-        .select("bank_alias, bank_cvu")
-        .single();
-      if (error && error.code !== "PGRST116") throw error;
-      return data as { bank_alias: string | null; bank_cvu: string | null } | null;
-    },
-    enabled: !!user,
-  });
+  const { data: bankDetails } = useMyBankDetails();
 
   useEffect(() => {
     if (bankDetails) {
@@ -152,40 +141,12 @@ const ProviderProfile = () => {
   }, [bankDetails]);
 
   // Fetch MP account status
-  const { data: mpAccount, isLoading: mpLoading } = useQuery({
-    queryKey: ["provider-mp-account", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("provider_mp_accounts" as any)
-        .select("*")
-        .eq("user_id", user!.id)
-        .single();
-      if (error && error.code !== "PGRST116") throw error;
-      return data as any;
-    },
-    enabled: !!user,
-  });
+  const { data: mpAccount, isLoading: mpLoading } = useMpAccount();
 
   const docPaths: string[] = (fullProfile?.provider_doc_urls as string[] | null) || [];
   const verificationStatus = fullProfile?.provider_verification_status || "pending";
 
-  const { data: signedDocs } = useQuery({
-    queryKey: ["provider-docs-signed", user?.id, docPaths.length],
-    queryFn: async () => {
-      const results = await Promise.all(
-        docPaths.map(async (path) => {
-          const { data } = await supabase.storage.from("provider-docs").createSignedUrl(path, 3600);
-          if (data?.signedUrl) {
-            const name = path.split("/").pop() || "Documento";
-            return { path, url: data.signedUrl, name };
-          }
-          return null;
-        })
-      );
-      return results.filter((r): r is { path: string; url: string; name: string } => r !== null);
-    },
-    enabled: !!user && docPaths.length > 0,
-  });
+  const { data: signedDocs } = useSignedDocs(user, docPaths);
 
   // ─── Profile Completeness (Neurotécnica: Endowed Progress) ─────
   const profileCompleteness = useMemo(() => {
@@ -203,35 +164,40 @@ const ProviderProfile = () => {
     return { fields, completed, total: fields.length, percent: Math.round((completed / fields.length) * 100) };
   }, [profile?.avatar_url, fullName, providerCategory, bio, phone, location, schedule, savedSchedule, myServices]);
 
+  // ─── Mutation Hooks ────────────────────────────────
+  const updateProfile = useUpdateProfile();
+  const connectMp = useConnectMp();
+  const disconnectMp = useDisconnectMp();
+  const uploadDocs = useUploadProviderDocs();
+  const removeDoc = useRemoveProviderDoc();
+  const uploadCriminal = useUploadCriminalRecord();
+  const deleteAccount = useDeleteAccount();
+
   // ─── Handlers ──────────────────────────────────────
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = () => {
     if (!user) return;
     setSaving(true);
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: fullName.trim(),
-          phone: phone.trim(),
-          bio: bio.trim(),
-          location: location.trim(),
-          provider_category: providerCategory || null,
-          provider_price_range: priceRange.trim() || null,
-          provider_coverage_area: coverageArea.length > 0 ? coverageArea : null,
-          bank_alias: bankAlias.trim() || null,
-          bank_cvu: bankCvu.trim() || null,
-        })
-        .eq("id", user.id);
-      if (error) throw error;
-      toast.success("Perfil actualizado");
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["provider-profile", user?.id] });
-    } catch (err: any) {
-      toast.error(err.message || "Error al guardar");
-    } finally {
-      setSaving(false);
-    }
+    updateProfile.mutate({
+      full_name: fullName.trim(),
+      phone: phone.trim(),
+      bio: bio.trim(),
+      location: location.trim(),
+      provider_category: providerCategory || null,
+      provider_price_range: priceRange.trim() || null,
+      provider_coverage_area: coverageArea.length > 0 ? coverageArea : null,
+      bank_alias: bankAlias.trim() || null,
+      bank_cvu: bankCvu.trim() || null,
+    }, {
+      onSuccess: () => {
+        toast.success("Perfil actualizado");
+        setSaving(false);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Error al guardar");
+        setSaving(false);
+      }
+    });
   };
 
   const handleSaveSchedule = () => {
@@ -269,7 +235,7 @@ const ProviderProfile = () => {
     }
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!user) return;
     const currentDocs = docPaths.length;
@@ -282,102 +248,95 @@ const ProviderProfile = () => {
     }
     const toUpload = validFiles.slice(0, 3 - currentDocs);
     if (toUpload.length === 0) return;
+
     setUploading(true);
-    try {
-      const newPaths: string[] = [];
-      for (const file of toUpload) {
-        const ext = file.name.split(".").pop();
-        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await supabase.storage.from("provider-docs").upload(path, file);
-        if (error) throw error;
-        newPaths.push(path);
+    uploadDocs.mutate({ files: toUpload, docPaths }, {
+      onSuccess: (newPaths) => {
+        toast.success(`${newPaths.length} documento(s) subido(s)`);
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      },
+      onError: (err) => {
+        toast.error(err.message || "Error al subir");
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
       }
-      const allPaths = [...docPaths, ...newPaths];
-      const { error } = await supabase.from("profiles").update({ provider_doc_urls: allPaths, provider_verification_status: "pending" }).eq("id", user.id);
-      if (error) throw error;
-      toast.success(`${newPaths.length} documento(s) subido(s)`);
-      refetchProfile();
-      queryClient.invalidateQueries({ queryKey: ["provider-docs-signed"] });
-    } catch (err: any) { toast.error(err.message || "Error al subir"); }
-    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
+    });
   };
 
-  const handleRemoveDoc = async (pathToRemove: string) => {
+  const handleRemoveDoc = (pathToRemove: string) => {
     if (!user) return;
-    try {
-      await supabase.storage.from("provider-docs").remove([pathToRemove]);
-      const newPaths = docPaths.filter((p) => p !== pathToRemove);
-      await supabase.from("profiles").update({ provider_doc_urls: newPaths.length > 0 ? newPaths : null, provider_verification_status: "pending" }).eq("id", user.id);
-      toast.success("Documento eliminado");
-      refetchProfile();
-      queryClient.invalidateQueries({ queryKey: ["provider-docs-signed"] });
-    } catch { toast.error("Error al eliminar documento"); }
+    removeDoc.mutate({ pathToRemove, docPaths }, {
+      onSuccess: () => toast.success("Documento eliminado"),
+      onError: () => toast.error("Error al eliminar documento")
+    });
   };
 
-  const handleConnectMP = async () => {
+  const handleConnectMP = () => {
     setConnectingMP(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("mercadopago-oauth", { method: "POST", body: {} });
-      if (error) throw error;
-      if (data?.oauth_url) window.location.href = data.oauth_url;
-    } catch (err: any) { toast.error("Error al conectar MercadoPago: " + (err.message || "")); setConnectingMP(false); }
+    connectMp.mutate(undefined, {
+      onSuccess: (data) => {
+        if (data?.oauth_url) window.location.href = data.oauth_url;
+      },
+      onError: (err) => {
+        toast.error("Error al conectar MercadoPago: " + (err.message || ""));
+        setConnectingMP(false);
+      }
+    });
   };
 
-  const handleDisconnectMP = async () => {
-    try {
-      const { error } = await supabase.functions.invoke("mercadopago-oauth", { method: "DELETE", body: {} });
-      if (error) throw error;
-      toast.success("Cuenta de MercadoPago desconectada");
-      queryClient.invalidateQueries({ queryKey: ["provider-mp-account"] });
-    } catch { toast.error("Error al desconectar"); }
+  const handleDisconnectMP = () => {
+    disconnectMp.mutate(undefined, {
+      onSuccess: () => toast.success("Cuenta de MercadoPago desconectada"),
+      onError: () => toast.error("Error al desconectar")
+    });
   };
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = () => {
     if (!user) return;
     setDeleting(true);
-    try {
-      const { error } = await supabase.rpc("delete_my_account" as any);
-      if (error) throw error;
-      toast.success("Tu cuenta ha sido eliminada");
-      await signOut();
-      navigate("/");
-    } catch (err: any) { toast.error(err.message || "Error al eliminar la cuenta"); }
-    finally { setDeleting(false); }
+    deleteAccount.mutate(undefined, {
+      onSuccess: () => {
+        toast.success("Tu cuenta ha sido eliminada");
+        signOut();
+        navigate("/");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Error al eliminar la cuenta");
+        setDeleting(false);
+      }
+    });
   };
 
   // ─── Criminal Record Upload Handler ──────────────
-  const handleCriminalFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCriminalFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     const accepted = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
     if (!accepted.includes(file.type)) { toast.error("Formato no soportado. Usá JPG, PNG, WEBP o PDF."); return; }
     if (file.size > MAX_DOC_SIZE) { toast.error("El archivo supera los 5MB"); return; }
+    
     setCriminalUploading(true);
-    try {
-      const ext = file.name.split(".").pop();
-      const path = `${user.id}/criminal-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage.from("provider-docs").upload(path, file);
-      if (uploadErr) throw uploadErr;
-      const { error: updateErr } = await supabase
-        .from("profiles")
-        .update({ criminal_record_url: path, criminal_record_status: "pending" } as any)
-        .eq("id", user.id);
-      if (updateErr) throw updateErr;
-      toast.success("Antecedentes penales subidos. Serán revisados por nuestro equipo.");
-      refetchProfile();
-    } catch (err: any) {
-      toast.error(err.message || "Error al subir el archivo");
-    } finally {
-      setCriminalUploading(false);
-      if (criminalFileInputRef.current) criminalFileInputRef.current.value = "";
-    }
+    uploadCriminal.mutate(file, {
+      onSuccess: () => {
+        toast.success("Antecedentes penales subidos. Serán revisados por nuestro equipo.");
+        setCriminalUploading(false);
+        if (criminalFileInputRef.current) criminalFileInputRef.current.value = "";
+      },
+      onError: (err) => {
+        toast.error(err.message || "Error al subir el archivo");
+        setCriminalUploading(false);
+        if (criminalFileInputRef.current) criminalFileInputRef.current.value = "";
+      }
+    });
   };
 
   // Criminal record helpers
-  const criminalRecordUrl = (fullProfile as any)?.criminal_record_url || null;
-  const criminalRecordStatus: string = (fullProfile as any)?.criminal_record_status || "not_submitted";
-  const criminalRecordNotes: string | null = (fullProfile as any)?.criminal_record_notes || null;
-  const criminalRecordExpiry: string | null = (fullProfile as any)?.criminal_record_expiry || null;
+  const profileProps = fullProfile as Record<string, unknown> | undefined;
+  const criminalRecordUrl = (profileProps?.criminal_record_url as string) || null;
+  const criminalRecordStatus: string = (profileProps?.criminal_record_status as string) || "not_submitted";
+  const criminalRecordNotes: string | null = (profileProps?.criminal_record_notes as string | null) || null;
+  const criminalRecordExpiry: string | null = (profileProps?.criminal_record_expiry as string | null) || null;
 
   const criminalStatusConfig: Record<string, { label: string; color: string }> = {
     not_submitted: { label: "Pendiente de envío", color: "bg-orange-100 text-orange-700" },
@@ -388,15 +347,7 @@ const ProviderProfile = () => {
   };
   const criminalStatus = criminalStatusConfig[criminalRecordStatus] || criminalStatusConfig.not_submitted;
 
-  const { data: signedCriminalUrl } = useQuery({
-    queryKey: ["criminal-record-signed", user?.id, criminalRecordUrl],
-    queryFn: async () => {
-      if (!criminalRecordUrl) return null;
-      const { data } = await supabase.storage.from("provider-docs").createSignedUrl(criminalRecordUrl, 3600);
-      return data?.signedUrl || null;
-    },
-    enabled: !!user && !!criminalRecordUrl,
-  });
+  const { data: signedCriminalUrl } = useSignedCriminalUrl(user, criminalRecordUrl);
 
   const statusConfig = {
     pending: { label: "Pendiente de revisión", icon: Clock, color: "bg-warning/10 text-warning" },

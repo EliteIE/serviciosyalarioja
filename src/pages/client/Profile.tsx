@@ -18,13 +18,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useUpdateProfile, useDeleteAccount } from "@/hooks/useProfiles";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const ClientProfile = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const updateProfile = useUpdateProfile();
+  const deleteAccount = useDeleteAccount();
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,17 +47,12 @@ const ClientProfile = () => {
     if (!user) return;
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: formData.full_name,
-          phone: formData.phone,
-          location: formData.location,
-          bio: formData.bio,
-        })
-        .eq("id", user.id);
-
-      if (error) throw error;
+      await updateProfile.mutateAsync({
+        full_name: formData.full_name,
+        phone: formData.phone,
+        location: formData.location,
+        bio: formData.bio,
+      });
       toast.success("Perfil actualizado correctamente");
     } catch (err: any) {
       toast.error(err.message || "Error al guardar");
@@ -68,8 +65,7 @@ const ClientProfile = () => {
     if (!user) return;
     setDeleting(true);
     try {
-      const { error } = await supabase.rpc("delete_my_account" as any);
-      if (error) throw error;
+      await deleteAccount.mutateAsync();
       toast.success("Tu cuenta ha sido eliminada");
       await signOut();
       navigate("/");

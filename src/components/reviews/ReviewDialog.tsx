@@ -45,7 +45,7 @@ const ReviewDialog = ({ serviceRequestId, reviewedId, reviewedName, children }: 
       setRating(0);
       setComment("");
       setTags([]);
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error al enviar la reseña");
     }
   };

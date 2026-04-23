@@ -40,7 +40,7 @@ export default function CommissionBanner() {
         </div>
         <button
           onClick={() => setShowPayDialog(true)}
-          className="shrink-0 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-semibold hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg shadow-orange-500/20"
+          className="shrink-0 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-primary-foreground text-sm font-semibold hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg shadow-orange-500/20"
         >
           <DollarSign className="h-4 w-4 inline mr-1" />
           Pagar

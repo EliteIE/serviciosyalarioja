@@ -175,7 +175,7 @@ export default function ChatPage() {
           <h1 className="text-2xl font-bold text-foreground">Mensajes</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-foreground transition-colors">
+              <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-slate-500 hover:text-foreground transition-colors">
                 <MoreVertical size={18} />
               </button>
             </DropdownMenuTrigger>
@@ -266,7 +266,7 @@ export default function ChatPage() {
                   {/* Info da Conversa */}
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline mb-1">
-                      <h3 className={`text-sm font-bold truncate pr-2 ${hasUnread ? 'text-slate-800 dark:text-slate-100' : 'text-slate-600 dark:text-slate-400'}`}>
+                      <h3 className={`text-sm font-bold truncate pr-2 ${hasUnread ? 'text-foreground' : 'text-slate-600 dark:text-slate-400'}`}>
                         {displayName}
                       </h3>
                       <span className={`text-xs font-medium ${hasUnread ? 'text-orange-600 dark:text-orange-400' : 'text-muted-foreground'}`}>
@@ -275,14 +275,14 @@ export default function ChatPage() {
                     </div>
                     
                     <p className="text-xs text-muted-foreground truncate mb-1">
-                      <span className="font-medium text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300 px-1.5 py-0.5 rounded truncate mr-1">
+                      <span className="font-medium text-slate-600 bg-muted dark:text-slate-300 px-1.5 py-0.5 rounded truncate mr-1">
                         {s.category.split(' ')[0]}
                       </span>
                       {s.title}
                     </p>
                     
                     <div className="flex justify-between items-center">
-                      <p className={`text-sm truncate pr-4 ${hasUnread ? 'font-semibold text-slate-800 dark:text-slate-100' : 'text-muted-foreground w-11/12'}`}>
+                      <p className={`text-sm truncate pr-4 ${hasUnread ? 'font-semibold text-foreground' : 'text-muted-foreground w-11/12'}`}>
                         {previewStatus}
                       </p>
                       {hasUnread && (
@@ -371,9 +371,9 @@ export default function ChatPage() {
                 if (isSystem) {
                   return (
                     <div key={msg.id} className="flex justify-center my-4">
-                      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl px-4 py-2 flex flex-col items-center">
-                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 text-center max-w-xs">{msg.content}</span>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                      <div className="bg-muted border border-border shadow-sm rounded-xl px-4 py-2 flex flex-col items-center">
+                        <span className="text-xs font-semibold text-foreground text-center max-w-xs">{msg.content}</span>
+                        <span className="text-[10px] text-muted-foreground mt-1">
                           {new Date(msg.created_at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
@@ -399,13 +399,13 @@ export default function ChatPage() {
                       {!isMe && <span className="text-[11px] text-muted-foreground mb-1 ml-1">{msg.sender_name}</span>}
 
                       {(msg.message_type === "image" || msg.message_type === "file") && msg.content?.toLowerCase().endsWith(".pdf") ? (
-                         <div className={`px-4 py-3 rounded-2xl shadow-sm flex items-center gap-3 ${isMe ? 'bg-orange-600 text-white' : 'bg-card border border-border text-foreground'}`}>
+                         <div className={`px-4 py-3 rounded-2xl shadow-sm flex items-center gap-3 ${isMe ? 'bg-orange-600 text-primary-foreground' : 'bg-card border border-border text-foreground'}`}>
                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-red-100 dark:bg-red-900/30'}`}>
-                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isMe ? 'text-white' : 'text-red-600'}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isMe ? 'text-primary-foreground' : 'text-red-600'}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
                            </div>
                            <div className="min-w-0 flex-1">
-                             <p className={`text-sm font-semibold truncate ${isMe ? 'text-white' : 'text-foreground'}`}>Documento PDF</p>
-                             <a href={msg.content} target="_blank" rel="noopener noreferrer" className={`text-xs font-medium underline underline-offset-2 ${isMe ? 'text-white/80 hover:text-white' : 'text-primary hover:text-primary/80'}`}>
+                             <p className={`text-sm font-semibold truncate ${isMe ? 'text-primary-foreground' : 'text-foreground'}`}>Documento PDF</p>
+                             <a href={msg.content} target="_blank" rel="noopener noreferrer" className={`text-xs font-medium underline underline-offset-2 ${isMe ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-primary hover:text-primary/80'}`}>
                                Descargar / Ver
                              </a>
                            </div>
@@ -417,8 +417,8 @@ export default function ChatPage() {
                       ) : (
                         <div className={`px-4 py-2.5 shadow-sm text-[15px] leading-relaxed relative ${
                           isMe 
-                            ? 'bg-orange-600 text-white rounded-2xl rounded-br-sm' 
-                            : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-2xl rounded-bl-sm'
+                            ? 'bg-orange-600 text-primary-foreground rounded-2xl rounded-br-sm' 
+                            : 'bg-card text-foreground border border-border rounded-2xl rounded-bl-sm'
                         }`}>
                           <p className="break-words">{msg.content}</p>
                         </div>
@@ -462,11 +462,11 @@ export default function ChatPage() {
                   type="button" 
                   disabled={uploading}
                   onClick={() => fileRef.current?.click()}
-                  className="p-2.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                  className="p-2.5 text-slate-500 hover:text-slate-700 hover:bg-accent rounded-full transition-colors"
                 >
                   {uploading ? <Loader2 size={20} className="animate-spin text-orange-500" /> : <Paperclip size={20} />}
                 </button>
-                <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()} className="p-2.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors hidden sm:block">
+                <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()} className="p-2.5 text-slate-500 hover:text-slate-700 hover:bg-accent rounded-full transition-colors hidden sm:block">
                   <ImageIcon size={20} />
                 </button>
               </div>
@@ -487,8 +487,8 @@ export default function ChatPage() {
                 disabled={!newMsg.trim() || sendMessage.isPending}
                 className={`p-3.5 rounded-full flex items-center justify-center transition-all ${
                   newMsg.trim() && !sendMessage.isPending
-                    ? 'bg-orange-600 text-white shadow-sm hover:bg-orange-500 transform hover:-translate-y-0.5' 
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                    ? 'bg-orange-600 text-primary-foreground shadow-sm hover:bg-orange-500 transform hover:-translate-y-0.5' 
+                    : 'bg-muted text-slate-400 cursor-not-allowed'
                 }`}
               >
                 <Send size={20} className={newMsg.trim() ? "translate-x-0.5" : ""} />
@@ -500,7 +500,7 @@ export default function ChatPage() {
       ) : (
         /* Estado Vazio (Nenhum chat selecionado - visível principalmente em Desktop) */
         <div className="flex-1 hidden md:flex flex-col items-center justify-center bg-background">
-          <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 text-slate-300 dark:text-slate-600">
+          <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6 text-slate-300 dark:text-slate-600">
             <MessageSquare size={48} />
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">Tus Mensajes</h2>

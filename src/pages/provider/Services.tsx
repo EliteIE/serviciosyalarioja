@@ -7,14 +7,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from "@/components/ui/textarea";
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
 import { CheckCircle2, MessageSquare, Loader2, Play, Eye, Plus, DollarSign, KeyRound, Star, X, Check, Search, ShieldCheck, Calendar, Clock, MapPin } from "lucide-react";
-import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
+import { useProviderRequests, useUpdateServiceStatus, useApprovedExtraCharges, useVerifyAndStartService, useRequestExtraCharge } from "@/hooks/useServiceRequests";
 import { useSendMessage } from "@/hooks/useMessages";
 import { useCreateReview, useMyReviewedServiceIds } from "@/hooks/useReviews";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import CommissionBanner from "@/components/provider/CommissionBanner";
@@ -28,6 +27,8 @@ const ProviderServices = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const sendMessage = useSendMessage();
+  const verifyAndStart = useVerifyAndStartService();
+  const requestExtraCharge = useRequestExtraCharge();
 
   const { isBlocked } = useCommissionBalance();
 
@@ -43,14 +44,14 @@ const ProviderServices = () => {
   const { data: reviewedIds } = useMyReviewedServiceIds(completedServiceIds);
 
   // Review modal state
-  const [reviewService, setReviewService] = useState<any>(null);
+  const [reviewService, setReviewService] = useState<unknown>(null);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewHover, setReviewHover] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSent, setReviewSent] = useState(false);
 
-  const openReviewModal = (service: any) => {
+  const openReviewModal = (service) => {
     setReviewService(service);
     setReviewRating(0);
     setReviewHover(0);
@@ -87,26 +88,13 @@ const ProviderServices = () => {
   };
 
   // Fetch approved extra charges for total display
-  const { data: extraCharges } = useQuery({
-    queryKey: ["extra-charges", "provider", serviceIds],
-    queryFn: async () => {
-      if (serviceIds.length === 0) return [];
-      const { data, error } = await supabase
-        .from("extra_charges")
-        .select("*")
-        .in("service_request_id", serviceIds)
-        .eq("status", "aprobado");
-      if (error) throw error;
-      return data;
-    },
-    enabled: serviceIds.length > 0,
-  });
+  const { data: extraCharges } = useApprovedExtraCharges(serviceIds);
 
-  const getServiceTotal = (service: any) => {
+  const getServiceTotal = (service) => {
     const base = service.budget_amount || 0;
     const extras = (extraCharges || [])
-      .filter((e: any) => e.service_request_id === service.id)
-      .reduce((sum: number, e: any) => sum + Number(e.amount), 0);
+      .filter((e) => e.service_request_id === service.id)
+      .reduce((sum: number, e) => sum + Number(e.amount), 0);
     return { base, extras, total: base + extras };
   };
 
@@ -161,19 +149,12 @@ const ProviderServices = () => {
     if (!codeServiceId || codeInput.length < 6) return;
     setVerifying(true);
     try {
-      const { data, error } = await supabase.rpc("verify_and_start_service", {
-        p_request_id: codeServiceId,
-        p_code: codeInput.trim(),
+      await verifyAndStart.mutateAsync({
+        requestId: codeServiceId,
+        code: codeInput.trim(),
       });
-      if (error) throw error;
-      const result = data as { success: boolean; error?: string };
-      if (!result.success) {
-        toast.error(result.error || "Error al verificar código");
-        return;
-      }
       setCodeVerified(true);
       toast.success("¡Trabajo iniciado!");
-      queryClient.invalidateQueries({ queryKey: ["service-requests"] });
       setTimeout(() => setCodeDialogOpen(false), 1800);
     } catch (err: any) {
       toast.error(err.message || "Error al verificar código");
@@ -222,12 +203,11 @@ const ProviderServices = () => {
     }
     setSubmittingExtra(true);
     try {
-      const { error } = await supabase.from("extra_charges").insert({
-        service_request_id: extraServiceId,
+      await requestExtraCharge.mutateAsync({
+        serviceRequestId: extraServiceId,
         description: extraDesc.trim(),
         amount: parsedAmount,
       });
-      if (error) throw error;
 
       // Register in chat as system message
       await sendMessage.mutateAsync({
@@ -239,7 +219,6 @@ const ProviderServices = () => {
 
       toast.success("Cargo extra solicitado al cliente");
       setExtraDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["extra-charges"] });
     } catch (err: any) {
       toast.error(err.message || "Error al solicitar cargo extra");
     } finally {
@@ -293,7 +272,7 @@ const ProviderServices = () => {
       ) : (
         <div className="space-y-5">
           {/* Toolbar bar */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <div className="bg-card rounded-2xl shadow-sm border border-border p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             {/* Filter pills */}
             <div className="flex-1 overflow-x-auto no-scrollbar">
               <div className="flex gap-2">
@@ -303,14 +282,14 @@ const ProviderServices = () => {
                     onClick={() => setActiveTab(tab.key)}
                     className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       activeTab === tab.key
-                        ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
-                        : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                        ? "bg-slate-900 text-primary-foreground dark:bg-white dark:text-slate-900 shadow-sm"
+                        : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-muted dark:text-slate-300 dark:border-slate-700"
                     }`}
                   >
                     {tab.label}
                     {tab.count !== undefined && ` (${tab.count})`}
                     {tab.badge && tab.badge > 0 ? (
-                      <span className="ml-1.5 h-5 min-w-[20px] px-1.5 text-xs rounded-full bg-orange-500 text-white inline-flex items-center justify-center">
+                      <span className="ml-1.5 h-5 min-w-[20px] px-1.5 text-xs rounded-full bg-orange-500 text-primary-foreground inline-flex items-center justify-center">
                         {tab.badge}
                       </span>
                     ) : null}
@@ -339,9 +318,9 @@ const ProviderServices = () => {
               filteredServices.map((service) => {
                 const { base, extras, total } = getServiceTotal(service);
                 return (
-                  <Card key={service.id} className="overflow-hidden border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
+                  <Card key={service.id} className="overflow-hidden border-border hover:shadow-md transition-shadow">
                     {/* Card header */}
-                    <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-border">
                       <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shrink-0 overflow-hidden">
                         {service.client_avatar ? (
                           <img src={service.client_avatar} alt={service.client_name || ""} className="h-full w-full object-cover" />
@@ -349,7 +328,7 @@ const ProviderServices = () => {
                           service.client_name?.[0] || "?"
                         )}
                       </div>
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{service.client_name}</span>
+                      <span className="text-sm font-medium text-foreground">{service.client_name}</span>
                       <Badge className={`${STATUS_COLORS[service.status]} ml-auto`}>{STATUS_LABELS[service.status]}</Badge>
                     </div>
 
@@ -358,11 +337,11 @@ const ProviderServices = () => {
                       <div className="flex flex-col md:flex-row gap-4">
                         {/* Left side */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 hover:text-orange-500 transition-colors cursor-default">
+                          <h3 className="text-lg font-bold text-foreground hover:text-orange-500 transition-colors cursor-default">
                             {service.title}
                           </h3>
                           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{service.description}</p>
-                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5" />
                               {new Date(service.created_at).toLocaleDateString("es-AR")}
@@ -386,7 +365,7 @@ const ProviderServices = () => {
                         <div className="flex flex-col items-end justify-between gap-3 shrink-0">
                           {service.budget_amount ? (
                             <div className="text-right">
-                              <span className="text-2xl font-extrabold text-slate-900 dark:text-white">${total.toLocaleString()}</span>
+                              <span className="text-2xl font-extrabold text-slate-900 dark:text-primary-foreground">${total.toLocaleString()}</span>
                               {extras > 0 && (
                                 <p className="text-xs text-slate-400 mt-0.5">Base: ${base.toLocaleString()} + Extras: ${extras.toLocaleString()}</p>
                               )}
@@ -412,7 +391,7 @@ const ProviderServices = () => {
                             {service.status === "aceptado" && (
                               <Button
                                 size="sm"
-                                className="gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-500/20"
+                                className="gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-primary-foreground shadow-md shadow-orange-500/20"
                                 onClick={() => handleStartWithCode(service.id)}
                                 disabled={verifying || isBlocked}
                                 title={isBlocked ? "Pagá tus comisiones pendientes para iniciar servicios" : undefined}
@@ -498,13 +477,13 @@ const ProviderServices = () => {
                     value={digit}
                     onChange={e => handleDigitChange(i, e.target.value)}
                     onKeyDown={e => handleDigitKeyDown(i, e)}
-                    className="w-10 h-14 text-center text-xl font-bold font-mono rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all text-foreground"
+                    className="w-10 h-14 text-center text-xl font-bold font-mono rounded-xl border-2 border-border bg-slate-50 dark:bg-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all text-foreground"
                   />
                 ))}
               </div>
 
               <Button
-                className="w-full gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-500/20"
+                className="w-full gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-primary-foreground shadow-md shadow-orange-500/20"
                 onClick={handleVerifyCode}
                 disabled={verifying || codeInput.length < 6}
               >

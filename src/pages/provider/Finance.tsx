@@ -4,9 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useProviderPaymentsList, useProviderMonthlyRevenue } from "@/hooks/usePayments";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import CommissionBanner from "@/components/provider/CommissionBanner";
@@ -20,48 +19,8 @@ const ProviderFinance = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
 
-  const { data: payments, isLoading } = useQuery({
-    queryKey: ["provider-payments", user?.id],
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select("*, service_requests(title)")
-        .eq("provider_id", user!.id)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
-
-  const { data: monthlyData } = useQuery({
-    queryKey: ["provider-monthly-revenue", user?.id],
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("payments")
-        .select("provider_amount, platform_fee, created_at, status")
-        .eq("provider_id", user!.id)
-        .eq("status", "completed");
-      const months: Record<string, { revenue: number; commission: number }> = {};
-      const now = new Date();
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = d.toLocaleDateString("es", { month: "short" });
-        months[key] = { revenue: 0, commission: 0 };
-      }
-      data?.forEach((p) => {
-        const key = new Date(p.created_at).toLocaleDateString("es", { month: "short" });
-        if (months[key]) {
-          months[key].revenue += Number(p.provider_amount);
-          months[key].commission += Number(p.platform_fee);
-        }
-      });
-      return Object.entries(months).map(([month, v]) => ({ month, ...v }));
-    },
-    enabled: !!user,
-  });
+  const { data: payments, isLoading } = useProviderPaymentsList(user?.id);
+  const { data: monthlyData } = useProviderMonthlyRevenue(user?.id);
 
   const completed = payments?.filter(p => p.status === "completed") || [];
   const totalEarnings = completed.reduce((s, p) => s + Number(p.provider_amount), 0);
@@ -87,7 +46,7 @@ const ProviderFinance = () => {
       return;
     }
     const headers = ["Servicio", "Monto Bruto", "Comisión", "Neto", "Estado", "Fecha"];
-    const rows = filteredPayments.map((p: any) => [
+    const rows = filteredPayments.map((p) => [
       p.service_requests?.title || "—",
       Number(p.amount).toFixed(2),
       Number(p.platform_fee).toFixed(2),
@@ -182,7 +141,7 @@ const ProviderFinance = () => {
           {entries && entries.length > 0 ? (
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Detalle de comisiones</p>
-              {entries.map((entry: any) => (
+              {entries.map((entry) => (
                 <div key={entry.id} className="flex items-center justify-between p-3 rounded-xl bg-accent/50">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${entry.status === "paid" ? "bg-success/10" : "bg-amber-100 dark:bg-amber-900/30"}`}>
@@ -264,7 +223,7 @@ const ProviderFinance = () => {
             <p className="text-sm text-muted-foreground text-center py-4">Sin transacciones</p>
           ) : (
             <>
-              {paginatedPayments.map((tx: any) => (
+              {paginatedPayments.map((tx) => (
                 <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl bg-accent/50">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${tx.status === "completed" ? "bg-success/10" : tx.status === "pending" ? "bg-warning/10" : "bg-muted"}`}>

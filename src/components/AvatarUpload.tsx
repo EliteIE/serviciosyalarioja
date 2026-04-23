@@ -1,10 +1,9 @@
 import { useRef, useState } from "react";
 import { Camera, Loader2, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useUploadAvatar, useRemoveAvatar } from "@/hooks/useProfiles";
 
 interface AvatarUploadProps {
   currentUrl?: string | null;
@@ -22,7 +21,10 @@ export default function AvatarUpload({ currentUrl, initials, onUploaded, onRemov
 
   const displayUrl = previewUrl || currentUrl;
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadAvatar = useUploadAvatar();
+  const removeAvatar = useRemoveAvatar();
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
@@ -42,82 +44,40 @@ export default function AvatarUpload({ currentUrl, initials, onUploaded, onRemov
     setPreviewUrl(localPreview);
     setUploading(true);
 
-    try {
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const filePath = `${user.id}/avatar.${ext}`;
-
-      // Delete old avatar if exists (different extension)
-      const { data: existingFiles } = await supabase.storage
-        .from("avatars")
-        .list(user.id);
-      if (existingFiles && existingFiles.length > 0) {
-        const toDelete = existingFiles.map((f) => `${user.id}/${f.name}`);
-        await supabase.storage.from("avatars").remove(toDelete);
+    uploadAvatar.mutate(file, {
+      onSuccess: (publicUrl) => {
+        if (previewUrl && previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+        toast.success("¡Foto de perfil actualizada!");
+        onUploaded?.(publicUrl);
+        setUploading(false);
+        if (fileRef.current) fileRef.current.value = "";
+      },
+      onError: (err) => {
+        toast.error(err.message || "Error al subir la imagen");
+        setPreviewUrl(null); // Revert preview
+        setUploading(false);
+        if (fileRef.current) fileRef.current.value = "";
       }
-
-      // Upload new avatar
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, { upsert: true, contentType: file.type });
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(filePath);
-      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
-
-      // Update profile
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: publicUrl })
-        .eq("id", user.id);
-      if (updateError) throw updateError;
-
-      // Revoke the blob preview now that we have the real URL
-      if (previewUrl && previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(null);
-      toast.success("¡Foto de perfil actualizada!");
-      onUploaded?.(publicUrl);
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-    } catch (err: any) {
-      toast.error(err.message || "Error al subir la imagen");
-      setPreviewUrl(null); // Revert preview
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
+    });
   };
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (!user) return;
     setUploading(true);
-    try {
-      // Delete from storage
-      const { data: existingFiles } = await supabase.storage
-        .from("avatars")
-        .list(user.id);
-      if (existingFiles && existingFiles.length > 0) {
-        const toDelete = existingFiles.map((f) => `${user.id}/${f.name}`);
-        await supabase.storage.from("avatars").remove(toDelete);
+    
+    removeAvatar.mutate(undefined, {
+      onSuccess: () => {
+        setPreviewUrl(null);
+        toast.success("Foto de perfil eliminada");
+        onRemoved?.();
+        setUploading(false);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Error al eliminar la imagen");
+        setUploading(false);
       }
-
-      // Clear in profile
-      const { error } = await supabase
-        .from("profiles")
-        .update({ avatar_url: null })
-        .eq("id", user.id);
-      if (error) throw error;
-
-      setPreviewUrl(null);
-      toast.success("Foto de perfil eliminada");
-      onRemoved?.();
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-    } catch (err: any) {
-      toast.error(err.message || "Error al eliminar la imagen");
-    } finally {
-      setUploading(false);
-    }
+    });
   };
 
   return (
@@ -144,12 +104,12 @@ export default function AvatarUpload({ currentUrl, initials, onUploaded, onRemov
           type="button"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center cursor-pointer"
+          className="absolute inset-0 rounded-full bg-primary/0 group-hover:bg-primary/40 transition-colors flex items-center justify-center cursor-pointer"
         >
           {uploading ? (
-            <Loader2 className="h-6 w-6 text-white animate-spin" />
+            <Loader2 className="h-6 w-6 text-primary-foreground animate-spin" />
           ) : (
-            <Camera className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Camera className="h-6 w-6 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
           )}
         </button>
 

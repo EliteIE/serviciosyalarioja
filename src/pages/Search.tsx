@@ -17,7 +17,7 @@ import {
   Heart
 } from "lucide-react";
 import { CATEGORIES } from "@/constants/categories";
-import { supabase } from "@/integrations/supabase/client";
+import { useSearchProviders } from "@/hooks/useSearchProviders";
 import { SearchSkeleton } from "@/components/skeletons/SearchSkeleton";
 import { useFavorites } from "@/hooks/useFavorites";
 
@@ -41,7 +41,6 @@ export default function SearchPage() {
   const [categoriaActiva, setCategoriaActiva] = useState(searchParams.get("category") || "todas");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [providers, setProviders] = useState<ProviderProfile[]>([]);
-  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"rating" | "jobs" | "recommended">("rating");
   const { toggleFavorite, isFavorite } = useFavorites();
 
@@ -60,7 +59,7 @@ export default function SearchPage() {
   }, [searchParams, categoriaActiva]);
 
   // Configuração visual dinâmica para cada categoria (Adaptação do modelo original)
-  const categoriasConfig: Record<string, any> = {
+  const categoriasConfig: Record<string, unknown> = {
     todas: {
       titulo: 'Explorar Servicios',
       subtitulo: 'Encontrá al profesional ideal para tu necesidad en tu zona.',
@@ -73,7 +72,7 @@ export default function SearchPage() {
       titulo: 'Expertos en Plomería',
       subtitulo: 'Reparaciones, instalaciones y urgencias con agua y gas.',
       color: 'bg-blue-600',
-      txtColor: 'text-white',
+      txtColor: 'text-primary-foreground',
       icono: Wrench,
       bgEfecto: 'from-blue-500 to-blue-700'
     },
@@ -81,7 +80,7 @@ export default function SearchPage() {
       titulo: 'Profesionales de Limpieza',
       subtitulo: 'Limpieza profunda, post-obra y mantenimiento de espacios.',
       color: 'bg-teal-500',
-      txtColor: 'text-white',
+      txtColor: 'text-primary-foreground',
       icono: Sparkles,
       bgEfecto: 'from-teal-400 to-teal-600'
     },
@@ -89,7 +88,7 @@ export default function SearchPage() {
       titulo: 'Técnicos Electricistas',
       subtitulo: 'Instalaciones seguras, tableros y reparaciones eléctricas.',
       color: 'bg-amber-500',
-      txtColor: 'text-white',
+      txtColor: 'text-primary-foreground',
       icono: Zap,
       bgEfecto: 'from-amber-400 to-amber-600'
     },
@@ -97,31 +96,17 @@ export default function SearchPage() {
       titulo: 'Servicios de Jardinería',
       subtitulo: 'Mantenimiento de espacios verdes, poda y paisajismo.',
       color: 'bg-emerald-600',
-      txtColor: 'text-white',
+      txtColor: 'text-primary-foreground',
       icono: TreePine,
       bgEfecto: 'from-emerald-500 to-emerald-700'
     }
   };
 
+  const { data: searchProviders = [], isLoading: loading } = useSearchProviders(categoriaActiva);
+
   useEffect(() => {
-    const fetchProviders = async () => {
-      setLoading(true);
-      let query = supabase
-        .from("profiles_public")
-        .select("*")
-        .eq("is_provider", true)
-        .order("rating_avg", { ascending: false });
-
-      if (categoriaActiva !== "todas") {
-        query = query.eq("provider_category", categoriaActiva);
-      }
-
-      const { data } = await query;
-      setProviders((data as ProviderProfile[]) || []);
-      setLoading(false);
-    };
-    fetchProviders();
-  }, [categoriaActiva]);
+    setProviders(searchProviders);
+  }, [searchProviders]);
 
   const prestadoresFiltrados = useMemo(() => {
     const locationFilter = searchParams.get("location")?.toLowerCase() || "";
@@ -142,10 +127,11 @@ export default function SearchPage() {
           return (b.rating_avg || 0) - (a.rating_avg || 0);
         case "jobs":
           return (b.completed_jobs || 0) - (a.completed_jobs || 0);
-        case "recommended":
+        case "recommended": {
           const scoreA = (a.rating_avg || 0) * Math.log2((a.review_count || 0) + 1) + (a.completed_jobs || 0) * 0.1;
           const scoreB = (b.rating_avg || 0) * Math.log2((b.review_count || 0) + 1) + (b.completed_jobs || 0) * 0.1;
           return scoreB - scoreA;
+        }
         default:
           return 0;
       }
@@ -285,7 +271,7 @@ export default function SearchPage() {
                   onClick={() => setVerifiedOnly(!verifiedOnly)}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
                     verifiedOnly
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-blue-500 text-primary-foreground'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   }`}
                 >
@@ -301,7 +287,7 @@ export default function SearchPage() {
                   onClick={() => setAvailableNow(!availableNow)}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
                     availableNow
-                      ? 'bg-green-500 text-white'
+                      ? 'bg-green-500 text-primary-foreground'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   }`}
                 >
@@ -338,7 +324,7 @@ export default function SearchPage() {
             <span className="text-muted-foreground">Ordenar por:</span>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as "rating" | "jobs" | "recommended")}
               className="bg-transparent font-semibold text-foreground cursor-pointer outline-none"
             >
               <option value="rating">Mejor calificación</option>
@@ -363,7 +349,7 @@ export default function SearchPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {prestadoresFiltrados.map((prestador) => (
-              <Link to={`/prestador/${prestador.id}`} key={prestador.id} className="group">
+              <Link to={`/p/${prestador.id}`} key={prestador.id} className="group">
                 <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full flex flex-col">
                   
                   {/* Header do Cartão (Avatar e Nome) */}

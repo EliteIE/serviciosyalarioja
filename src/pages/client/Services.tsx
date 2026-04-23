@@ -19,11 +19,9 @@ import {
   Briefcase
 } from 'lucide-react';
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
-import { useClientRequests } from "@/hooks/useServiceRequests";
+import { useClientRequests, useCancelServiceRequest } from "@/hooks/useServiceRequests";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useCreateReview, useMyReviewedServiceIds } from "@/hooks/useReviews";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -57,7 +55,7 @@ const getCategoryColor = (category: string) => {
 export default function ClientServices() {
   const { data: services, isLoading } = useClientRequests();
   const createReview = useCreateReview();
-  const queryClient = useQueryClient();
+  const cancelService = useCancelServiceRequest();
 
   // Check which completed services the client already reviewed
   const completedServiceIds = useMemo(
@@ -73,7 +71,7 @@ export default function ClientServices() {
   const [cancelServiceId, setCancelServiceId] = useState<string | null>(null);
 
   // Modal de Avaliação
-  const [servicioACalificar, setServicioACalificar] = useState<any>(null);
+  const [servicioACalificar, setServicioACalificar] = useState<unknown>(null);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comentario, setComentario] = useState('');
@@ -467,13 +465,8 @@ export default function ClientServices() {
               onClick={async () => {
                 if (!cancelServiceId) return;
                 try {
-                  const { error } = await supabase
-                    .from("service_requests")
-                    .update({ status: "cancelado" as any })
-                    .eq("id", cancelServiceId);
-                  if (error) throw error;
+                  await cancelService.mutateAsync(cancelServiceId);
                   toast.success("Solicitud cancelada");
-                  queryClient.invalidateQueries({ queryKey: ["service-requests"] });
                 } catch {
                   toast.error("Error al cancelar");
                 } finally {

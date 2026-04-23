@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUploadFile } from "@/hooks/useServiceRequests";
+import { useProviderPortfolio, useAddPortfolioItem, useDeletePortfolioItem } from "@/hooks/useProfiles";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const ProviderPortfolio = () => {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const addPortfolioItem = useAddPortfolioItem();
+  const deletePortfolioItem = useDeletePortfolioItem();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,19 +27,7 @@ const ProviderPortfolio = () => {
   const beforeRef = useRef<HTMLInputElement>(null);
   const afterRef = useRef<HTMLInputElement>(null);
 
-  const { data: photos = [], isLoading } = useQuery({
-    queryKey: ["portfolio", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("portfolio_items")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
+  const { data: photos = [], isLoading } = useProviderPortfolio(user?.id);
 
   const handleUpload = async (file: File, setter: (url: string) => void, setUploadingState: (v: boolean) => void) => {
     setUploadingState(true);
@@ -56,16 +44,13 @@ const ProviderPortfolio = () => {
     if (!title || !beforeUrl || !afterUrl) return;
     setSaving(true);
     try {
-      const { error } = await supabase.from("portfolio_items").insert({
-        user_id: user!.id,
+      await addPortfolioItem.mutateAsync({
         title,
         description: description.trim() || null,
         before_url: beforeUrl,
         after_url: afterUrl,
       });
-      if (error) throw error;
       toast.success("¡Trabajo agregado al portafolio!");
-      queryClient.invalidateQueries({ queryKey: ["portfolio"] });
       setAddSuccess(true);
     } catch (err: any) {
       toast.error(err.message || "Error al guardar");
@@ -90,10 +75,8 @@ const ProviderPortfolio = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase.from("portfolio_items").delete().eq("id", id);
-      if (error) throw error;
+      await deletePortfolioItem.mutateAsync(id);
       toast.success("Trabajo eliminado");
-      queryClient.invalidateQueries({ queryKey: ["portfolio"] });
     } catch (err: any) {
       toast.error(err.message || "Error al eliminar");
     }
@@ -114,16 +97,16 @@ const ProviderPortfolio = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">
             Tus mejores trabajos
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md">
+          <p className="text-sm text-muted-foreground mt-1 max-w-md">
             Los perfiles con fotos reciben un <span className="font-semibold text-orange-600">40% más</span> de solicitudes de presupuesto.
           </p>
         </div>
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setAddSuccess(false); setTitle(""); setDescription(""); setBeforeUrl(""); setAfterUrl(""); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-600/20 hover:shadow-xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
+            <Button className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-primary-foreground shadow-lg shadow-orange-600/20 hover:shadow-xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
               <Plus className="h-4 w-4" /> Agregar Trabajo
             </Button>
           </DialogTrigger>
@@ -134,13 +117,13 @@ const ProviderPortfolio = () => {
                 <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-5 animate-in zoom-in-50 duration-300">
                   <CheckCircle2 className="h-10 w-10 text-green-600" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">¡Trabajo Agregado!</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-primary-foreground">¡Trabajo Agregado!</h3>
                 <p className="text-sm text-slate-500 mt-1">Tu portafolio se ha actualizado</p>
               </div>
             ) : (
               <>
                 {/* Modal header bar */}
-                <div className="flex items-center justify-between px-6 py-4 border-b bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex items-center justify-between px-6 py-4 border-b bg-background/50">
                   <DialogHeader className="p-0 space-y-0">
                     <DialogTitle className="text-lg font-bold">Agregar trabajo al portafolio</DialogTitle>
                   </DialogHeader>
@@ -176,7 +159,7 @@ const ProviderPortfolio = () => {
                       placeholder="Breve descripción del trabajo realizado..."
                       rows={2}
                       maxLength={200}
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-background px-4 py-2.5 text-sm text-foreground focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none transition-all"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none transition-all"
                     />
                   </div>
 
@@ -189,8 +172,8 @@ const ProviderPortfolio = () => {
                       {beforeUrl ? (
                         <div className="relative group cursor-pointer rounded-xl overflow-hidden" onClick={() => beforeRef.current?.click()}>
                           <img src={beforeUrl} className="h-36 w-full object-cover rounded-xl" />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Camera className="h-6 w-6 text-white" />
+                          <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Camera className="h-6 w-6 text-primary-foreground" />
                           </div>
                         </div>
                       ) : (
@@ -218,8 +201,8 @@ const ProviderPortfolio = () => {
                       {afterUrl ? (
                         <div className="relative group cursor-pointer rounded-xl overflow-hidden" onClick={() => afterRef.current?.click()}>
                           <img src={afterUrl} className="h-36 w-full object-cover rounded-xl" />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Camera className="h-6 w-6 text-white" />
+                          <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Camera className="h-6 w-6 text-primary-foreground" />
                           </div>
                         </div>
                       ) : (
@@ -248,7 +231,7 @@ const ProviderPortfolio = () => {
 
                   {/* Submit button */}
                   <Button
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-semibold shadow-lg shadow-orange-600/20 transition-all duration-200"
+                    className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-primary-foreground font-semibold shadow-lg shadow-orange-600/20 transition-all duration-200"
                     onClick={handleAdd}
                     disabled={!title || !beforeUrl || !afterUrl || saving}
                   >
@@ -270,7 +253,7 @@ const ProviderPortfolio = () => {
       ) : photos.length === 0 ? (
         /* Premium empty state */
         <div
-          className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center cursor-pointer hover:shadow-lg transition-shadow duration-300"
+          className="bg-card rounded-3xl border border-border p-12 text-center cursor-pointer hover:shadow-lg transition-shadow duration-300"
           onClick={() => setOpen(true)}
         >
           <div className="relative inline-flex items-center justify-center mb-8">
@@ -282,17 +265,17 @@ const ProviderPortfolio = () => {
                 <ImageIcon className="h-8 w-8 text-slate-400" />
               </div>
               <div className="w-28 h-36 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-xl flex items-center justify-center rotate-6 relative z-10 ml-4">
-                <Camera className="h-8 w-8 text-white" />
+                <Camera className="h-8 w-8 text-primary-foreground" />
               </div>
             </div>
           </div>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-14">
+          <h3 className="text-xl font-bold text-slate-900 dark:text-primary-foreground mt-14">
             Aún no hay fotos en tu portafolio
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-sm mx-auto">
+          <p className="text-sm text-muted-foreground mt-2 max-w-sm mx-auto">
             Las fotos de antes y después generan confianza con los clientes y te ayudan a conseguir más trabajos.
           </p>
-          <Button className="mt-6 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white font-semibold px-6 h-11 shadow-md">
+          <Button className="mt-6 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-primary-foreground font-semibold px-6 h-11 shadow-md">
             Subir mi primer trabajo
           </Button>
         </div>
@@ -300,19 +283,19 @@ const ProviderPortfolio = () => {
         /* Gallery grid */
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {photos.map((pair) => (
-            <div key={pair.id} className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div key={pair.id} className="group rounded-2xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow duration-300">
               {/* Image area */}
               <div className="relative h-48">
                 <div className="grid grid-cols-2 h-full">
                   <div className="relative overflow-hidden">
                     <img src={pair.before_url} alt="Antes" className="h-full w-full object-cover" />
-                    <span className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    <span className="absolute bottom-2 left-2 bg-primary/60 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                       Antes
                     </span>
                   </div>
                   <div className="relative overflow-hidden">
                     <img src={pair.after_url} alt="Después" className="h-full w-full object-cover" />
-                    <span className="absolute bottom-2 left-2 bg-green-500/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    <span className="absolute bottom-2 left-2 bg-green-500/80 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                       Después
                     </span>
                   </div>
@@ -335,9 +318,9 @@ const ProviderPortfolio = () => {
               </div>
               {/* Footer */}
               <div className="px-4 py-3">
-                <h3 className="font-semibold text-sm text-slate-900 dark:text-white truncate">{pair.title}</h3>
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-primary-foreground truncate">{pair.title}</h3>
                 {pair.description && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{pair.description}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{pair.description}</p>
                 )}
                 <p className="text-xs text-slate-400 mt-0.5">{formatDate(pair.created_at)}</p>
               </div>

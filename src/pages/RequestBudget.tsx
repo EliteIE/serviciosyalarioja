@@ -27,8 +27,7 @@ import { CATEGORIES } from "@/constants/categories";
 import { useCreateServiceRequest, useUploadFile } from "@/hooks/useServiceRequests";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useProviderProfile } from "@/hooks/useProfiles";
 import { useProviderSchedulePublic } from "@/hooks/useProviderSchedule";
 
 export default function RequestBudget() {
@@ -36,19 +35,7 @@ export default function RequestBudget() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
 
-  const { data: provider, isLoading: providerLoading } = useQuery({
-    queryKey: ["provider-profile", providerId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles_public")
-        .select("*")
-        .eq("id", providerId!)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!providerId,
-  });
+  const { data: provider, isLoading: providerLoading } = useProviderProfile(providerId);
 
   const { data: schedule } = useProviderSchedulePublic(providerId || null);
 
@@ -166,7 +153,7 @@ export default function RequestBudget() {
         urgency,
         budget: undefined,
         photos: photos.length > 0 ? photos : undefined,
-        // @ts-ignore - Supabase RPC may need this or not, handling this for compatibility
+        // @ts-expect-error - Supabase RPC may need this or not, handling this for compatibility
         provider_id: provider.id,
       });
       setIsSuccess(true);
@@ -278,7 +265,7 @@ export default function RequestBudget() {
               <div className="p-12 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in duration-500 min-h-[500px]">
                 <div className="relative mb-8">
                   <div className="absolute inset-0 bg-success/80 rounded-full animate-ping opacity-40"></div>
-                  <div className="relative bg-gradient-to-tr from-success to-emerald-400 text-white p-5 rounded-full shadow-lg shadow-success/30 transform transition-transform duration-500 hover:scale-110">
+                  <div className="relative bg-gradient-to-tr from-success to-emerald-400 text-primary-foreground p-5 rounded-full shadow-lg shadow-success/30 transform transition-transform duration-500 hover:scale-110">
                     <Check size={48} strokeWidth={3} />
                   </div>
                 </div>
@@ -289,7 +276,7 @@ export default function RequestBudget() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                  <Link to={`/prestador/${provider.id}`}>
+                  <Link to={`/p/${provider.id}`}>
                     <button className="w-full px-8 py-3.5 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-xl transition-colors">
                       Volver al perfil
                     </button>

@@ -186,7 +186,7 @@ export default function ClientReviews() {
               <div className="absolute inset-0 bg-white rounded-full scale-125 shadow-sm"></div>
               
               {/* Ícone Principal */}
-              <div className="relative w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg text-white transform group-hover:-translate-y-2 transition-transform duration-500">
+              <div className="relative w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg text-primary-foreground transform group-hover:-translate-y-2 transition-transform duration-500">
                 <Star size={40} fill="currentColor" />
                 <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-orange-500">
                   <MessageSquare size={20} />
