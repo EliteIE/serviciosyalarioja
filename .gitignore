@@ -27,3 +27,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code local config
+.claude/settings.local.json
+
+# Lint/debug outputs (ad-hoc, not to be committed)
+eslint_output*.txt
+lint-*.txt
+lint_output*.txt
+any_errors.txt
+data.sql
+scratch/
