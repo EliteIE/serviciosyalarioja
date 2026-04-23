@@ -89,8 +89,8 @@ const RegisterClient = () => {
         {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios Ya" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">Ya</span></span>
+            <img src={logo} alt="Servicios 360" className="w-10 h-10 rounded-xl shadow-lg" />
+            <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
 
@@ -152,10 +152,10 @@ const RegisterClient = () => {
           <div className="mb-8 text-center xl:text-left">
             {/* Logo para mobile */}
             <div className="lg:hidden flex justify-center mb-6">
-              <img src={logo} alt="Servicios Ya" className="w-16 h-16 rounded-2xl shadow-lg" />
+              <img src={logo} alt="Servicios 360" className="w-16 h-16 rounded-2xl shadow-lg" />
             </div>
             <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Crear Cuenta</h2>
-            <p className="text-muted-foreground mt-2">Registrate como cliente en Servicios Ya</p>
+            <p className="text-muted-foreground mt-2">Registrate como cliente en Servicios 360</p>
           </div>
 
           {/* Google Login */}

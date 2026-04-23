@@ -37,7 +37,7 @@ const Contacto = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Mensaje enviado correctamente. Te responderemos a la brevedad.");
       setFormData({ nombre: "", email: "", asunto: "", mensaje: "" });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Error al enviar el mensaje");
     } finally {
       setSending(false);
@@ -65,10 +65,10 @@ const Contacto = () => {
                 <div>
                   <h3 className="font-semibold mb-1">Email</h3>
                   <a
-                    href="mailto:soporte@serviciosyalr.com"
+                    href="mailto:soporte@servicios360.com.ar"
                     className="text-sm text-primary hover:underline"
                   >
-                    soporte@serviciosyalr.com
+                    soporte@servicios360.com.ar
                   </a>
                 </div>
               </div>

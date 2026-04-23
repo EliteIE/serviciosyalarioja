@@ -46,9 +46,9 @@ export function TestimoniosSection() {
         {/* Cabeçalho da Secção */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-sm font-bold text-primary uppercase tracking-widest mb-2">
-            Comunidad Servicios Ya
+            Comunidad Servicios 360
           </h2>
-          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary-foreground tracking-tight">
             Lo que dicen nuestros usuarios
           </h3>
         </div>
@@ -90,7 +90,7 @@ export function TestimoniosSection() {
                 
                 {/* Nome e Rol */}
                 <div>
-                  <h4 className="font-bold text-white text-base">
+                  <h4 className="font-bold text-primary-foreground text-base">
                     {testimonio.nombre}
                   </h4>
                   <div className="flex items-center gap-1.5 text-sm mt-0.5 text-slate-400">

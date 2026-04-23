@@ -165,8 +165,8 @@ const RegisterProvider = () => {
         {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios Ya" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="text-2xl font-bold tracking-tight text-secondary-foreground">Servicios <span className="text-primary">Ya</span></span>
+            <img src={logo} alt="Servicios 360" className="w-10 h-10 rounded-xl shadow-lg" />
+            <span className="text-2xl font-bold tracking-tight text-secondary-foreground">Servicios <span className="text-primary">360</span></span>
             <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-wider">Profesionales</span>
           </div>
         </div>
@@ -177,7 +177,7 @@ const RegisterProvider = () => {
             Convertite en el profesional más buscado.
           </h1>
           <p className="text-lg text-secondary-foreground/80 mb-10 leading-relaxed">
-            Unite a la red de expertos de Servicios Ya. Conseguí nuevos clientes todas las semanas, gestioná tus presupuestos y hacé crecer tu negocio.
+            Unite a la red de expertos de Servicios 360. Conseguí nuevos clientes todas las semanas, gestioná tus presupuestos y hacé crecer tu negocio.
           </p>
 
           {/* Badges de Confiança (Benefícios Prestador) */}
@@ -231,7 +231,7 @@ const RegisterProvider = () => {
             <div className="mb-8 text-center lg:text-left">
               {/* Logo para mobile */}
               <div className="lg:hidden flex justify-center mb-6">
-                <img src={logo} alt="Servicios Ya" className="w-16 h-16 rounded-2xl shadow-lg" />
+                <img src={logo} alt="Servicios 360" className="w-16 h-16 rounded-2xl shadow-lg" />
               </div>
               <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Registro de Prestador</h2>
               <p className="text-muted-foreground mt-2">Completá tus datos para empezar a ofrecer servicios.</p>

@@ -46,8 +46,8 @@ const DashboardLayout = ({ variant }: DashboardLayoutProps) => {
             <div className="flex items-center gap-2">
               <SidebarTrigger className="hidden md:flex" />
               <Link to="/" className="md:hidden flex items-center gap-2">
-                <img src={logo} alt="Servicios Ya" className="h-7 w-7 rounded-lg" />
-                <span className="text-lg font-bold">Servicios <span className="text-primary">Ya</span></span>
+                <img src={logo} alt="Servicios 360" className="h-7 w-7 rounded-lg" />
+                <span className="text-lg font-bold">Servicios <span className="text-primary">360</span></span>
               </Link>
             </div>
             <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ const DashboardLayout = ({ variant }: DashboardLayoutProps) => {
                     <h4 className="font-semibold text-sm">Notificaciones</h4>
                     {unreadCount > 0 && (
                       <button
-                        onClick={() => notifications.data?.filter((n: any) => !n.read).forEach((n: any) => markAsRead.mutate(n.id))}
+                        onClick={() => notifications.data?.filter((n) => !n.read).forEach((n) => markAsRead.mutate(n.id))}
                         className="text-[10px] text-primary hover:underline font-medium"
                       >
                         Marcar todas como leídas
@@ -79,7 +79,7 @@ const DashboardLayout = ({ variant }: DashboardLayoutProps) => {
                     {!notifications.data?.length ? (
                       <p className="text-sm text-muted-foreground text-center py-6">Sin notificaciones</p>
                     ) : (
-                      notifications.data.map((n: any) => {
+                      notifications.data.map((n) => {
                         const getNotificationLink = () => {
                           const text = `${n.title} ${n.message}`.toLowerCase();
                           if (text.includes("presupuesto") || text.includes("servicio")) return `${dashboardPath}/servicios`;

@@ -7,13 +7,13 @@ const PrivacyPolicy = () => {
       <div className="prose prose-sm max-w-none space-y-6 text-foreground/90">
         <section>
           <h2 className="text-xl font-semibold mb-3">1. Introducción</h2>
-          <p><strong>Servicios Ya</strong> (en adelante, "la Plataforma") se compromete a proteger la privacidad de sus usuarios. Esta Política de Privacidad describe cómo recopilamos, usamos, almacenamos y protegemos sus datos personales, en cumplimiento con la Ley 25.326 de Protección de Datos Personales de la República Argentina y su decreto reglamentario 1558/2001.</p>
+          <p><strong>Servicios 360</strong> (en adelante, "la Plataforma") se compromete a proteger la privacidad de sus usuarios. Esta Política de Privacidad describe cómo recopilamos, usamos, almacenamos y protegemos sus datos personales, en cumplimiento con la Ley 25.326 de Protección de Datos Personales de la República Argentina y su decreto reglamentario 1558/2001.</p>
           <p>Al utilizar la Plataforma, usted consiente el tratamiento de sus datos conforme a esta política.</p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold mb-3">2. Responsable del Tratamiento</h2>
-          <p>El responsable del tratamiento de los datos personales es Servicios Ya, con domicilio en la provincia de La Rioja, República Argentina. Contacto: <strong>contacto@serviciosyalr.com</strong></p>
+          <p>El responsable del tratamiento de los datos personales es Servicios 360, con domicilio en la provincia de La Rioja, República Argentina. Contacto: <strong>contacto@servicios360.com.ar</strong></p>
         </section>
 
         <section>
@@ -101,7 +101,7 @@ const PrivacyPolicy = () => {
             <li><strong>Supresión:</strong> solicitar la eliminación de sus datos cuando ya no sean necesarios para la finalidad para la que fueron recopilados (Art. 16).</li>
             <li><strong>Confidencialidad:</strong> exigir que sus datos sean tratados con la debida reserva (Art. 10).</li>
           </ul>
-          <p>Para ejercer estos derechos, contacte a <strong>contacto@serviciosyalr.com</strong>. Responderemos dentro de los 10 días hábiles establecidos por la ley.</p>
+          <p>Para ejercer estos derechos, contacte a <strong>contacto@servicios360.com.ar</strong>. Responderemos dentro de los 10 días hábiles establecidos por la ley.</p>
           <p>La Dirección Nacional de Protección de Datos Personales (AAIP), órgano de control de la Ley 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes. Sitio web: <strong>www.argentina.gob.ar/aaip</strong></p>
         </section>
 
@@ -128,8 +128,8 @@ const PrivacyPolicy = () => {
         <section>
           <h2 className="text-xl font-semibold mb-3">13. Contacto</h2>
           <p>Para consultas, reclamos o ejercicio de derechos relacionados con sus datos personales:</p>
-          <p>Correo electrónico: <strong>contacto@serviciosyalr.com</strong></p>
-          <p>Plataforma: <strong>serviciosyalr.com</strong></p>
+          <p>Correo electrónico: <strong>contacto@servicios360.com.ar</strong></p>
+          <p>Plataforma: <strong>servicios360.com.ar</strong></p>
         </section>
       </div>
     </div>

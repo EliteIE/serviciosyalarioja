@@ -54,8 +54,8 @@ const ForgotPassword = () => {
         {/* Topo: Logótipo Branco */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios Ya" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="text-2xl font-bold tracking-tight text-secondary-foreground">Servicios <span className="text-primary">Ya</span></span>
+            <img src={logo} alt="Servicios 360" className="w-10 h-10 rounded-xl shadow-lg" />
+            <span className="text-2xl font-bold tracking-tight text-secondary-foreground">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
 
@@ -140,7 +140,7 @@ const ForgotPassword = () => {
               <div className="text-center lg:text-left mb-10 mt-8 lg:mt-0">
                 {/* Logo para mobile */}
                 <div className="lg:hidden flex justify-center mb-6">
-                  <img src={logo} alt="Servicios Ya" className="w-16 h-16 rounded-2xl shadow-lg" />
+                  <img src={logo} alt="Servicios 360" className="w-16 h-16 rounded-2xl shadow-lg" />
                 </div>
                 <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Recuperar Contraseña</h2>
                 <p className="text-muted-foreground mt-3 text-sm lg:text-base leading-relaxed">

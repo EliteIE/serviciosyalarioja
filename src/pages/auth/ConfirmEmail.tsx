@@ -37,7 +37,7 @@ const ConfirmEmail = () => {
             </div>
 
             <div className="space-y-2">
-              <img src={logo} alt="Servicios Ya" className="mx-auto h-10 w-10 rounded-xl" />
+              <img src={logo} alt="Servicios 360" className="mx-auto h-10 w-10 rounded-xl" />
               <h1 className="text-2xl font-bold text-foreground">¡Revisá tu correo!</h1>
               <p className="text-muted-foreground">
                 Enviamos un enlace de verificación a

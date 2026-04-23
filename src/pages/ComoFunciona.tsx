@@ -56,7 +56,7 @@ export default function ComoFunciona() {
         <div className="absolute right-0 top-0 -mt-20 -mr-20 w-96 h-96 bg-primary opacity-5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-secondary-foreground tracking-tight mb-4">
-            Como funciona <span className="text-primary">Servicios Ya</span>
+            Como funciona <span className="text-primary">Servicios 360</span>
           </h1>
           <p className="text-lg md:text-xl text-secondary-foreground/80 max-w-2xl mx-auto">
             Conectamos clientes con profesionales de confianza de forma simple, rapida y segura.
@@ -116,7 +116,7 @@ export default function ComoFunciona() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {providerSteps.map((step, i) => (
             <div key={step.title} className="relative bg-card rounded-2xl border border-border p-6 text-center hover:shadow-lg hover:border-blue-500/30 transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-blue-500 text-primary-foreground flex items-center justify-center text-sm font-bold">
                 {i + 1}
               </div>
               <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mt-4 mb-4">
@@ -136,7 +136,7 @@ export default function ComoFunciona() {
             Listo para empezar?
           </h2>
           <p className="text-secondary-foreground/80 mb-8 max-w-lg mx-auto">
-            Ya sea que necesites un servicio o quieras ofrecer tus habilidades, Servicios Ya es el lugar indicado.
+            Ya sea que necesites un servicio o quieras ofrecer tus habilidades, Servicios 360 es el lugar indicado.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/buscar">

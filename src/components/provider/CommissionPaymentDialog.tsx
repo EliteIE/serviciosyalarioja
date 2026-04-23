@@ -1,11 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useCommissionBalance } from "@/hooks/useCommissionBalance";
+import { useCommissionBalance, usePayCommission, useCreateMercadoPagoCheckout } from "@/hooks/useCommissionBalance";
 import { CreditCard, Building2, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   open: boolean;
@@ -14,68 +11,32 @@ interface Props {
 
 export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
   const { totalOwed, entries } = useCommissionBalance();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const { mutateAsync: payCommission, isPending: isPaying } = usePayCommission();
+  const { mutateAsync: createCheckout, isPending: isCreatingCheckout } = useCreateMercadoPagoCheckout();
+  
   const [method, setMethod] = useState<"mercadopago" | "transferencia" | null>(null);
   const [transferSent, setTransferSent] = useState(false);
-  const [processing, setProcessing] = useState(false);
+
+  const processing = isPaying || isCreatingCheckout;
 
   const handleMercadoPago = async () => {
-    if (!user) return;
-    setProcessing(true);
     try {
-      const { data: commPayment, error: insertErr } = await supabase
-        .from("commission_payments")
-        .insert({
-          provider_id: user.id,
-          amount: totalOwed,
-          payment_method: "mercadopago",
-          status: "pending",
-        } as any)
-        .select()
-        .single();
-      if (insertErr) throw insertErr;
-
-      const { data, error } = await supabase.functions.invoke("mercadopago", {
-        body: {
-          action: "create_commission_checkout",
-          commission_payment_id: (commPayment as any).id,
-          amount: totalOwed,
-          payer_email: user.email,
-        },
-      });
-      if (error) throw error;
-      if (data?.init_point) {
-        window.open(data.init_point, "_blank");
-        toast.success("Redirigido a MercadoPago para pagar comisiones");
-        onOpenChange(false);
-      }
-    } catch (err: any) {
-      toast.error("Error al crear checkout: " + err.message);
-    } finally {
-      setProcessing(false);
+      const initPoint = await createCheckout({ amount: totalOwed });
+      window.open(initPoint, "_blank");
+      toast.success("Redirigido a MercadoPago para pagar comisiones");
+      onOpenChange(false);
+    } catch (err) {
+      // Error is handled by the hook
     }
   };
 
   const handleTransferConfirm = async () => {
-    if (!user) return;
-    setProcessing(true);
     try {
-      await supabase
-        .from("commission_payments")
-        .insert({
-          provider_id: user.id,
-          amount: totalOwed,
-          payment_method: "transferencia",
-          status: "pending",
-        } as any);
+      await payCommission({ amount: totalOwed, paymentMethod: "transferencia" });
       setTransferSent(true);
       toast.success("Transferencia registrada. El admin la confirmara pronto.");
-      queryClient.invalidateQueries({ queryKey: ["commission-balance"] });
-    } catch (err: any) {
-      toast.error("Error: " + err.message);
-    } finally {
-      setProcessing(false);
+    } catch (err) {
+      // Error is handled by the hook
     }
   };
 
@@ -100,7 +61,7 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
           <p className="text-sm text-muted-foreground">Total adeudado</p>
           <p className="text-3xl font-extrabold text-orange-600">${totalOwed.toLocaleString("es-AR")}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            {(entries || []).filter((e: any) => e.status === "pending").length} servicio(s) pendiente(s)
+            {(entries || []).filter((e) => e.status === "pending").length} servicio(s) pendiente(s)
           </p>
         </div>
 
@@ -108,7 +69,7 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
           <div className="text-center py-6">
             <CheckCircle2 className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
             <p className="font-semibold">Transferencia registrada</p>
-            <p className="text-sm text-muted-foreground mt-1">El equipo de ServiciosYa confirmara tu pago en las proximas horas.</p>
+            <p className="text-sm text-muted-foreground mt-1">El equipo de Servicios 360 confirmará tu pago en las próximas horas.</p>
           </div>
         ) : !method ? (
           <div className="space-y-3">
@@ -145,14 +106,14 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
             <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4">
               <p className="font-semibold text-sm mb-2">Datos para transferir:</p>
               <div className="space-y-1 text-sm">
-                <p><span className="text-muted-foreground">Alias:</span> <span className="font-mono font-bold">serviciosya.comisiones</span></p>
+                <p><span className="text-muted-foreground">Alias:</span> <span className="font-mono font-bold">servicios360.comisiones</span></p>
                 <p><span className="text-muted-foreground">Monto:</span> <span className="font-bold">${totalOwed.toLocaleString("es-AR")}</span></p>
               </div>
             </div>
             <button
               onClick={handleTransferConfirm}
               disabled={processing}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-50"
             >
               {processing ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Ya realice la transferencia"}
             </button>

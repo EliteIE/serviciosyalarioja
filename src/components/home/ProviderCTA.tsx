@@ -29,7 +29,7 @@ export const ProviderCTA = () => {
           
           {/* Subtítulo */}
           <p className="text-lg md:text-xl text-secondary-foreground/80 mb-8 leading-relaxed max-w-2xl">
-            Miles de clientes en tu zona están buscando lo que hacés. Unite a <strong className="text-secondary-foreground font-semibold">Servicios Ya</strong>, destacá tu talento y conseguí nuevos proyectos sin esfuerzo.
+            Miles de clientes en tu zona están buscando lo que hacés. Unite a <strong className="text-secondary-foreground font-semibold">Servicios 360</strong>, destacá tu talento y conseguí nuevos proyectos sin esfuerzo.
           </p>
 
           {/* Pontos de Confiança (Trust Badges) */}

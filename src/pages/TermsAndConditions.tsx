@@ -7,13 +7,13 @@ const TermsAndConditions = () => {
       <div className="prose prose-sm max-w-none space-y-6 text-foreground/90">
         <section>
           <h2 className="text-xl font-semibold mb-3">1. Aceptación de los Términos</h2>
-          <p>Al acceder y utilizar la plataforma <strong>Servicios Ya</strong> (en adelante, "la Plataforma"), disponible en serviciosyalr.com, usted acepta cumplir con estos Términos y Condiciones. Si no está de acuerdo, le solicitamos que no utilice la Plataforma.</p>
+          <p>Al acceder y utilizar la plataforma <strong>Servicios 360</strong> (en adelante, "la Plataforma"), disponible en servicios360.com.ar, usted acepta cumplir con estos Términos y Condiciones. Si no está de acuerdo, le solicitamos que no utilice la Plataforma.</p>
           <p>Estos términos se rigen por la legislación argentina vigente, incluyendo la Ley 24.240 de Defensa del Consumidor, el Código Civil y Comercial de la Nación, y las normativas aplicables al comercio electrónico.</p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold mb-3">2. Descripción del Servicio</h2>
-          <p>Servicios Ya es una plataforma digital que conecta a personas que necesitan servicios profesionales del hogar y mantenimiento (en adelante, "Clientes") con prestadores de servicios verificados (en adelante, "Prestadores"). La Plataforma actúa como intermediaria tecnológica y <strong>no es parte de la relación contractual</strong> entre el Cliente y el Prestador.</p>
+          <p>Servicios 360 es una plataforma digital que conecta a personas que necesitan servicios profesionales del hogar y mantenimiento (en adelante, "Clientes") con prestadores de servicios verificados (en adelante, "Prestadores"). La Plataforma actúa como intermediaria tecnológica y <strong>no es parte de la relación contractual</strong> entre el Cliente y el Prestador.</p>
           <p>Los servicios ofrecidos incluyen, entre otros: plomería, electricidad, limpieza, pintura, albañilería y jardinería, dentro de la provincia de La Rioja, República Argentina.</p>
         </section>
 
@@ -72,7 +72,7 @@ const TermsAndConditions = () => {
         <section>
           <h2 className="text-xl font-semibold mb-3">9. Responsabilidad de la Plataforma</h2>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Servicios Ya actúa exclusivamente como intermediaria tecnológica y no garantiza la calidad, idoneidad o resultado de los servicios prestados.</li>
+            <li>Servicios 360 actúa exclusivamente como intermediaria tecnológica y no garantiza la calidad, idoneidad o resultado de los servicios prestados.</li>
             <li>La Plataforma no es responsable por daños materiales, personales o de cualquier naturaleza que puedan derivarse de la prestación de servicios.</li>
             <li>La verificación de Prestadores reduce riesgos pero no constituye una garantía absoluta de competencia profesional.</li>
             <li>La Plataforma no será responsable por interrupciones temporales del servicio por mantenimiento o fuerza mayor.</li>
@@ -101,12 +101,12 @@ const TermsAndConditions = () => {
 
         <section>
           <h2 className="text-xl font-semibold mb-3">12. Propiedad Intelectual</h2>
-          <p>Todo el contenido de la Plataforma (diseño, marcas, logos, código fuente, textos) es propiedad de Servicios Ya y está protegido por las leyes de propiedad intelectual de la República Argentina (Ley 11.723). Queda prohibida su reproducción sin autorización previa por escrito.</p>
+          <p>Todo el contenido de la Plataforma (diseño, marcas, logos, código fuente, textos) es propiedad de Servicios 360 y está protegido por las leyes de propiedad intelectual de la República Argentina (Ley 11.723). Queda prohibida su reproducción sin autorización previa por escrito.</p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold mb-3">13. Modificaciones</h2>
-          <p>Servicios Ya se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Las modificaciones serán notificadas a los usuarios a través de la Plataforma y/o por correo electrónico. El uso continuado de la Plataforma tras la notificación implica la aceptación de los nuevos términos.</p>
+          <p>Servicios 360 se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Las modificaciones serán notificadas a los usuarios a través de la Plataforma y/o por correo electrónico. El uso continuado de la Plataforma tras la notificación implica la aceptación de los nuevos términos.</p>
         </section>
 
         <section>
@@ -116,7 +116,7 @@ const TermsAndConditions = () => {
 
         <section>
           <h2 className="text-xl font-semibold mb-3">15. Contacto</h2>
-          <p>Para consultas sobre estos Términos y Condiciones, puede comunicarse a través de la Plataforma o al correo electrónico: <strong>contacto@serviciosyalr.com</strong></p>
+          <p>Para consultas sobre estos Términos y Condiciones, puede comunicarse a través de la Plataforma o al correo electrónico: <strong>contacto@servicios360.com.ar</strong></p>
         </section>
       </div>
     </div>

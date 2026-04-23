@@ -22,9 +22,9 @@ const Footer = () => {
           {/* Coluna 1: Marca e Proposta de Valor */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <img src={logo} alt="Servicios Ya" className="h-10 w-10 rounded-xl shadow-lg" />
+              <img src={logo} alt="Servicios 360" className="h-10 w-10 rounded-xl shadow-lg" />
               <span className="text-2xl font-bold tracking-tight text-secondary-foreground">
-                Servicios <span className="text-primary">Ya</span>
+                Servicios <span className="text-primary">360</span>
               </span>
             </div>
             <p className="text-secondary-foreground/70 leading-relaxed mb-8 max-w-sm">
@@ -109,7 +109,7 @@ const Footer = () => {
         <div className="container py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-secondary-foreground">
           
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-sm text-secondary-foreground/70 text-center md:text-left">
-            <p>© 2026 Servicios Ya. Todos los derechos reservados.</p>
+            <p>© 2026 Servicios 360. Todos los derechos reservados.</p>
             <div className="hidden md:flex items-center gap-4">
               <Link to="/terminos" className="hover:text-secondary-foreground transition-colors">Términos y Condiciones</Link>
               <span className="w-1 h-1 rounded-full bg-secondary-foreground/30"></span>

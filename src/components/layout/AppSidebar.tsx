@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, AlertTriangle, TrendingUp,
@@ -12,8 +11,8 @@ import {
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useActiveServiceRequestIds } from "@/hooks/useServiceRequests";
 
 const adminItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
@@ -53,20 +52,7 @@ const AppSidebar = ({ variant }: AppSidebarProps) => {
   const { user } = useAuth();
 
   // Fetch active service request IDs for unread badge
-  const [serviceIds, setServiceIds] = useState<string[]>([]);
-  useEffect(() => {
-    if (!user || variant === "admin") return;
-    const fetchIds = async () => {
-      const col = variant === "provider" ? "provider_id" : "client_id";
-      const { data } = await supabase
-        .from("service_requests")
-        .select("id")
-        .eq(col, user.id)
-        .not("status", "in", '("cancelado","completado")');
-      setServiceIds((data || []).map((d) => d.id));
-    };
-    fetchIds();
-  }, [user, variant]);
+  const { data: serviceIds = [] } = useActiveServiceRequestIds(variant);
 
   const { hasUnread, unreadServiceIds } = useUnreadMessages(serviceIds);
   const unreadCount = unreadServiceIds.size;
@@ -80,9 +66,9 @@ const AppSidebar = ({ variant }: AppSidebarProps) => {
         <div className="p-4">
           {!collapsed && (
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="Servicios Ya" className="h-8 w-8 rounded-lg" />
+              <img src={logo} alt="Servicios 360" className="h-8 w-8 rounded-lg" />
               <span className="text-lg font-bold text-sidebar-foreground">
-                Servicios <span className="text-sidebar-primary">Ya</span>
+                Servicios <span className="text-sidebar-primary">360</span>
               </span>
             </Link>
           )}
@@ -103,7 +89,7 @@ const AppSidebar = ({ variant }: AppSidebarProps) => {
                       <div className="relative mr-2">
                         <item.icon className="h-4 w-4" />
                         {item.title === "Chat" && hasUnread && (
-                          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-primary-foreground">
                             {unreadCount > 9 ? "9+" : unreadCount}
                           </span>
                         )}
