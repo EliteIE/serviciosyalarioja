@@ -1,10 +1,17 @@
 import { Users, Briefcase, DollarSign, TrendingUp, Loader2, ShieldCheck, AlertTriangle, Clock, ArrowUpRight, ArrowDownRight, Bell, Activity, BarChart3, PieChart as PieChartIcon, Wallet, CheckCircle2, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from "recharts";
+import { 
+  useAdminStats, 
+  useAdminCommissionStats, 
+  useAdminConversionData, 
+  useAdminServicesByCategory, 
+  useAdminProvidersByCategory, 
+  useAdminMonthlyData, 
+  useAdminRecentAuditLog 
+} from "@/hooks/useAdmin";
+
 import { CATEGORIES } from "@/constants/categories";
 
 const COLORS = ["hsl(25, 100%, 50%)", "hsl(213, 80%, 15%)", "hsl(142, 70%, 45%)", "hsl(38, 92%, 50%)", "hsl(0, 84%, 60%)", "hsl(280, 70%, 50%)"];
@@ -14,192 +21,15 @@ const getCategoryName = (slug: string) => CATEGORIES.find(c => c.slug === slug)?
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-stats"],
-    staleTime: 30_000,
-    queryFn: async () => {
-      const now = new Date();
-      const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).toISOString();
-      const sixtyDaysAgo = new Date(now.getFullYear(), now.getMonth() - 2, now.getDate()).toISOString();
+  const { data: stats, isLoading } = useAdminStats();
+  const { data: commissionStats } = useAdminCommissionStats();
+  const { data: conversionData } = useAdminConversionData();
+  const { data: servicesByCategory } = useAdminServicesByCategory(getCategoryName);
+  const { data: providersByCategory } = useAdminProvidersByCategory(getCategoryName);
+  const { data: monthlyData } = useAdminMonthlyData();
+  const { data: recentAudit } = useAdminRecentAuditLog();
 
-      const [
-        usersRes, providersRes, requestsRes, paymentsRes,
-        disputesRes, verifiedRes, recentUsersRes, prevUsersRes,
-        recentRequestsRes, prevRequestsRes, failedPaymentsRes,
-        badReviewsRes,
-      ] = await Promise.all([
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_provider", true),
-        supabase.from("service_requests").select("id", { count: "exact", head: true }),
-        supabase.from("payments").select("amount, platform_fee, status"),
-        supabase.from("disputes").select("id", { count: "exact", head: true }).eq("status", "abierta"),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_provider", true).eq("provider_verified", true),
-        // Recent 30 days users
-        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo),
-        // Previous 30 days users (for comparison)
-        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", sixtyDaysAgo).lt("created_at", thirtyDaysAgo),
-        // Recent 30 days requests
-        supabase.from("service_requests").select("id", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo),
-        // Previous 30 days requests
-        supabase.from("service_requests").select("id", { count: "exact", head: true }).gte("created_at", sixtyDaysAgo).lt("created_at", thirtyDaysAgo),
-        // Failed payments
-        supabase.from("payments").select("id", { count: "exact", head: true }).eq("status", "failed"),
-        // Bad reviews (1-2 stars) last 30 days
-        supabase.from("reviews").select("id", { count: "exact", head: true }).lte("rating", 2).gte("created_at", thirtyDaysAgo),
-      ]);
 
-      // Log errors from parallel queries and default to 0 on failure
-      const allResults = [
-        { name: "users", res: usersRes },
-        { name: "providers", res: providersRes },
-        { name: "requests", res: requestsRes },
-        { name: "payments", res: paymentsRes },
-        { name: "disputes", res: disputesRes },
-        { name: "verified", res: verifiedRes },
-        { name: "recentUsers", res: recentUsersRes },
-        { name: "prevUsers", res: prevUsersRes },
-        { name: "recentRequests", res: recentRequestsRes },
-        { name: "prevRequests", res: prevRequestsRes },
-        { name: "failedPayments", res: failedPaymentsRes },
-        { name: "badReviews", res: badReviewsRes },
-      ];
-      for (const { name, res } of allResults) {
-        if (res.error) {
-          console.error(`Admin stats query error [${name}]:`, res.error);
-        }
-      }
-
-      const safeCount = (res: { count: number | null; error: any }) => res.error ? 0 : (res.count || 0);
-
-      const payments = paymentsRes.error ? [] : (paymentsRes.data || []);
-      const completedPayments = payments.filter(p => p.status === "completed");
-      const totalRevenue = completedPayments.reduce((s, p) => s + Number(p.amount), 0);
-      const totalFees = completedPayments.reduce((s, p) => s + Number(p.platform_fee), 0);
-      const avgTicket = completedPayments.length > 0 ? totalRevenue / completedPayments.length : 0;
-
-      return {
-        users: safeCount(usersRes),
-        providers: safeCount(providersRes),
-        verified: safeCount(verifiedRes),
-        requests: safeCount(requestsRes),
-        disputes: safeCount(disputesRes),
-        totalRevenue,
-        totalFees,
-        payments: payments.length,
-        completedPayments: completedPayments.length,
-        avgTicket,
-        recentUsers: safeCount(recentUsersRes),
-        prevUsers: safeCount(prevUsersRes),
-        recentRequests: safeCount(recentRequestsRes),
-        prevRequests: safeCount(prevRequestsRes),
-        failedPayments: safeCount(failedPaymentsRes),
-        badReviews: safeCount(badReviewsRes),
-      };
-    },
-  });
-
-  const { data: commissionStats } = useQuery({
-    queryKey: ["admin-commission-stats"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("commission_balance")
-        .select("total_owed, is_blocked");
-      const totalPending = (data || []).reduce((sum: number, b: any) => sum + Number(b.total_owed || 0), 0);
-      const blockedCount = (data || []).filter((b: any) => b.is_blocked).length;
-      return { totalPending, blockedCount };
-    },
-  });
-
-  // Conversion rate: completed / total requests
-  const { data: conversionData } = useQuery({
-    queryKey: ["admin-conversion"],
-    staleTime: 60_000,
-    queryFn: async () => {
-      const [totalRes, completedRes, cancelledRes] = await Promise.all([
-        supabase.from("service_requests").select("id", { count: "exact", head: true }),
-        supabase.from("service_requests").select("id", { count: "exact", head: true }).eq("status", "completado"),
-        supabase.from("service_requests").select("id", { count: "exact", head: true }).eq("status", "cancelado"),
-      ]);
-      const total = totalRes.count || 0;
-      const completed = completedRes.count || 0;
-      const cancelled = cancelledRes.count || 0;
-      return {
-        conversionRate: total > 0 ? ((completed / total) * 100).toFixed(1) : "0",
-        cancellationRate: total > 0 ? ((cancelled / total) * 100).toFixed(1) : "0",
-        completed,
-        cancelled,
-      };
-    },
-  });
-
-  const { data: servicesByCategory } = useQuery({
-    queryKey: ["admin-services-by-category"],
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase.from("service_requests").select("category");
-      const counts: Record<string, number> = {};
-      data?.forEach((r) => { counts[r.category] = (counts[r.category] || 0) + 1; });
-      return Object.entries(counts).map(([slug, value]) => ({ name: getCategoryName(slug), value })).sort((a, b) => b.value - a.value).slice(0, 6);
-    },
-  });
-
-  const { data: providersByCategory } = useQuery({
-    queryKey: ["admin-providers-by-category"],
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("provider_category").eq("is_provider", true);
-      const counts: Record<string, number> = {};
-      data?.forEach((r) => {
-        const cat = r.provider_category || "sin-categoria";
-        counts[cat] = (counts[cat] || 0) + 1;
-      });
-      return Object.entries(counts).map(([slug, value]) => ({ name: getCategoryName(slug), value })).sort((a, b) => b.value - a.value).slice(0, 6);
-    },
-  });
-
-  const { data: monthlyData } = useQuery({
-    queryKey: ["admin-monthly"],
-    staleTime: 60_000,
-    queryFn: async () => {
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      const { data } = await supabase
-        .from("service_requests")
-        .select("created_at, status")
-        .gte("created_at", sixMonthsAgo.toISOString());
-      const months: Record<string, { total: number; completed: number }> = {};
-      const now = new Date();
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = d.toLocaleDateString("es", { month: "short" });
-        months[key] = { total: 0, completed: 0 };
-      }
-      data?.forEach((r) => {
-        const d = new Date(r.created_at);
-        const key = d.toLocaleDateString("es", { month: "short" });
-        if (months[key]) {
-          months[key].total++;
-          if (r.status === "completado") months[key].completed++;
-        }
-      });
-      return Object.entries(months).map(([month, v]) => ({ month, ...v }));
-    },
-  });
-
-  // Recent audit log entries
-  const { data: recentAudit } = useQuery({
-    queryKey: ["admin-recent-audit"],
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("audit_log")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
-      if (error) return [];
-      return data;
-    },
-  });
 
   if (isLoading) {
     return (
@@ -207,7 +37,7 @@ const AdminDashboard = () => {
         <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center shadow-lg shadow-orange-500/10">
           <Loader2 className="h-7 w-7 animate-spin text-orange-500" />
         </div>
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 tracking-wide">Cargando panel...</p>
+        <p className="text-sm font-medium text-muted-foreground tracking-wide">Cargando panel...</p>
       </div>
     );
   }
@@ -249,10 +79,10 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">
             Panel de Administracion
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-medium">
+          <p className="text-sm text-muted-foreground mt-1.5 font-medium">
             Resumen general de la plataforma
           </p>
         </div>
@@ -270,8 +100,8 @@ const AdminDashboard = () => {
               <Bell className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-white">Alertas que requieren atencion</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{alerts.length} alerta{alerts.length !== 1 ? "s" : ""} activa{alerts.length !== 1 ? "s" : ""}</p>
+              <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">Alertas que requieren atencion</h3>
+              <p className="text-xs text-muted-foreground font-medium">{alerts.length} alerta{alerts.length !== 1 ? "s" : ""} activa{alerts.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
           <div className="space-y-2.5">
@@ -283,7 +113,7 @@ const AdminDashboard = () => {
                 <div className={`h-2.5 w-2.5 rounded-full shrink-0 animate-pulse ${
                   alert.type === "error" ? "bg-red-500 shadow-sm shadow-red-500/50" : alert.type === "warning" ? "bg-amber-500 shadow-sm shadow-amber-500/50" : "bg-blue-500 shadow-sm shadow-blue-500/50"
                 }`} />
-                <span className="text-slate-700 dark:text-slate-300 font-medium">{alert.text}</span>
+                <span className="text-foreground font-medium">{alert.text}</span>
                 {alert.type === "error" && (
                   <XCircle className="h-4 w-4 text-red-400 ml-auto shrink-0" />
                 )}
@@ -319,8 +149,8 @@ const AdminDashboard = () => {
                   </span>
                 )}
               </div>
-              <p className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">{stat.value}</p>
-              <p className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 mt-1.5">{stat.label}</p>
+              <p className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">{stat.value}</p>
+              <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1.5">{stat.label}</p>
               {"sublabel" in stat && stat.sublabel && (
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{stat.sublabel}</p>
               )}
@@ -345,8 +175,8 @@ const AdminDashboard = () => {
               <div className={`h-10 w-10 rounded-xl ${kpi.bgColor} flex items-center justify-center mb-3 shadow-sm`}>
                 <kpi.icon className={`h-5 w-5 ${kpi.iconColor}`} />
               </div>
-              <p className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">{kpi.value}</p>
-              <p className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 mt-1.5">{kpi.label}</p>
+              <p className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">{kpi.value}</p>
+              <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1.5">{kpi.label}</p>
               {"sublabel" in kpi && kpi.sublabel && (
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{kpi.sublabel}</p>
               )}
@@ -365,8 +195,8 @@ const AdminDashboard = () => {
                 <BarChart3 className="h-5 w-5 text-orange-500" />
               </div>
               <div>
-                <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-white">Solicitudes por Mes</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Ultimos 6 meses</p>
+                <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">Solicitudes por Mes</h3>
+                <p className="text-xs text-muted-foreground font-medium">Ultimos 6 meses</p>
               </div>
             </div>
           </div>
@@ -411,8 +241,8 @@ const AdminDashboard = () => {
                 <PieChartIcon className="h-5 w-5 text-blue-500" />
               </div>
               <div>
-                <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-white">Solicitudes por Categoria</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Distribucion actual</p>
+                <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">Solicitudes por Categoria</h3>
+                <p className="text-xs text-muted-foreground font-medium">Distribucion actual</p>
               </div>
             </div>
           </div>
@@ -442,8 +272,8 @@ const AdminDashboard = () => {
                   {servicesByCategory.map((item, i) => (
                     <div key={item.name} className="flex items-center gap-3 text-sm group hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl px-3 py-1.5 -mx-3 transition-colors duration-200">
                       <div className="h-3.5 w-3.5 rounded-full shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                      <span className="text-slate-700 dark:text-slate-300 truncate flex-1 font-medium">{item.name}</span>
-                      <span className="font-extrabold text-slate-900 dark:text-white tabular-nums">{item.value}</span>
+                      <span className="text-foreground truncate flex-1 font-medium">{item.name}</span>
+                      <span className="font-extrabold text-slate-900 dark:text-primary-foreground tabular-nums">{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -471,8 +301,8 @@ const AdminDashboard = () => {
                 <Users className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
-                <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-white">Prestadores por Categoria</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Distribucion de prestadores</p>
+                <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">Prestadores por Categoria</h3>
+                <p className="text-xs text-muted-foreground font-medium">Distribucion de prestadores</p>
               </div>
             </div>
           </div>
@@ -502,8 +332,8 @@ const AdminDashboard = () => {
                   {providersByCategory.map((item, i) => (
                     <div key={item.name} className="flex items-center gap-3 text-sm group hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl px-3 py-1.5 -mx-3 transition-colors duration-200">
                       <div className="h-3.5 w-3.5 rounded-full shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                      <span className="text-slate-700 dark:text-slate-300 truncate flex-1 font-medium">{item.name}</span>
-                      <span className="font-extrabold text-slate-900 dark:text-white tabular-nums">{item.value}</span>
+                      <span className="text-foreground truncate flex-1 font-medium">{item.name}</span>
+                      <span className="font-extrabold text-slate-900 dark:text-primary-foreground tabular-nums">{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -529,8 +359,8 @@ const AdminDashboard = () => {
                   <Activity className="h-5 w-5 text-violet-500" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-white">Actividad Reciente</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Registro de auditoria</p>
+                  <h3 className="font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">Actividad Reciente</h3>
+                  <p className="text-xs text-muted-foreground font-medium">Registro de auditoria</p>
                 </div>
               </div>
               <button
@@ -544,7 +374,7 @@ const AdminDashboard = () => {
           <div className="px-6 pb-6">
             {recentAudit && recentAudit.length > 0 ? (
               <div className="space-y-1">
-                {recentAudit.map((entry: any, index: number) => (
+                {recentAudit.map((entry, index: number) => (
                   <div
                     key={entry.id}
                     className="group flex items-start gap-4 text-sm rounded-2xl px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-200"
@@ -557,8 +387,8 @@ const AdminDashboard = () => {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-slate-900 dark:text-white truncate">
-                        {entry.action} <span className="font-normal text-slate-300 dark:text-slate-600">--</span> <span className="text-slate-600 dark:text-slate-300 font-medium">{entry.table_name}</span>
+                      <p className="font-semibold text-slate-900 dark:text-primary-foreground truncate">
+                        {entry.action} <span className="font-normal text-slate-300 dark:text-slate-600">--</span> <span className="text-foreground font-medium">{entry.table_name}</span>
                       </p>
                       <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 font-medium">
                         {new Date(entry.created_at).toLocaleString("es-AR")}

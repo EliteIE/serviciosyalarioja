@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAdminProviders, useAdminVerifyProvider, useAdminUpdateCriminalRecord, useAdminFileSignedUrl } from "@/hooks/useAdmin";
 import { toast } from "sonner";
 import { CATEGORIES } from "@/constants/categories";
+import { logger } from "@/lib/logger";
 
 const PAGE_SIZE = 20;
 
@@ -24,7 +24,7 @@ const AdminProviders = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [selectedProvider, setSelectedProvider] = useState<unknown>(null);
   const [verifyNotes, setVerifyNotes] = useState("");
   const [docUrls, setDocUrls] = useState<string[]>([]);
   const [page, setPage] = useState(0);
@@ -34,56 +34,12 @@ const AdminProviders = () => {
   const [criminalExpiry, setCriminalExpiry] = useState("");
   const [criminalDocUrl, setCriminalDocUrl] = useState("");
 
-  const { data: providers, isLoading } = useQuery({
-    queryKey: ["admin-providers"],
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("is_provider", true)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: providers, isLoading } = useAdminProviders();
+  const verifyMutation = useAdminVerifyProvider();
+  const updateCriminalRecord = useAdminUpdateCriminalRecord();
+  const getSignedUrl = useAdminFileSignedUrl();
 
-  const verifyMutation = useMutation({
-    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes: string }) => {
-      const { error } = await supabase.from("profiles").update({
-        provider_verified: status === "approved",
-        provider_verification_status: status,
-        provider_verification_notes: notes || null,
-      }).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-providers"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-pending-providers"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      setSelectedProvider(null);
-      setVerifyNotes("");
-      toast.success("Estado del prestador actualizado");
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const updateCriminalRecord = useMutation({
-    mutationFn: async ({ id, status, notes, expiry }: { id: string; status: string; notes?: string; expiry?: string }) => {
-      const updateData: Record<string, any> = { criminal_record_status: status };
-      if (notes !== undefined) updateData.criminal_record_notes = notes;
-      if (expiry) updateData.criminal_record_expiry = expiry;
-      const { error } = await supabase.from("profiles").update(updateData).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-providers"] });
-      toast.success("Antecedentes penales actualizados");
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const openReview = async (provider: any) => {
+  const openReview = async (provider) => {
     setSelectedProvider(provider);
     setVerifyNotes(provider.provider_verification_notes || "");
     setCriminalNotes(provider.criminal_record_notes || "");
@@ -95,11 +51,11 @@ const AdminProviders = () => {
     const urls: string[] = [];
     try {
       for (const path of paths) {
-        const { data } = await supabase.storage.from("provider-docs").createSignedUrl(path, 3600);
-        if (data?.signedUrl) urls.push(data.signedUrl);
+        const signedUrl = await getSignedUrl.mutateAsync(path);
+        if (signedUrl) urls.push(signedUrl);
       }
     } catch (err) {
-      console.error("Error loading document URLs:", err);
+      logger.error("Error loading document URLs:", err);
       toast.error("Error al cargar documentos");
     }
     setDocUrls(urls);
@@ -107,10 +63,10 @@ const AdminProviders = () => {
     // Load criminal record signed URL
     if (provider.criminal_record_url) {
       try {
-        const { data } = await supabase.storage.from("provider-docs").createSignedUrl(provider.criminal_record_url, 3600);
-        if (data?.signedUrl) setCriminalDocUrl(data.signedUrl);
+        const signedUrl = await getSignedUrl.mutateAsync(provider.criminal_record_url);
+        if (signedUrl) setCriminalDocUrl(signedUrl);
       } catch (err) {
-        console.error("Error loading criminal record URL:", err);
+        logger.error("Error loading criminal record URL:", err);
       }
     }
   };
@@ -136,7 +92,7 @@ const AdminProviders = () => {
 
   const providerCategories = [...new Set(providers?.map(p => p.provider_category).filter(Boolean) || [])];
 
-  const statusBadge = (p: any) => {
+  const statusBadge = (p) => {
     const s = p.provider_verification_status || (p.provider_verified ? "approved" : "pending");
     if (s === "approved") return (
       <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 gap-1">
@@ -196,11 +152,11 @@ const AdminProviders = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">
             Gestión de Prestadores
           </h1>
           <div className="flex flex-wrap gap-2 mt-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground">
               <Users className="h-3.5 w-3.5" /> {providers?.length || 0} total
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 text-sm font-medium text-emerald-700 dark:text-emerald-400">
@@ -222,13 +178,13 @@ const AdminProviders = () => {
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Buscar por nombre, categoría o teléfono..."
-            className="pl-10 rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 h-10"
+            className="pl-10 rounded-xl border-border bg-card h-10"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           />
         </div>
         <Select value={statusFilter} onValueChange={handleFilterChange(setStatusFilter)}>
-          <SelectTrigger className="w-40 rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 h-10">
+          <SelectTrigger className="w-40 rounded-xl border-border bg-card h-10">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
@@ -239,7 +195,7 @@ const AdminProviders = () => {
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={handleFilterChange(setCategoryFilter)}>
-          <SelectTrigger className="w-44 rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 h-10">
+          <SelectTrigger className="w-44 rounded-xl border-border bg-card h-10">
             <SelectValue placeholder="Categoría" />
           </SelectTrigger>
           <SelectContent>
@@ -257,26 +213,26 @@ const AdminProviders = () => {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Loader2 className="h-7 w-7 animate-spin text-primary" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">Cargando prestadores...</p>
+              <p className="text-sm text-muted-foreground">Cargando prestadores...</p>
             </div>
           ) : !paginatedProviders?.length ? (
             <div className="flex flex-col items-center justify-center py-16 gap-2">
               <Users className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-              <p className="text-sm text-slate-500 dark:text-slate-400">No se encontraron prestadores</p>
+              <p className="text-sm text-muted-foreground">No se encontraron prestadores</p>
             </div>
           ) : (
             <>
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Prestador</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Categoría</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Rating</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Trabajos</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Docs</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Estado</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Antecedentes</TableHead>
-                    <TableHead className="font-semibold text-slate-600 dark:text-slate-300">Acciones</TableHead>
+                  <TableRow className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-border">
+                    <TableHead className="font-semibold text-foreground">Prestador</TableHead>
+                    <TableHead className="font-semibold text-foreground">Categoría</TableHead>
+                    <TableHead className="font-semibold text-foreground">Rating</TableHead>
+                    <TableHead className="font-semibold text-foreground">Trabajos</TableHead>
+                    <TableHead className="font-semibold text-foreground">Docs</TableHead>
+                    <TableHead className="font-semibold text-foreground">Estado</TableHead>
+                    <TableHead className="font-semibold text-foreground">Antecedentes</TableHead>
+                    <TableHead className="font-semibold text-foreground">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -288,21 +244,21 @@ const AdminProviders = () => {
                             {p.full_name?.[0]?.toUpperCase() || "?"}
                           </div>
                           <div>
-                            <span className="font-medium text-slate-900 dark:text-white block">{p.full_name}</span>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">{p.phone || "Sin teléfono"}</span>
+                            <span className="font-medium text-slate-900 dark:text-primary-foreground block">{p.full_name}</span>
+                            <span className="text-xs text-muted-foreground">{p.phone || "Sin teléfono"}</span>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-slate-700 dark:text-slate-300">
+                      <TableCell className="text-sm text-foreground">
                         {CATEGORIES.find(c => c.slug === p.provider_category)?.name || p.provider_category || "—"}
                       </TableCell>
                       <TableCell>
-                        <span className="flex items-center gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <span className="flex items-center gap-1 text-sm font-medium text-foreground">
                           <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                           {Number(p.rating_avg).toFixed(1)}
                         </span>
                       </TableCell>
-                      <TableCell className="text-sm font-medium text-slate-700 dark:text-slate-300">{p.completed_jobs || 0}</TableCell>
+                      <TableCell className="text-sm font-medium text-foreground">{p.completed_jobs || 0}</TableCell>
                       <TableCell>
                         {(p.provider_doc_urls as string[] | null)?.length ? (
                           <Badge variant="outline" className="gap-1 rounded-full border-slate-200 dark:border-slate-600">
@@ -331,8 +287,8 @@ const AdminProviders = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-slate-50/50 dark:bg-slate-800/30">
+                  <p className="text-sm text-muted-foreground">
                     Mostrando {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered?.length || 0)} de {filtered?.length}
                   </p>
                   <div className="flex gap-1.5">
@@ -381,12 +337,12 @@ const AdminProviders = () => {
       {/* Review Dialog */}
       <Dialog open={!!selectedProvider} onOpenChange={(o) => { if (!o) { setSelectedProvider(null); setCriminalDocUrl(""); } }}>
         <DialogContent className="max-w-2xl rounded-3xl p-0 overflow-hidden dark:bg-slate-900">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
+            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-primary-foreground flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
               Verificar Prestador
             </DialogTitle>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {selectedProvider?.full_name}
             </p>
           </DialogHeader>
@@ -394,35 +350,35 @@ const AdminProviders = () => {
           <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
             {/* Provider Info Card */}
             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
-              <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Información del Prestador</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">Información del Prestador</h4>
               <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400">Categoría:</span>{" "}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                  <span className="text-muted-foreground">Categoría:</span>{" "}
+                  <span className="font-medium text-foreground">
                     {CATEGORIES.find(c => c.slug === selectedProvider?.provider_category)?.name || selectedProvider?.provider_category || "—"}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400">Teléfono:</span>{" "}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">{selectedProvider?.phone || "—"}</span>
+                  <span className="text-muted-foreground">Teléfono:</span>{" "}
+                  <span className="font-medium text-foreground">{selectedProvider?.phone || "—"}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400">Rating:</span>{" "}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                  <span className="text-muted-foreground">Rating:</span>{" "}
+                  <span className="font-medium text-foreground">
                     {Number(selectedProvider?.rating_avg || 0).toFixed(1)} ({selectedProvider?.review_count || 0} resenas)
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400">Trabajos:</span>{" "}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">{selectedProvider?.completed_jobs || 0}</span>
+                  <span className="text-muted-foreground">Trabajos:</span>{" "}
+                  <span className="font-medium text-foreground">{selectedProvider?.completed_jobs || 0}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-slate-500 dark:text-slate-400">Bio:</span>{" "}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">{selectedProvider?.bio || "—"}</span>
+                  <span className="text-muted-foreground">Bio:</span>{" "}
+                  <span className="font-medium text-foreground">{selectedProvider?.bio || "—"}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-slate-500 dark:text-slate-400">Registrado:</span>{" "}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                  <span className="text-muted-foreground">Registrado:</span>{" "}
+                  <span className="font-medium text-foreground">
                     {selectedProvider?.created_at ? new Date(selectedProvider.created_at).toLocaleDateString("es-AR") : "—"}
                   </span>
                 </div>
@@ -431,7 +387,7 @@ const AdminProviders = () => {
 
             {/* Documents Card */}
             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
-              <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                 <FileText className="h-4 w-4 text-primary" />
                 Documentos ({docUrls.length})
               </h4>
@@ -445,10 +401,10 @@ const AdminProviders = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 flex items-center gap-2.5 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
+                      className="border border-border rounded-xl p-3 flex items-center gap-2.5 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
                     >
                       <FileText className="h-5 w-5 text-primary shrink-0" />
-                      <span className="text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">Documento {i + 1}</span>
+                      <span className="text-foreground group-hover:text-primary transition-colors">Documento {i + 1}</span>
                       <ExternalLink className="h-3.5 w-3.5 text-slate-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                     </a>
                   ))}
@@ -458,13 +414,13 @@ const AdminProviders = () => {
 
             {/* Verification Notes */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Notas de verificación</label>
+              <label className="text-sm font-semibold text-foreground">Notas de verificación</label>
               <Textarea
                 value={verifyNotes}
                 onChange={(e) => setVerifyNotes(e.target.value)}
                 placeholder="Observaciones sobre los documentos..."
                 rows={2}
-                className="rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 resize-none"
+                className="rounded-xl border-border bg-card resize-none"
               />
             </div>
 
@@ -479,7 +435,7 @@ const AdminProviders = () => {
                 <Ban className="h-4 w-4 mr-1.5" /> Rechazar Prestador
               </Button>
               <Button
-                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"
                 disabled={verifyMutation.isPending}
                 onClick={() => verifyMutation.mutate({ id: selectedProvider.id, status: "approved", notes: verifyNotes })}
               >
@@ -489,12 +445,12 @@ const AdminProviders = () => {
             </div>
 
             {/* Divider */}
-            <div className="border-t border-slate-200 dark:border-slate-700" />
+            <div className="border-t border-border" />
 
             {/* Antecedentes Penales Section */}
             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <ShieldAlert className="h-4 w-4 text-orange-500" />
                   Antecedentes Penales
                 </h4>
@@ -507,10 +463,10 @@ const AdminProviders = () => {
                   href={criminalDocUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 border border-slate-200 dark:border-slate-700 rounded-xl p-3 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
+                  className="flex items-center gap-2.5 border border-border rounded-xl p-3 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
                 >
                   <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
-                  <span className="text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">
+                  <span className="text-foreground group-hover:text-primary transition-colors">
                     Certificado de Antecedentes Penales
                   </span>
                   <ExternalLink className="h-3.5 w-3.5 text-slate-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -528,7 +484,7 @@ const AdminProviders = () => {
                   type="date"
                   value={criminalExpiry}
                   onChange={(e) => setCriminalExpiry(e.target.value)}
-                  className="rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 max-w-xs h-10"
+                  className="rounded-xl border-border bg-card max-w-xs h-10"
                 />
               </div>
 
@@ -540,7 +496,7 @@ const AdminProviders = () => {
                   onChange={(e) => setCriminalNotes(e.target.value)}
                   placeholder="Observaciones sobre los antecedentes penales..."
                   rows={2}
-                  className="rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 resize-none"
+                  className="rounded-xl border-border bg-card resize-none"
                 />
               </div>
 
@@ -561,7 +517,7 @@ const AdminProviders = () => {
                 </Button>
                 <Button
                   size="sm"
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"
                   disabled={updateCriminalRecord.isPending}
                   onClick={() => updateCriminalRecord.mutate({
                     id: selectedProvider.id,
@@ -577,7 +533,7 @@ const AdminProviders = () => {
             </div>
           </div>
 
-          <DialogFooter className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+          <DialogFooter className="px-6 py-4 border-t border-border bg-slate-50/50 dark:bg-slate-800/30">
             <Button
               variant="outline"
               className="rounded-xl"

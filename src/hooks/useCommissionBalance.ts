@@ -77,7 +77,7 @@ export const usePayCommission = () => {
           amount,
           payment_method: paymentMethod,
           status: "pending",
-        } as any)
+        } as never)
         .select()
         .single();
       if (error) throw error;
@@ -88,8 +88,46 @@ export const usePayCommission = () => {
       queryClient.invalidateQueries({ queryKey: ["commission-entries"] });
       queryClient.invalidateQueries({ queryKey: ["commission-payments"] });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error("Error al procesar pago: " + error.message);
     },
   });
 };
+
+export const useCreateMercadoPagoCheckout = () => {
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ amount }: { amount: number }) => {
+      if (!user) throw new Error("No autenticado");
+      
+      const { data: commPayment, error: insertErr } = await supabase
+        .from("commission_payments")
+        .insert({
+          provider_id: user.id,
+          amount,
+          payment_method: "mercadopago",
+          status: "pending",
+        } as never)
+        .select()
+        .single();
+      if (insertErr) throw insertErr;
+
+      const { data, error } = await supabase.functions.invoke("mercadopago", {
+        body: {
+          action: "create_commission_checkout",
+          commission_payment_id: (commPayment as { id: string }).id,
+          amount,
+          payer_email: user.email,
+        },
+      });
+      if (error) throw error;
+      if (!data?.init_point) throw new Error("No se recibio un link de pago valido");
+      return data.init_point;
+    },
+    onError: (error) => {
+      toast.error("Error al crear checkout: " + error.message);
+    },
+  });
+};
+

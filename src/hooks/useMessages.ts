@@ -40,7 +40,7 @@ export const useMessages = (serviceRequestId: string | null) => {
             .single();
 
           const msg: ChatMessage = {
-            ...(payload.new as any),
+            ...(payload.new as never),
             sender_name: profile?.full_name || "",
             sender_avatar: profile?.avatar_url || "",
           };

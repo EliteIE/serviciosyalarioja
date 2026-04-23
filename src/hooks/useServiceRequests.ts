@@ -30,7 +30,7 @@ export interface ServiceRequest {
   provider_avatar?: string;
 }
 
-async function enrichWithProfiles(requests: any[]): Promise<ServiceRequest[]> {
+async function enrichWithProfiles(requests: (Record<string, unknown> & { client_id: string; provider_id: string | null })[]): Promise<ServiceRequest[]> {
   const userIds = new Set<string>();
   requests.forEach((r) => {
     if (r.client_id) userIds.add(r.client_id);
@@ -163,6 +163,28 @@ export const useUpdateServiceStatus = () => {
   });
 };
 
+export const useUpdateServiceRequest = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      if (!user) throw new Error("No autenticado");
+
+      const { error } = await supabase
+        .from("service_requests")
+        .update(data)
+        .eq("id", id)
+        .or(`client_id.eq.${user.id},provider_id.eq.${user.id}`);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-requests"] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+};
+
 export const useUploadFile = () => {
   const { user } = useAuth();
 
@@ -194,4 +216,124 @@ export const useUploadFile = () => {
     if (!data?.publicUrl) throw new Error("Failed to generate public URL");
     return data.publicUrl;
   };
+};
+
+export const useApprovedExtraCharges = (serviceIds: string[]) => {
+  return useQuery({
+    queryKey: ["extra-charges", "provider", serviceIds],
+    queryFn: async () => {
+      if (serviceIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("extra_charges")
+        .select("*")
+        .in("service_request_id", serviceIds)
+        .eq("status", "aprobado");
+      if (error) throw error;
+      return data;
+    },
+    enabled: serviceIds.length > 0,
+  });
+};
+
+export const useVerifyAndStartService = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ requestId, code }: { requestId: string; code: string }) => {
+      const { data, error } = await supabase.rpc("verify_and_start_service", {
+        p_request_id: requestId,
+        p_code: code,
+      });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) throw new Error(result.error || "Error al verificar código");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-requests"] });
+    },
+  });
+};
+
+export const useRequestExtraCharge = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (req: { serviceRequestId: string; description: string; amount: number }) => {
+      const { error } = await supabase.from("extra_charges").insert({
+        service_request_id: req.serviceRequestId,
+        description: req.description,
+        amount: req.amount,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["extra-charges"] });
+    },
+  });
+};
+
+export const useClaimServiceRequest = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ requestId, providerId, budgetAmount, budgetMessage }: { 
+      requestId: string; 
+      providerId: string; 
+      budgetAmount: number; 
+      budgetMessage: string | null 
+    }) => {
+      const { data, error } = await supabase.rpc("claim_service_request", {
+        p_request_id: requestId,
+        p_provider_id: providerId,
+        p_budget_amount: budgetAmount,
+        p_budget_message: budgetMessage,
+      });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) throw new Error(result.error || "No se pudo enviar el presupuesto");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-requests"] });
+    },
+  });
+};
+
+export const useCancelServiceRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("service_requests")
+        .update({ status: "cancelado" as never })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-requests"] });
+    },
+  });
+};
+
+export const useActiveServiceRequestIds = (variant: "admin" | "provider" | "client") => {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ["active-service-requests-ids", variant, user?.id],
+    queryFn: async () => {
+      if (!user || variant === "admin") return [];
+      const col = variant === "provider" ? "provider_id" : "client_id";
+      const { data, error } = await supabase
+        .from("service_requests")
+        .select("id")
+        .eq(col, user.id)
+        .not("status", "in", '("cancelado","completado")');
+      
+      if (error) throw error;
+      return (data || []).map((d) => d.id);
+    },
+    enabled: !!user && variant !== "admin",
+  });
 };

@@ -12,11 +12,11 @@ export const useUnreadMessages = (serviceRequestIds: string[]) => {
   const { user } = useAuth();
   const [unreadServiceIds, setUnreadServiceIds] = useState<Set<string>>(new Set());
 
-  // Memoize the joined string to stabilize dependencies across renders
-  const idsKey = useMemo(() => serviceRequestIds.join(","), [serviceRequestIds.join(",")]);
+  const idsStr = serviceRequestIds.join(",");
+  const stableIds = useMemo(() => (idsStr !== "" ? idsStr.split(",") : []), [idsStr]);
 
   const checkUnread = useCallback(async () => {
-    if (!user || serviceRequestIds.length === 0) {
+    if (!user || stableIds.length === 0) {
       setUnreadServiceIds(new Set());
       return;
     }
@@ -25,7 +25,7 @@ export const useUnreadMessages = (serviceRequestIds: string[]) => {
     const { data: messages } = await supabase
       .from("messages")
       .select("id, service_request_id, sender_id, created_at")
-      .in("service_request_id", serviceRequestIds)
+      .in("service_request_id", stableIds)
       .order("created_at", { ascending: false });
 
     if (!messages || messages.length === 0) {
@@ -57,19 +57,19 @@ export const useUnreadMessages = (serviceRequestIds: string[]) => {
     }
 
     setUnreadServiceIds(unread);
-  }, [user, idsKey]);
+  }, [user, stableIds]);
 
   useEffect(() => {
     checkUnread();
 
-    if (!user || serviceRequestIds.length === 0) return;
+    if (!user || stableIds.length === 0) return;
 
     // Use a hash of all IDs for the channel name to keep it short but unique
-    const channelName = `unread-msgs-${user.id}-${idsKey.length}-${idsKey.slice(0, 64)}`;
+    const channelName = `unread-msgs-${user.id}-${idsStr.length}-${idsStr.slice(0, 64)}`;
     const channel = supabase.channel(channelName);
 
     // Register listeners for ALL IDs, not just the first 5
-    for (const srId of serviceRequestIds) {
+    for (const srId of stableIds) {
       channel.on(
         "postgres_changes",
         {
@@ -92,7 +92,7 @@ export const useUnreadMessages = (serviceRequestIds: string[]) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [checkUnread]);
+  }, [checkUnread, user, stableIds, idsStr]);
 
   const markAsRead = (serviceRequestId: string) => {
     setUnreadServiceIds((prev) => {

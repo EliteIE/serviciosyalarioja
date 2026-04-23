@@ -33,7 +33,7 @@ export const useMySchedule = () => {
     queryKey: ["provider-schedule", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("provider_schedule" as any)
+        .from("provider_schedule" as never)
         .select("*")
         .eq("provider_id", user!.id)
         .order("day_of_week", { ascending: true });
@@ -49,7 +49,7 @@ export const useProviderSchedulePublic = (providerId: string | null) => {
     queryKey: ["provider-schedule-public", providerId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("provider_schedule" as any)
+        .from("provider_schedule" as never)
         .select("*")
         .eq("provider_id", providerId!)
         .eq("is_active", true)
@@ -71,14 +71,14 @@ export const useSaveSchedule = () => {
 
       // Fetch existing slots before deleting so we can restore on insert failure
       const { data: existingSlots, error: fetchError } = await supabase
-        .from("provider_schedule" as any)
+        .from("provider_schedule" as never)
         .select("*")
         .eq("provider_id", user.id);
       if (fetchError) throw fetchError;
 
       // Delete existing slots and re-insert all
       const { error: delError } = await supabase
-        .from("provider_schedule" as any)
+        .from("provider_schedule" as never)
         .delete()
         .eq("provider_id", user.id);
       if (delError) throw delError;
@@ -94,13 +94,13 @@ export const useSaveSchedule = () => {
       }));
 
       const { error } = await supabase
-        .from("provider_schedule" as any)
+        .from("provider_schedule" as never)
         .insert(rows);
       if (error) {
         // Attempt to restore previous slots since insert failed after delete
         if (existingSlots && existingSlots.length > 0) {
           await supabase
-            .from("provider_schedule" as any)
+            .from("provider_schedule" as never)
             .insert(existingSlots);
         }
         throw error;
@@ -122,7 +122,7 @@ export const useMyServices = () => {
     queryKey: ["provider-services", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("provider_services" as any)
+        .from("provider_services" as never)
         .select("*")
         .eq("provider_id", user!.id)
         .order("created_at", { ascending: true });
@@ -138,7 +138,7 @@ export const useProviderServicesPublic = (providerId: string | null) => {
     queryKey: ["provider-services-public", providerId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("provider_services" as any)
+        .from("provider_services" as never)
         .select("*")
         .eq("provider_id", providerId!)
         .order("created_at", { ascending: true });
@@ -156,7 +156,7 @@ export const useAddService = () => {
   return useMutation({
     mutationFn: async (svc: { name: string; description?: string; estimated_duration?: string; price_from?: number; price_to?: number }) => {
       const { error } = await supabase
-        .from("provider_services" as any)
+        .from("provider_services" as never)
         .insert({ provider_id: user!.id, ...svc });
       if (error) throw error;
     },
@@ -176,7 +176,7 @@ export const useDeleteService = () => {
     mutationFn: async (id: string) => {
       if (!user) throw new Error("No autenticado");
       const { error } = await supabase
-        .from("provider_services" as any)
+        .from("provider_services" as never)
         .delete()
         .eq("id", id)
         .eq("provider_id", user.id);
