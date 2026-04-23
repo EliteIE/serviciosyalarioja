@@ -1,25 +1,48 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
-const PROD_ORIGINS = ["https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
+const PROD_ORIGINS = ["https://servicios360.com.ar", "https://www.servicios360.com.ar", "https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:3000"];
 const ALLOWED_ORIGINS = Deno.env.get("ENVIRONMENT") === "production"
   ? PROD_ORIGINS
   : [...PROD_ORIGINS, ...DEV_ORIGINS];
 
 function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("Origin") || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
+  // HTTP headers are case-insensitive — use lowercase access.
+  const origin = req.headers.get("origin") || "";
+  const headers: Record<string, string> = {
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+    "Vary": "Origin",
   };
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+}
+
+function isAllowedOrigin(req: Request) {
+  const origin = req.headers.get("origin");
+  if (!origin) return false;
+  return ALLOWED_ORIGINS.includes(origin);
 }
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
+  const url = new URL(req.url);
+  const path = url.pathname.split("/").pop();
+  // /callback is a top-level redirect target from MP — no Origin header.
+  const isCallback = path === "callback";
+
+  if (!isCallback && req.method !== "OPTIONS" && !isAllowedOrigin(req)) {
+    return new Response(JSON.stringify({ error: "Origin not allowed" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   if (req.method === "OPTIONS") {
+    if (!isAllowedOrigin(req)) return new Response(null, { status: 403 });
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -30,7 +53,7 @@ Deno.serve(async (req) => {
 
   const MP_APP_ID = Deno.env.get("MERCADOPAGO_APP_ID");
   const MP_CLIENT_SECRET = Deno.env.get("MERCADOPAGO_CLIENT_SECRET");
-  const appUrl = "https://serviciosyalr.com";
+  const appUrl = Deno.env.get("APP_URL") || PROD_ORIGINS[0];
 
   if (!MP_APP_ID || !MP_CLIENT_SECRET) {
     return new Response(JSON.stringify({ error: "MP OAuth not configured" }), {
@@ -38,9 +61,6 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-
-  const url = new URL(req.url);
-  const path = url.pathname.split("/").pop();
 
   try {
     // Rate limiting
@@ -59,11 +79,17 @@ Deno.serve(async (req) => {
 
     // GET /mercadopago-oauth/callback - Handle OAuth callback from MercadoPago
     if (path === "callback") {
-      const nonce = url.searchParams.get("state");
-
-      if (!nonce) {
+      const callbackSchema = z.object({
+        state: z.string().min(1, "Missing state"),
+        code: z.string().min(1, "Missing code").optional(),
+      });
+      
+      const parsedParams = callbackSchema.safeParse(Object.fromEntries(url.searchParams));
+      if (!parsedParams.success) {
         return Response.redirect(`${appUrl}/prestador/perfil?mp_error=missing_params`, 302);
       }
+
+      const nonce = parsedParams.data.state;
 
       // Verify nonce and get actual user_id from oauth_states table
       const { data: stateRow, error: stateError } = await supabase
@@ -80,10 +106,10 @@ Deno.serve(async (req) => {
 
       const userId = stateRow.user_id;
 
-      // Clean up used nonce
-      await supabase.from("oauth_states").delete().eq("nonce", nonce);
+      // Clean up used nonce (soft delete)
+      await supabase.from("oauth_states").update({ deleted_at: new Date().toISOString() }).eq("nonce", nonce);
 
-      const code = url.searchParams.get("code");
+      const code = parsedParams.data.code;
       if (!code) {
         return Response.redirect(`${appUrl}/prestador/perfil?mp_error=missing_code`, 302);
       }
@@ -115,21 +141,32 @@ Deno.serve(async (req) => {
       });
       const mpUser = await userRes.json();
 
-      // Upsert provider MP account
+      // Upsert metadata (no tokens yet). Tokens are written via SECURITY
+      // DEFINER RPC that encrypts at rest with a vault-managed key.
       const { error: upsertError } = await supabase
         .from("provider_mp_accounts")
         .upsert({
           user_id: userId,
           mp_user_id: String(tokenData.user_id || mpUser.id),
-          mp_access_token: tokenData.access_token,
-          mp_refresh_token: tokenData.refresh_token || null,
+          mp_access_token: "",   // legacy column; kept NOT NULL by schema until drop migration
+          mp_refresh_token: null,
           mp_email: mpUser.email || null,
           mp_public_key: tokenData.public_key || null,
           updated_at: new Date().toISOString(),
         }, { onConflict: "user_id" });
 
       if (upsertError) {
-        console.error("Upsert error:", upsertError);
+        console.error("Upsert metadata failed:", upsertError.code);
+        return Response.redirect(`${appUrl}/prestador/perfil?mp_error=save_failed`, 302);
+      }
+
+      const { error: encErr } = await supabase.rpc("set_provider_mp_tokens", {
+        p_user_id: userId,
+        p_access_token: tokenData.access_token,
+        p_refresh_token: tokenData.refresh_token || null,
+      });
+      if (encErr) {
+        console.error("Token encryption failed:", encErr.code);
         return Response.redirect(`${appUrl}/prestador/perfil?mp_error=save_failed`, 302);
       }
 
@@ -161,8 +198,8 @@ Deno.serve(async (req) => {
       const nonce = crypto.randomUUID();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
       
-      // Clean up any existing states for this user
-      await supabase.from("oauth_states").delete().eq("user_id", userData.user.id);
+      // Clean up any existing states for this user (soft delete)
+      await supabase.from("oauth_states").update({ deleted_at: new Date().toISOString() }).eq("user_id", userData.user.id);
       
       const { error: insertError } = await supabase.from("oauth_states").insert({
         nonce,
@@ -207,9 +244,10 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Soft delete provider MP account
       await supabase
         .from("provider_mp_accounts")
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq("user_id", userData.user.id);
 
       return new Response(JSON.stringify({ ok: true }), {

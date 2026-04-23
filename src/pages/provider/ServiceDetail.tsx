@@ -9,9 +9,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { STATUS_LABELS, STATUS_COLORS, URGENCY_LABELS, CATEGORIES } from "@/constants/categories";
 import { ArrowLeft, Calendar, MapPin, AlertTriangle, Image as ImageIcon, Send, XCircle, Loader2, Clock, ShieldCheck, CheckCircle2, DollarSign } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useProviderRequests, useUpdateServiceStatus } from "@/hooks/useServiceRequests";
+import { useProviderRequests, useUpdateServiceStatus, useClaimServiceRequest } from "@/hooks/useServiceRequests";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CommissionBanner from "@/components/provider/CommissionBanner";
 import { useCommissionBalance } from "@/hooks/useCommissionBalance";
@@ -58,6 +57,7 @@ const ServiceDetail = () => {
   const navigate = useNavigate();
   const { data: services, isLoading } = useProviderRequests();
   const updateStatus = useUpdateServiceStatus();
+  const claimServiceRequest = useClaimServiceRequest();
   const { user } = useAuth();
   const { isBlocked } = useCommissionBalance();
   const [budgetAmount, setBudgetAmount] = useState("");
@@ -84,18 +84,12 @@ const ServiceDetail = () => {
     }
     setSending(true);
     try {
-      const { data, error } = await supabase.rpc("claim_service_request", {
-        p_request_id: service.id,
-        p_provider_id: user!.id,
-        p_budget_amount: amount,
-        p_budget_message: budgetMessage || null,
+      await claimServiceRequest.mutateAsync({
+        requestId: service.id,
+        providerId: user!.id,
+        budgetAmount: amount,
+        budgetMessage: budgetMessage || null,
       });
-      if (error) throw error;
-      const result = data as { success: boolean; error?: string };
-      if (!result.success) {
-        toast.error(result.error || "No se pudo enviar el presupuesto");
-        return;
-      }
       toast.success("¡Presupuesto enviado al cliente!");
       setBudgetSent(true);
     } catch (err: any) {
@@ -128,7 +122,14 @@ const ServiceDetail = () => {
     return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
-  if (!service) {
+  // Deny access (not-found) before any detail renders:
+  //   - row missing
+  //   - service is assigned to a different provider
+  //   - service was soft-deleted
+  const isForeignAssigned =
+    service?.provider_id && user?.id && service.provider_id !== user.id;
+  const isSoftDeleted = (service as { deleted_at?: string | null } | null)?.deleted_at;
+  if (!service || isForeignAssigned || isSoftDeleted) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <p>Solicitud no encontrada</p>

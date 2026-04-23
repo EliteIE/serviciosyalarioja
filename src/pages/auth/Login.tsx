@@ -41,8 +41,16 @@ const Login = () => {
     }
   }, [confirmed, setSearchParams]);
 
-  // Validate redirect is a safe relative path (prevent open redirect attacks)
-  const isSafeRedirect = redirectTo && /^\/[a-zA-Z0-9\-_\/\?=&%]+$/.test(redirectTo);
+  // Validate redirect is a same-origin relative path:
+  //   - must start with a single "/" (rejects "//evil.com" protocol-relative)
+  //   - no backslashes (some browsers normalize "/\\evil.com" to "//evil.com")
+  //   - no explicit scheme
+  const isSafeRedirect =
+    !!redirectTo &&
+    /^\/[a-zA-Z0-9\-_/?=&%.]*$/.test(redirectTo) &&
+    !redirectTo.startsWith("//") &&
+    !redirectTo.includes("\\") &&
+    !/^\/[^/]*:/.test(redirectTo);
 
   if (user) {
     if (isSafeRedirect) return <Navigate to={redirectTo} replace />;
@@ -92,8 +100,8 @@ const Login = () => {
         {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios Ya" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">Ya</span></span>
+            <img src={logo} alt="Servicios 360" className="w-10 h-10 rounded-xl shadow-lg" />
+            <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
 
@@ -156,7 +164,7 @@ const Login = () => {
           <div className="text-center mb-10 mt-8 lg:mt-0">
             {/* Logo para mobile */}
             <div className="lg:hidden flex items-center justify-center mb-6">
-              <img src={logo} alt="Servicios Ya" className="w-16 h-16 rounded-2xl shadow-lg" />
+              <img src={logo} alt="Servicios 360" className="w-16 h-16 rounded-2xl shadow-lg" />
             </div>
             {confirmed && (
               <div className="mb-6 flex items-center gap-3 rounded-xl bg-success/10 border border-success/20 p-4 text-left">
@@ -168,7 +176,7 @@ const Login = () => {
               </div>
             )}
             <h2 className="text-3xl font-extrabold text-foreground tracking-tight">¡Hola de nuevo!</h2>
-            <p className="text-muted-foreground mt-2">Ingresá a tu cuenta de Servicios Ya</p>
+            <p className="text-muted-foreground mt-2">Ingresá a tu cuenta de Servicios 360</p>
           </div>
 
           {/* Google Login */}

@@ -4,8 +4,7 @@ import {
   CheckCircle2, ThumbsUp, Award, ArrowLeft, Loader2, Briefcase,
   Calendar, DollarSign, Globe, Camera
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useProviderProfile, useProviderPortfolio } from "@/hooks/useProfiles";
 import { useReviews } from "@/hooks/useReviews";
 import { CATEGORIES } from "@/constants/categories";
 import { useProviderSchedulePublic, useProviderServicesPublic, DAY_NAMES_SHORT } from "@/hooks/useProviderSchedule";
@@ -23,43 +22,24 @@ const getCategoryTheme = (slug: string | null) => {
 export default function ProviderProfilePage() {
   const { id } = useParams();
 
-  const { data: provider, isLoading } = useQuery({
-    queryKey: ["provider-profile", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles_public")
-        .select("*")
-        .eq("id", id!)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,
-  });
-
+  const { data: provider, isLoading } = useProviderProfile(id);
   const { data: reviews } = useReviews(id || null);
   const { data: schedule } = useProviderSchedulePublic(id || null);
   const { data: services } = useProviderServicesPublic(id || null);
-
-  const { data: portfolioItems } = useQuery({
-    queryKey: ["portfolio-public", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("portfolio_items")
-        .select("*")
-        .eq("user_id", id!)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,
-  });
+  const { data: portfolioItems } = useProviderPortfolio(id);
 
   if (isLoading) {
     return <div className="min-h-screen flex justify-center items-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
   }
 
-  if (!provider) {
+  // Treat unverified/soft-deleted providers as not-found: RLS should already
+  // hide them for anon/authenticated users, but this guards rendering when
+  // the row is accessible via a privileged session or stale cache.
+  const providerRecord = provider as (typeof provider & {
+    provider_verified?: boolean;
+    deleted_at?: string | null;
+  }) | null;
+  if (!providerRecord || !providerRecord.provider_verified || providerRecord.deleted_at) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-muted-foreground gap-4">
         <h2 className="text-2xl font-bold text-foreground">Profesional no encontrado</h2>
@@ -71,8 +51,8 @@ export default function ProviderProfilePage() {
   const categoryName = CATEGORIES.find(c => c.slug === provider.provider_category)?.name || provider.provider_category || "Servicio General";
   const theme = getCategoryTheme(provider.provider_category);
   const totalAvaliacoes = reviews?.length || 0;
-  const coverageArea: string[] = (provider as any).provider_coverage_area || [];
-  const priceRange: string | null = (provider as any).provider_price_range || null;
+  const coverageArea: string[] = (provider as { provider_coverage_area?: string[] }).provider_coverage_area || [];
+  const priceRange: string | null = (provider as { provider_price_range?: string | null }).provider_price_range || null;
 
   const ratingCounts = [5, 4, 3, 2, 1].map(stars => {
     const count = reviews?.filter(r => r.rating === stars).length || 0;
@@ -96,7 +76,7 @@ export default function ProviderProfilePage() {
       <div className="bg-card border-b border-border">
         <div className={`h-48 md:h-64 w-full bg-gradient-to-r ${theme.from} ${theme.to} relative overflow-hidden`}>
           <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')]"></div>
-          <Link to="/buscar" className="absolute top-6 left-6 flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors bg-black/20 px-3 py-1.5 rounded-full backdrop-blur-md">
+          <Link to="/buscar" className="absolute top-6 left-6 flex items-center gap-2 text-sm font-semibold text-primary-foreground/80 hover:text-primary-foreground transition-colors bg-primary/20 px-3 py-1.5 rounded-full backdrop-blur-md">
             <ArrowLeft size={16} /> Volver
           </Link>
         </div>
@@ -252,13 +232,13 @@ export default function ProviderProfilePage() {
                       <div className="grid grid-cols-2 h-40">
                         <div className="relative overflow-hidden">
                           <img src={item.before_url} alt="Antes" className="h-full w-full object-cover" />
-                          <span className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          <span className="absolute bottom-2 left-2 bg-primary/60 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                             Antes
                           </span>
                         </div>
                         <div className="relative overflow-hidden">
                           <img src={item.after_url} alt="Después" className="h-full w-full object-cover" />
-                          <span className="absolute bottom-2 left-2 bg-green-500/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          <span className="absolute bottom-2 left-2 bg-green-500/80 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                             Después
                           </span>
                         </div>

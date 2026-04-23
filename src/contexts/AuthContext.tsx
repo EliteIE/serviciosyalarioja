@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, useCallback, ty
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 interface AuthContextType {
   user: User | null;
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .eq("id", userId)
       .single();
     if (error) {
-      console.error("Failed to fetch profile:", error.message);
+      logger.error("Failed to fetch profile:", error.message);
       setProfile(null);
       return null;
     }
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .eq("user_id", userId)
       .single();
     if (error) {
-      console.error("Failed to fetch role:", error.message);
+      logger.error("Failed to fetch role:", error.message);
       // Fallback: check profile.is_provider to determine role safely
       // This prevents a missing user_roles row from granting wrong access
       const { data: prof } = await supabase
@@ -178,33 +179,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Handle OAuth provider registration: if ?oauth_role=provider is in URL,
-        // promote this account to provider role (invisible until admin approves)
+        // OAuth provider-signup claim: server-side RPC enforces account-age
+        // and current-role checks. URL param is only a hint; the RPC is the
+        // sole authority. Stale/replayed params are silently ignored server-side.
         const urlParams = new URLSearchParams(window.location.search);
-        const oauthRole = urlParams.get("oauth_role");
-        if (oauthRole === "provider") {
+        if (urlParams.get("oauth_role") === "provider") {
           try {
-            // Update profile to provider
-            await supabase.from("profiles").update({
-              is_provider: true,
-              provider_verified: false,
-              provider_available: false,
-              provider_verification_status: "pending",
-            }).eq("id", session.user.id);
-            // Update or insert user_roles to provider
-            await supabase.from("user_roles").upsert({
-              user_id: session.user.id,
-              role: "provider",
-            }, { onConflict: "user_id" });
-            // Clean the URL param
-            urlParams.delete("oauth_role");
-            const cleanUrl = urlParams.toString()
-              ? `${window.location.pathname}?${urlParams.toString()}`
-              : window.location.pathname;
-            window.history.replaceState({}, "", cleanUrl);
-          } catch (err) {
-            console.error("Failed to promote to provider:", err);
+            await supabase.rpc("claim_provider_role");
+          } catch {
+            // Intentionally swallow: failure is not user-actionable.
           }
+          urlParams.delete("oauth_role");
+          const cleanUrl = urlParams.toString()
+            ? `${window.location.pathname}?${urlParams.toString()}`
+            : window.location.pathname;
+          window.history.replaceState({}, "", cleanUrl);
         }
 
         await Promise.all([

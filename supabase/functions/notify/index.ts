@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
-const PROD_ORIGINS = ["https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
+const PROD_ORIGINS = ["https://servicios360.com.ar", "https://www.servicios360.com.ar", "https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:3000"];
 const ALLOWED_ORIGINS = Deno.env.get("ENVIRONMENT") === "production"
   ? PROD_ORIGINS
@@ -75,14 +76,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { user_id, title, message, type = "info" } = await req.json();
+    const body = await req.json();
+    const notifySchema = z.object({
+      user_id: z.string().uuid("Invalid user_id formmat"),
+      title: z.string().min(1, "Title is required"),
+      message: z.string().min(1, "Message is required"),
+      type: z.string().default("info"),
+    });
 
-    if (!user_id || !title || !message) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+    const parsed = notifySchema.safeParse(body);
+    if (!parsed.success) {
+      return new Response(JSON.stringify({ error: "Validation error", details: parsed.error.format() }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const { user_id, title, message, type } = parsed.data;
 
     const { error } = await supabase.from("notifications").insert({
       user_id,

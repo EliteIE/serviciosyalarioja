@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
-const PROD_ORIGINS = ["https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
+const PROD_ORIGINS = ["https://servicios360.com.ar", "https://www.servicios360.com.ar", "https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:8080"];
 const ALLOWED_ORIGINS = Deno.env.get("ENVIRONMENT") === "production"
   ? PROD_ORIGINS
@@ -8,20 +9,51 @@ const ALLOWED_ORIGINS = Deno.env.get("ENVIRONMENT") === "production"
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("origin") || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
+  // Only echo the origin back when it's on the allowlist. Browsers will
+  // block the response for any other origin, preventing credential/data
+  // leakage via an opportunistic cross-site request.
+  const headers: Record<string, string> = {
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+    "Vary": "Origin",
   };
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
 }
+
+function isAllowedOrigin(req: Request) {
+  const origin = req.headers.get("origin");
+  if (!origin) return false;
+  return ALLOWED_ORIGINS.includes(origin);
+}
+
+// MP payment IDs are numeric. Constrain shape before use in crypto manifest
+// or DB lookups to avoid surprises downstream.
+const MP_ID_REGEX = /^\d{1,25}$/;
 
 const MP_API = "https://api.mercadopago.com";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
+  const url = new URL(req.url);
+  const path = url.pathname.split("/").pop();
+  const isWebhook = path === "webhook";
+
+  // Webhook is server-to-server (no Origin). Browser routes must carry a
+  // whitelisted Origin or be rejected — prevents CSRF from arbitrary pages.
+  if (!isWebhook && req.method !== "OPTIONS" && !isAllowedOrigin(req)) {
+    return new Response(JSON.stringify({ error: "Origin not allowed" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   if (req.method === "OPTIONS") {
+    if (!isAllowedOrigin(req)) {
+      return new Response(null, { status: 403 });
+    }
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -38,10 +70,7 @@ Deno.serve(async (req) => {
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  const url = new URL(req.url);
-  const path = url.pathname.split("/").pop();
-
-  const appUrl = "https://serviciosyalr.com";
+  const appUrl = Deno.env.get("APP_URL") || PROD_ORIGINS[0];
 
   try {
     // Rate limiting for non-webhook requests
@@ -81,16 +110,22 @@ Deno.serve(async (req) => {
         });
       }
 
-      const { service_request_id, payer_email } = await req.json();
+      const body = await req.json();
+      
+      const payloadSchema = z.object({
+        service_request_id: z.string().uuid("Invalid service_request_id format"),
+        payer_email: z.string().email("Email inválido").optional().nullable(),
+      });
 
-      // Validate payer_email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (payer_email && typeof payer_email === "string" && !emailRegex.test(payer_email)) {
-        return new Response(JSON.stringify({ error: "Email inválido" }), {
+      const parsed = payloadSchema.safeParse(body);
+      if (!parsed.success) {
+        return new Response(JSON.stringify({ error: "Validation error", details: parsed.error.format() }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      const { service_request_id, payer_email } = parsed.data;
 
       // Fetch the service request
       const { data: sr, error: srError } = await supabase
@@ -131,7 +166,7 @@ Deno.serve(async (req) => {
         .eq("service_request_id", service_request_id)
         .eq("status", "aprobado");
 
-      const extrasTotal = (extras || []).reduce((sum: number, e: any) => sum + Number(e.amount), 0);
+      const extrasTotal = (extras || []).reduce((sum: number, e: { amount: string | number }) => sum + Number(e.amount), 0);
       const amount = baseAmount + extrasTotal;
 
       if (!amount || amount <= 0) {
@@ -185,20 +220,26 @@ Deno.serve(async (req) => {
       let useMarketplace = false;
 
       if (sr.provider_id) {
-        const { data: mpAccount } = await supabase
-          .from("provider_mp_accounts")
-          .select("mp_access_token")
-          .eq("user_id", sr.provider_id)
-          .single();
-
-        if (mpAccount?.mp_access_token) {
-          collectorToken = mpAccount.mp_access_token;
+        const { data: providerToken } = await supabase.rpc(
+          "get_provider_mp_access_token",
+          { p_user_id: sr.provider_id }
+        );
+        if (providerToken) {
+          collectorToken = providerToken as string;
           useMarketplace = true;
         }
       }
 
       // Build preference body
-      const preferenceBody: any = {
+      const preferenceBody: {
+        items: Array<{ title: string; quantity: number; unit_price: number; currency_id: string }>;
+        payer: { email: string };
+        back_urls: { success: string; failure: string; pending: string };
+        notification_url: string;
+        external_reference: string;
+        auto_return: string;
+        marketplace_fee?: number;
+      } = {
         items: [
           {
             title: title,
@@ -336,6 +377,23 @@ Deno.serve(async (req) => {
 
       // Build manifest and compute HMAC
       const dataId = url.searchParams.get("data.id") || url.searchParams.get("id") || "";
+      // Constrain dataId shape before feeding into the HMAC manifest and
+      // downstream DB lookups. Rejects path-like or overlong inputs.
+      if (dataId && !MP_ID_REGEX.test(dataId)) {
+        console.error("Webhook rejected: malformed data.id");
+        return new Response(JSON.stringify({ error: "Invalid data.id" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Also constrain xRequestId — it's concatenated into the manifest.
+      if (!/^[a-zA-Z0-9_-]{1,128}$/.test(xRequestId)) {
+        console.error("Webhook rejected: malformed x-request-id");
+        return new Response(JSON.stringify({ error: "Invalid x-request-id" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
       const encoder = new TextEncoder();
       const key = await crypto.subtle.importKey(
@@ -376,10 +434,39 @@ Deno.serve(async (req) => {
       }
 
       const body = await req.json().catch(() => null);
-      console.log("Webhook received:", JSON.stringify(body));
+      if (!body) {
+        return new Response(JSON.stringify({ error: "Missing body" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      const webhookSchema = z.object({
+        type: z.string().optional(),
+        data: z.object({
+          id: z.coerce.string().optional(),
+        }).optional(),
+      }).passthrough();
 
-      if (body?.type === "payment" && body?.data?.id) {
-        const paymentId = body.data.id;
+      const parsedWebhook = webhookSchema.safeParse(body);
+      if (!parsedWebhook.success) {
+        return new Response(JSON.stringify({ error: "Invalid webhook payload" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log("Webhook received:", JSON.stringify(parsedWebhook.data));
+
+      if (parsedWebhook.data.type === "payment" && parsedWebhook.data.data?.id) {
+        const paymentId = parsedWebhook.data.data.id;
+        if (!MP_ID_REGEX.test(paymentId)) {
+          console.error("Webhook rejected: malformed payment id in body");
+          return new Response(JSON.stringify({ error: "Invalid payment id" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
 
         // --- IDEMPOTENCY GUARD ---
         // Check if this payment ID was already processed and marked as completed
@@ -419,14 +506,12 @@ Deno.serve(async (req) => {
             .single();
 
           if (sr?.provider_id) {
-            const { data: mpAccount } = await supabase
-              .from("provider_mp_accounts")
-              .select("mp_access_token")
-              .eq("user_id", sr.provider_id)
-              .single();
-
-            if (mpAccount?.mp_access_token) {
-              fetchToken = mpAccount.mp_access_token;
+            const { data: providerToken } = await supabase.rpc(
+              "get_provider_mp_access_token",
+              { p_user_id: sr.provider_id }
+            );
+            if (providerToken) {
+              fetchToken = providerToken as string;
             }
           }
         }
@@ -460,7 +545,7 @@ Deno.serve(async (req) => {
           .maybeSingle();
 
         if (pendingPayment) {
-          await supabase
+          const { error: updErr } = await supabase
             .from("payments")
             .update({
               status: mpStatus === "approved" ? "completed" : mpStatus,
@@ -468,6 +553,15 @@ Deno.serve(async (req) => {
               payment_method: mpPayment.payment_method_id || null,
             })
             .eq("id", pendingPayment.id);
+          // Unique-constraint violation (23505) means a parallel webhook
+          // already marked this payment completed — safe to ACK.
+          if (updErr && updErr.code !== "23505") {
+            console.error("Payment update failed:", updErr.code);
+            return new Response(JSON.stringify({ error: "Update failed" }), {
+              status: 500,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
         }
 
         // If approved, mark service as completado (only if currently finalizado_prestador)
