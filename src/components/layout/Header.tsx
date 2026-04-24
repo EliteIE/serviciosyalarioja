@@ -45,14 +45,9 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="Servicios 360 — inicio">
           <img src={logo} alt="Servicios 360" className="h-9 w-9 rounded-xl" />
-          <div className="hidden sm:flex flex-col leading-none">
-            <span className="text-xl font-bold text-foreground">
-              Servicios <span className="text-primary">360</span>
-            </span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
-              La Rioja
-            </span>
-          </div>
+          <span className="hidden sm:inline text-xl font-bold text-foreground leading-none">
+            Servicios <span className="text-primary">360</span>
+          </span>
         </Link>
 
         {isPublic && (
