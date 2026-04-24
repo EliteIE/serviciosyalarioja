@@ -5,8 +5,9 @@ export function TestimoniosSection() {
     {
       id: 1,
       nombre: "Valentina R.",
-      rol: "Cliente Verificada",
-      texto: '"Encontré un electricista excelente en menos de 5 minutos. Me resolvió el problema en el día y el precio fue súper transparente. ¡La plataforma es genial!"',
+      rol: "Cliente",
+      ciudad: "La Rioja Capital",
+      texto: '"Se me rompió la canilla un domingo. En un rato tenía 3 presupuestos y a las 2 horas un plomero en casa. Todo por chat, sin dar mi número a nadie."',
       rating: 5,
       inicial: "V",
       colorBg: "bg-blue-100 dark:bg-blue-500/20",
@@ -15,8 +16,9 @@ export function TestimoniosSection() {
     {
       id: 2,
       nombre: "Alejandro P.",
-      rol: "Prestador Top",
-      texto: '"Como prestador, dupliqué mis clientes en el primer mes. La verificación genera mucha confianza en la gente y la gestión de cobros es impecable."',
+      rol: "Prestador",
+      ciudad: "Chilecito",
+      texto: '"Soy electricista matriculado. En el primer mes conseguí más trabajos que por boca a boca en todo el año pasado. La verificación genera confianza."',
       rating: 5,
       inicial: "A",
       colorBg: "bg-primary/20",
@@ -25,8 +27,9 @@ export function TestimoniosSection() {
     {
       id: 3,
       nombre: "Camila O.",
-      rol: "Cliente Verificada",
-      texto: '"Me encanta poder ver las reseñas y el portafolio de trabajos antes de contratar a alguien. Muy transparente y seguro. Lo recomiendo a todos mis conocidos."',
+      rol: "Cliente",
+      ciudad: "Chamical",
+      texto: '"Me mudé y necesitaba pintor. Ver el portafolio de trabajos anteriores antes de contratar me ayudó un montón a decidir. Quedó impecable."',
       rating: 5,
       inicial: "C",
       colorBg: "bg-green-100 dark:bg-green-500/20",
@@ -83,19 +86,21 @@ export function TestimoniosSection() {
 
               {/* Rodapé do Cartão: Info do Utilizador */}
               <div className="relative z-10 flex items-center gap-4 pt-6 border-t border-slate-700/50">
-                {/* Avatar */}
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${testimonio.colorBg} ${testimonio.colorText}`}>
+                {/* Avatar con anillo riojano (acento local) */}
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ring-2 ring-offset-2 ring-offset-slate-800 ring-riojano/40 ${testimonio.colorBg} ${testimonio.colorText}`}>
                   {testimonio.inicial}
                 </div>
-                
-                {/* Nome e Rol */}
-                <div>
-                  <h4 className="font-bold text-primary-foreground text-base">
+
+                {/* Nome + rol + ciudad */}
+                <div className="min-w-0">
+                  <h4 className="font-bold text-primary-foreground text-base truncate">
                     {testimonio.nombre}
                   </h4>
                   <div className="flex items-center gap-1.5 text-sm mt-0.5 text-slate-400">
-                    <CheckCircle2 size={14} className={testimonio.rol.includes('Prestador') ? 'text-primary' : 'text-blue-500'} />
+                    <CheckCircle2 size={14} className={testimonio.rol === 'Prestador' ? 'text-primary' : 'text-blue-500'} />
                     <span>{testimonio.rol}</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-500"></span>
+                    <span className="text-riojano font-medium truncate">{testimonio.ciudad}</span>
                   </div>
                 </div>
               </div>

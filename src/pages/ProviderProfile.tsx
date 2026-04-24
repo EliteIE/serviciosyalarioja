@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import {
   Star, MapPin, Clock, ShieldCheck, MessageSquare, Share2,
-  CheckCircle2, ThumbsUp, Award, ArrowLeft, Loader2, Briefcase,
+  CheckCircle2, ThumbsUp, Award, ArrowLeft, Briefcase,
   Calendar, DollarSign, Globe, Camera
 } from "lucide-react";
 import { useProviderProfile, useProviderPortfolio } from "@/hooks/useProfiles";
@@ -9,6 +9,8 @@ import { useReviews } from "@/hooks/useReviews";
 import { CATEGORIES } from "@/constants/categories";
 import { useProviderSchedulePublic, useProviderServicesPublic, DAY_NAMES_SHORT } from "@/hooks/useProviderSchedule";
 import { toast } from "sonner";
+import Seo from "@/components/Seo";
+import { ProviderProfileSkeleton } from "@/components/skeletons/ProviderProfileSkeleton";
 
 const getCategoryTheme = (slug: string | null) => {
   const cat = (slug || "").toLowerCase();
@@ -29,7 +31,7 @@ export default function ProviderProfilePage() {
   const { data: portfolioItems } = useProviderPortfolio(id);
 
   if (isLoading) {
-    return <div className="min-h-screen flex justify-center items-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
+    return <ProviderProfileSkeleton />;
   }
 
   // Treat unverified/soft-deleted providers as not-found: RLS should already
@@ -69,8 +71,42 @@ export default function ProviderProfilePage() {
   const isCurrentlyAvailable = provider.provider_available && todaySlot &&
     currentTime >= todaySlot.start_time.slice(0, 5) && currentTime <= todaySlot.end_time.slice(0, 5);
 
+  const ratingAvg = typeof (provider as { rating_avg?: number | null }).rating_avg === "number"
+    ? (provider as { rating_avg: number }).rating_avg
+    : null;
+
+  const seoDescription = `${provider.full_name || "Profesional"} — ${categoryName} verificado en ${coverageArea[0] || "La Rioja"}. ${totalAvaliacoes} reseñas${ratingAvg ? `, calificación ${ratingAvg.toFixed(1)}/5` : ""}. Pedí presupuesto gratis en Servicios 360.`;
+
+  const localBusinessLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: provider.full_name,
+    description: (provider as { bio?: string | null }).bio || seoDescription,
+    url: `https://www.servicios360.com.ar/p/${id}`,
+    image: provider.avatar_url || "https://www.servicios360.com.ar/og-image.png",
+    areaServed: coverageArea.length > 0 ? coverageArea : ["La Rioja"],
+    priceRange: priceRange || "$$",
+  };
+  if (ratingAvg && totalAvaliacoes > 0) {
+    localBusinessLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: ratingAvg.toFixed(1),
+      reviewCount: totalAvaliacoes,
+      bestRating: "5",
+      worstRating: "1",
+    };
+  }
+
   return (
     <div className="min-h-screen bg-background font-sans pb-20">
+      <Seo
+        title={`${provider.full_name || "Profesional"} — ${categoryName} en ${coverageArea[0] || "La Rioja"}`}
+        description={seoDescription}
+        canonicalPath={`/p/${id}`}
+        image={provider.avatar_url || undefined}
+        ogType="profile"
+        jsonLd={localBusinessLd}
+      />
 
       {/* HERO */}
       <div className="bg-card border-b border-border">
@@ -86,7 +122,7 @@ export default function ProviderProfilePage() {
             <div className="flex flex-col sm:flex-row sm:items-end gap-5 sm:gap-6 -mt-16 sm:-mt-20 relative z-10 mb-4 sm:mb-0">
               <div className={`relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background flex items-center justify-center ${theme.txt} shadow-lg flex-shrink-0 overflow-hidden`}>
                 {provider.avatar_url ? (
-                  <img src={provider.avatar_url} alt={provider.full_name || ""} className="w-full h-full object-cover" />
+                  <img src={provider.avatar_url} alt={`Foto de ${provider.full_name || "el profesional"}`} width={160} height={160} decoding="async" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-5xl font-extrabold">{provider.full_name?.charAt(0) || "?"}</span>
                 )}
@@ -231,13 +267,13 @@ export default function ProviderProfilePage() {
                     <div key={item.id} className="rounded-2xl border border-border bg-muted/20 overflow-hidden">
                       <div className="grid grid-cols-2 h-40">
                         <div className="relative overflow-hidden">
-                          <img src={item.before_url} alt="Antes" className="h-full w-full object-cover" />
+                          <img src={item.before_url} alt="Foto del trabajo antes de realizarse" width={400} height={400} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                           <span className="absolute bottom-2 left-2 bg-primary/60 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                             Antes
                           </span>
                         </div>
                         <div className="relative overflow-hidden">
-                          <img src={item.after_url} alt="Después" className="h-full w-full object-cover" />
+                          <img src={item.after_url} alt="Foto del trabajo terminado" width={400} height={400} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                           <span className="absolute bottom-2 left-2 bg-green-500/80 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                             Después
                           </span>
@@ -302,7 +338,7 @@ export default function ProviderProfilePage() {
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-foreground font-bold text-sm overflow-hidden">
                             {review.reviewer_avatar ? (
-                              <img src={review.reviewer_avatar} alt={review.reviewer_name || ""} className="w-full h-full object-cover" />
+                              <img src={review.reviewer_avatar} alt={`Foto de ${review.reviewer_name || "usuario"}`} width={48} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             ) : (review.reviewer_name?.[0] || "?")}
                           </div>
                           <div>

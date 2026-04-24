@@ -64,6 +64,11 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        riojano: {
+          DEFAULT: "hsl(var(--riojano))",
+          foreground: "hsl(var(--riojano-foreground))",
+          soft: "hsl(var(--riojano-soft))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

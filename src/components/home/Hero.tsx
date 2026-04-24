@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Shield, Star } from "lucide-react";
+import { Search, MapPin, Shield, Star, CreditCard } from "lucide-react";
 
 // Barrios de La Rioja Capital y alrededores
 const BARRIOS_LA_RIOJA = [
@@ -108,9 +108,22 @@ export const Hero = () => {
       <div className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[800px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center">
-        
+
+        {/* Badge de localización + cuotas — ocre-Famatina para "La Rioja" (acento local) */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-foreground/5 border border-secondary-foreground/10 text-xs font-semibold text-secondary-foreground/80 backdrop-blur-sm mt-2">
+          <span className="inline-flex items-center gap-1.5">
+            <MapPin size={12} className="text-riojano" />
+            <span className="text-riojano">La Rioja</span>
+          </span>
+          <span className="w-1 h-1 rounded-full bg-secondary-foreground/30"></span>
+          <span className="inline-flex items-center gap-1.5">
+            <CreditCard size={12} className="text-primary" />
+            Cuotas sin interés con MercadoPago
+          </span>
+        </div>
+
         {/* Título Principal */}
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-secondary-foreground mb-6 tracking-tight leading-[1.1] mt-8">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-secondary-foreground mb-6 tracking-tight leading-[1.1] mt-6">
           Encontrá al profesional <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60 relative inline-block">
             perfecto
@@ -118,12 +131,12 @@ export const Hero = () => {
             <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary/40" viewBox="0 0 100 10" preserveAspectRatio="none">
               <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="transparent" />
             </svg>
-          </span> para vos
+          </span> para tu casa
         </h1>
 
         {/* Subtítulo */}
         <p className="text-lg md:text-xl text-secondary-foreground/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Prestadores verificados, presupuestos transparentes y garantía en cada servicio. Tu tranquilidad empieza acá.
+          Plomeros, electricistas y más prestadores <strong className="text-secondary-foreground">verificados en toda La Rioja</strong>. Pedí presupuestos gratis, compará reseñas reales y pagá seguro <strong className="text-secondary-foreground">en cuotas sin interés</strong>.
         </p>
 
         {/* Barra de Pesquisa Integrada */}
@@ -164,7 +177,7 @@ export const Hero = () => {
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => { setLocationQuery(barrio); setShowBarrios(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-primary/5 text-foreground flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-4 py-3 min-h-[44px] text-sm hover:bg-primary/5 text-foreground flex items-center gap-2 transition-colors"
                   >
                     <MapPin size={14} className="text-muted-foreground shrink-0" />
                     {barrio}
@@ -197,7 +210,7 @@ export const Hero = () => {
                   const slug = catMap[categoria.toLowerCase()] || categoria.toLowerCase();
                   navigate(`/buscar?q=${encodeURIComponent(categoria)}&category=${slug}`);
                 }}
-                className="px-4 py-1.5 rounded-full bg-secondary-foreground/5 text-secondary-foreground/80 text-sm border border-secondary-foreground/10 hover:bg-secondary-foreground/10 hover:text-secondary-foreground transition-all cursor-pointer"
+                className="min-h-[44px] sm:min-h-0 px-4 py-2.5 sm:py-1.5 rounded-full bg-secondary-foreground/5 text-secondary-foreground/80 text-sm border border-secondary-foreground/10 hover:bg-secondary-foreground/10 hover:text-secondary-foreground transition-all cursor-pointer"
               >
                 {categoria}
               </button>
@@ -220,14 +233,16 @@ export const Hero = () => {
                 <Star size={28} />
               </div>
               <h3 className="text-secondary-foreground font-semibold text-base mb-1">Reseñas Reales</h3>
-              <p className="text-secondary-foreground/60 text-sm">Opiniones 100% de clientes.</p>
+              <p className="text-secondary-foreground/60 text-sm">Opiniones verificadas de clientes.</p>
             </div>
             <div className="flex flex-col items-center justify-center text-center group min-w-[200px] snap-center shrink-0 sm:min-w-0 sm:shrink">
               <div className="w-14 h-14 bg-secondary-foreground/5 rounded-2xl flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
-                <Search size={28} />
+                <CreditCard size={28} />
               </div>
-              <h3 className="text-secondary-foreground font-semibold text-base mb-1">Presupuesto Rápido</h3>
-              <p className="text-secondary-foreground/60 text-sm">Compará precios sin compromiso.</p>
+              <h3 className="text-secondary-foreground font-semibold text-base mb-1">Pagá en Cuotas</h3>
+              <p className="text-secondary-foreground/60 text-sm">
+                Con MercadoPago, sin interés<sup className="text-[10px]">*</sup>.
+              </p>
             </div>
           </div>
         </div>

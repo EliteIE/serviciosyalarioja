@@ -41,6 +41,13 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
+    /* Ocre-Famatina — acento riojano para diferenciación local
+       (cerros de Famatina / Talampaya). Usar puntualmente: badges locales,
+       detalles cálidos, subrayados. NO reemplaza el primary (naranja acción). */
+    --riojano: 33 62% 52%;
+    --riojano-foreground: 0 0% 100%;
+    --riojano-soft: 33 70% 94%;
+
     --sidebar-background: 213 80% 15%;
     --sidebar-foreground: 210 20% 92%;
     --sidebar-primary: 25 100% 50%;
@@ -88,6 +95,11 @@
     --sidebar-accent-foreground: 210 20% 92%;
     --sidebar-border: 213 40% 15%;
     --sidebar-ring: 25 100% 50%;
+
+    /* Riojano — mismo hue, ligeramente más saturado para modo oscuro */
+    --riojano: 33 70% 58%;
+    --riojano-foreground: 0 0% 100%;
+    --riojano-soft: 33 40% 18%;
   }
 }
 
