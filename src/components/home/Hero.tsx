@@ -72,102 +72,105 @@ export const Hero = () => {
   };
 
   return (
-    <div className="relative bg-secondary flex flex-col items-center justify-center px-4 py-20 md:py-28 overflow-hidden">
-
-      {/* Ambient background effects */}
-      <div
-        className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--secondary-foreground)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--secondary-foreground)/0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[800px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"
+    <div className="relative w-full min-h-[500px] md:min-h-[600px] lg:min-h-[700px] flex items-center overflow-hidden bg-slate-50">
+      
+      {/* Imagem de Fundo (Upload do Usuário) */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center md:bg-right transition-transform duration-1000 hover:scale-105"
+        style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col items-center">
+      {/* Gradiente de Overlay para Leitura do Texto */}
+      <div className="absolute inset-0 z-10 bg-white/90 md:bg-gradient-to-r md:from-white/95 md:via-white/80 md:to-transparent" />
 
-        {/* Subtle disclosure badge (replaces the old trust-badge row below) */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-foreground/5 border border-secondary-foreground/10 text-xs font-medium text-secondary-foreground/70 backdrop-blur-sm">
-          <CreditCard size={12} className="text-primary" aria-hidden="true" />
-          Cuotas sin interés con MercadoPago
-        </div>
+      {/* Container do Conteúdo */}
+      <div className="container relative z-20 mx-auto px-4 py-16 md:py-24">
+        <div className="w-full max-w-2xl flex flex-col items-start text-left">
 
-        {/* Headline */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-secondary-foreground mt-6 mb-5 tracking-tight leading-[1.1]">
-          Encontrá al profesional{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 relative inline-block">
-            perfecto
-            <svg
-              className="absolute w-full h-3 -bottom-1 left-0 text-primary/40"
-              viewBox="0 0 100 10"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="transparent" />
-            </svg>
-          </span>{" "}
-          para tu casa
-        </h1>
-
-        {/* Short subheadline — no redundant pitch list */}
-        <p className="text-base md:text-lg text-secondary-foreground/70 mb-8 max-w-xl mx-auto leading-relaxed">
-          Profesionales verificados en toda La Rioja. Presupuestos gratis y reseñas reales.
-        </p>
-
-        {/* Single-field search — no zone dropdown */}
-        <form
-          onSubmit={handleSearch}
-          className="w-full max-w-2xl bg-background p-2 rounded-2xl md:rounded-full shadow-2xl flex items-stretch gap-2 transition-all focus-within:ring-4 focus-within:ring-primary/20"
-          role="search"
-          aria-label="Buscar servicios"
-        >
-          <div className="flex-1 flex items-center px-4">
-            <Search className="text-muted-foreground mr-3 flex-shrink-0" size={20} aria-hidden="true" />
-            <label htmlFor="hero-search" className="sr-only">
-              ¿Qué servicio necesitás?
-            </label>
-            <input
-              id="hero-search"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="¿Qué necesitás? Ej: plomero, electricista, limpieza..."
-              className="w-full bg-transparent border-none text-foreground focus:outline-none text-base placeholder:text-muted-foreground py-3"
-              autoComplete="off"
-            />
+          {/* Badge Informativo */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-100 text-xs font-semibold text-primary shadow-sm mb-6">
+            <CreditCard size={14} aria-hidden="true" />
+            Cuotas sin interés con MercadoPago
           </div>
 
-          <button
-            type="submit"
-            className="shrink-0 px-6 md:px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl md:rounded-full transition-colors flex items-center justify-center shadow-lg min-h-[44px]"
+          {/* Headline (Título) */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#082345] mb-6 tracking-tight leading-[1.15]">
+            Encontrá al profesional{" "}
+            <span className="text-primary relative inline-block">
+              perfecto
+              <svg
+                className="absolute w-full h-3 -bottom-1 left-0 text-primary/30"
+                viewBox="0 0 100 10"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="transparent" />
+              </svg>
+            </span>{" "}
+            <br className="hidden md:block" />para tu casa
+          </h1>
+
+          {/* Subheadline (Parágrafo) */}
+          <p className="text-base md:text-xl text-slate-600 mb-10 leading-relaxed max-w-lg">
+            Profesionales verificados en toda La Rioja. Presupuestos gratis y reseñas reales de clientes como vos.
+          </p>
+
+          {/* Barra de Pesquisa */}
+          <form
+            onSubmit={handleSearch}
+            className="w-full bg-white p-2 rounded-2xl md:rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-stretch gap-2 transition-all focus-within:ring-4 focus-within:ring-primary/20 border border-slate-100"
+            role="search"
+            aria-label="Buscar servicios"
           >
-            Buscar
-          </button>
-        </form>
+            <div className="flex-1 flex items-center px-4 py-2 md:py-0">
+              <Search className="text-slate-400 mr-3 flex-shrink-0" size={24} aria-hidden="true" />
+              <label htmlFor="hero-search" className="sr-only">
+                ¿Qué servicio necesitás?
+              </label>
+              <input
+                id="hero-search"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Ej: plomero, electricista, limpieza..."
+                className="w-full bg-transparent border-none text-[#082345] focus:outline-none text-base md:text-lg placeholder:text-slate-400 font-medium"
+                autoComplete="off"
+              />
+            </div>
 
-        {/* Popular searches — compact chips, no heading bloat */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          <span className="text-xs font-medium text-secondary-foreground/50 inline-flex items-center gap-1.5">
-            <Star size={12} className="text-primary" aria-hidden="true" />
-            Populares:
-          </span>
-          {[
-            { label: "Plomería", slug: "plomeria" },
-            { label: "Electricista", slug: "electricidad" },
-            { label: "Limpieza", slug: "limpieza" },
-            { label: "Aire Acondicionado", slug: "aire-acondicionado" },
-          ].map(({ label, slug }) => (
             <button
-              key={slug}
-              type="button"
-              onClick={() => navigate(`/buscar?q=${encodeURIComponent(label)}&category=${slug}`)}
-              className="min-h-[44px] sm:min-h-0 px-3 py-1.5 rounded-full bg-secondary-foreground/5 text-secondary-foreground/80 text-sm border border-secondary-foreground/10 hover:bg-secondary-foreground/10 hover:text-secondary-foreground transition-all"
+              type="submit"
+              className="shrink-0 w-full md:w-auto px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-xl md:rounded-full transition-transform active:scale-95 flex items-center justify-center shadow-lg"
             >
-              {label}
+              Buscar
             </button>
-          ))}
-        </div>
+          </form>
 
+          {/* Buscas Populares */}
+          <div className="mt-8 flex flex-wrap items-center gap-2.5">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mr-2">
+              <Star size={12} className="text-primary" aria-hidden="true" />
+              Populares
+            </span>
+            {[
+              { label: "Plomería", slug: "plomeria" },
+              { label: "Electricista", slug: "electricidad" },
+              { label: "Limpieza", slug: "limpieza" },
+              { label: "Aire Acondicionado", slug: "aire-acondicionado" },
+            ].map(({ label, slug }) => (
+              <button
+                key={slug}
+                type="button"
+                onClick={() => navigate(`/buscar?q=${encodeURIComponent(label)}&category=${slug}`)}
+                className="px-4 py-1.5 rounded-full bg-white/60 backdrop-blur-md text-slate-700 text-xs md:text-sm border border-slate-200 hover:bg-white hover:shadow-md hover:border-primary/30 hover:text-primary transition-all font-medium"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+        </div>
       </div>
     </div>
   );
