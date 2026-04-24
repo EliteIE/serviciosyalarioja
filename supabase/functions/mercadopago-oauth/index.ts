@@ -148,8 +148,6 @@ Deno.serve(async (req) => {
         .upsert({
           user_id: userId,
           mp_user_id: String(tokenData.user_id || mpUser.id),
-          mp_access_token: "",   // legacy column; kept NOT NULL by schema until drop migration
-          mp_refresh_token: null,
           mp_email: mpUser.email || null,
           mp_public_key: tokenData.public_key || null,
           updated_at: new Date().toISOString(),

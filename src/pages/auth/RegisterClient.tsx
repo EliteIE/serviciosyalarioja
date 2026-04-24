@@ -22,7 +22,8 @@ import logo from "@/assets/logo.png";
 const RegisterClient = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   // Estado do formulário
   const [formData, setFormData] = useState({
     nombre: "",
@@ -31,11 +32,29 @@ const RegisterClient = () => {
     localidad: "",
     password: ""
   });
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Ley 25.326 (AR Data Protection): consent must be explicit and proven.
+  // We gate both signup paths (email + Google) on this checkbox so the
+  // timestamp we persist is defensible if challenged.
+  const handleGoogleSignup = async () => {
+    if (!termsAccepted) {
+      toast.error("Aceptá los Términos y la Política de Privacidad para continuar.");
+      return;
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/login`,
+        queryParams: { prompt: "select_account" }
+      }
+    });
+    if (error) toast.error("Error al registrar con Google");
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -48,29 +67,47 @@ const RegisterClient = () => {
       toast.error("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número");
       return;
     }
-    
-    setIsSubmitting(true);
-    const { error } = await supabase.auth.signUp({
-      email: formData.email, 
-      password: formData.password,
-      options: { 
-        emailRedirectTo: `${window.location.origin}/login?confirmed=true`,
-        data: { 
-          full_name: formData.nombre, 
-          phone: formData.telefono, 
-          location: formData.localidad || "La Rioja", 
-          is_provider: false 
-        } 
-      },
-    });
-    setIsSubmitting(false);
-    
-    if (error) { 
-      toast.error(error.message); 
-      return; 
+    if (!termsAccepted) {
+      toast.error("Aceptá los Términos y la Política de Privacidad para continuar.");
+      return;
     }
-    
-    navigate(`/confirmar-email?email=${encodeURIComponent(formData.email)}`);
+
+    setIsSubmitting(true);
+    try {
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login?confirmed=true`,
+          data: {
+            full_name: formData.nombre,
+            phone: formData.telefono,
+            location: formData.localidad || "La Rioja",
+            is_provider: false
+          }
+        },
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      // Persist consent timestamp. If the signup returned an immediate
+      // session we can update the profile row directly; otherwise the
+      // profile row already exists (handle_new_user trigger) and the
+      // update still applies under the anon client + RLS self-policy.
+      if (authData.user) {
+        await supabase
+          .from("profiles")
+          .update({ terms_accepted_at: new Date().toISOString() })
+          .eq("id", authData.user.id);
+      }
+
+      navigate(`/confirmar-email?email=${encodeURIComponent(formData.email)}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -158,19 +195,16 @@ const RegisterClient = () => {
             <p className="text-muted-foreground mt-2">Registrate como cliente en Servicios 360</p>
           </div>
 
-          {/* Google Login */}
+          {/* Google Login — gated on consent (same LPDP contract as email path) */}
           <button
-            onClick={async () => {
-              const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                  redirectTo: `${window.location.origin}/login`,
-                  queryParams: { prompt: "select_account" }
-                }
-              });
-              if (error) toast.error("Error al registrar con Google");
-            }}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-xl hover:bg-muted/50 hover:border-primary/30 transition-all text-sm font-semibold text-foreground shadow-sm mb-6"
+            onClick={handleGoogleSignup}
+            disabled={!termsAccepted}
+            aria-disabled={!termsAccepted}
+            className={`w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-xl transition-all text-sm font-semibold shadow-sm mb-6 ${
+              termsAccepted
+                ? "hover:bg-muted/50 hover:border-primary/30 text-foreground cursor-pointer"
+                : "text-muted-foreground/60 cursor-not-allowed opacity-60"
+            }`}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -293,18 +327,37 @@ const RegisterClient = () => {
               </div>
             </div>
 
-            {/* Termos e Condições */}
-            <div className="pt-2">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Al hacer clic en "Crear Cuenta", aceptás nuestros <Link to="/terminos" className="text-primary hover:underline">Términos de Servicio</Link> y <Link to="/privacidad" className="text-primary hover:underline">Política de Privacidad</Link>.
-              </p>
-            </div>
+            {/* Consentimento explícito — Ley 25.326 */}
+            <label className="flex items-start gap-3 cursor-pointer select-none pt-2">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/30 cursor-pointer"
+                required
+              />
+              <span className="text-xs text-muted-foreground leading-relaxed">
+                Acepto los{" "}
+                <Link to="/terminos" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                  Términos de Servicio
+                </Link>{" "}
+                y la{" "}
+                <Link to="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                  Política de Privacidad
+                </Link>{" "}
+                de Servicios 360. <span className="text-red-500" aria-hidden="true">*</span>
+              </span>
+            </label>
 
             {/* Botão de Submit */}
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 py-4 mt-2 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${isSubmitting ? 'bg-primary/70 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
+            <button
+              type="submit"
+              disabled={isSubmitting || !termsAccepted}
+              className={`w-full flex items-center justify-center gap-2 py-4 mt-2 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${
+                isSubmitting || !termsAccepted
+                  ? 'bg-primary/50 cursor-not-allowed shadow-none'
+                  : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'
+              }`}
             >
               {isSubmitting ? (
                 <><Loader2 className="animate-spin" size={20} /> Creando cuenta...</>
