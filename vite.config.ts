@@ -37,9 +37,12 @@ export default defineConfig(({ mode }) => ({
             if (id.includes("@radix-ui")) {
               return "radix";
             }
-            if (id.includes("recharts") || id.includes("d3-")) {
-              return "charts";
-            }
+            // NOTE: recharts + d3 deliberately NOT in a manual chunk.
+            // Recharts 2.x has internal circular imports that hit a Temporal
+            // Dead Zone ("Cannot access '_' before initialization") when
+            // combined with d3 into a single forced chunk under Rollup's
+            // minifier. Let Vite/Rollup chunk them automatically to avoid
+            // the TDZ and keep the app from white-screening on load.
             if (id.includes("react-hook-form") || id.includes("@hookform") || id.includes("zod")) {
               return "forms";
             }

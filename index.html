@@ -15,7 +15,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <!-- Inter font self-hosted via @fontsource-variable/inter (imported in src/main.tsx) -->
-    <link rel="preload" as="image" href="/og-image.png" />
+    <!-- og-image.png is referenced only via <meta og:image> / twitter:image —
+         it's consumed by crawlers, not the browser render pipeline. Preloading
+         it wastes bandwidth on every pageview and triggers a DevTools warning. -->
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
