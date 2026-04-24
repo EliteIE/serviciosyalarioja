@@ -20,6 +20,7 @@ import { CATEGORIES } from "@/constants/categories";
 import { useSearchProviders } from "@/hooks/useSearchProviders";
 import { SearchSkeleton } from "@/components/skeletons/SearchSkeleton";
 import { useFavorites } from "@/hooks/useFavorites";
+import Seo from "@/components/Seo";
 
 interface ProviderProfile {
   id: string;
@@ -153,7 +154,12 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-background font-sans flex flex-col">
-      
+      <Seo
+        title="Buscar profesionales verificados en La Rioja"
+        description="Compará plomeros, electricistas, limpieza, pintura y más profesionales verificados en La Rioja. Filtrá por categoría, zona y calificación. Presupuestos gratis."
+        canonicalPath="/buscar"
+      />
+
       {/* HEADER DINÂMICO (HERO SECTION) */}
       <div className={`relative pt-12 pb-20 px-6 lg:px-10 transition-colors duration-500 overflow-hidden ${tema.color}`}>
         {/* Efeitos de fundo dinâmicos */}
@@ -359,7 +365,7 @@ export default function SearchPage() {
                       <div className="relative flex-shrink-0">
                         <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden">
                           {prestador.avatar_url ? (
-                            <img src={prestador.avatar_url} alt={prestador.full_name} className="w-full h-full object-cover" />
+                            <img src={prestador.avatar_url} alt={`Foto de ${prestador.full_name}`} width={96} height={96} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                           ) : (
                             prestador.full_name?.[0] || "?"
                           )}

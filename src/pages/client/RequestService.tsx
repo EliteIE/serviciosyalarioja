@@ -489,7 +489,7 @@ export default function RequestService() {
                         Sin compromiso — recibí presupuestos y decidí sin presión.
                       </p>
                       <div className="flex items-center justify-center gap-4 text-[10px] text-muted-foreground">
-                        <span className="flex items-center gap-1"><ShieldCheck size={12} className="text-green-500" /> 100% Seguro</span>
+                        <span className="flex items-center gap-1"><ShieldCheck size={12} className="text-green-500" /> Pago seguro</span>
                         <span className="flex items-center gap-1"><Users size={12} className="text-blue-500" /> Profesionales verificados</span>
                         <span className="flex items-center gap-1"><Check size={12} className="text-primary" /> Sin costo</span>
                       </div>

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Search, BarChart3, Handshake, Star, UserPlus, FileText, Bell, DollarSign } from "lucide-react";
+import Seo from "@/components/Seo";
 
 const clientSteps = [
   {
@@ -50,6 +51,11 @@ const providerSteps = [
 export default function ComoFunciona() {
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Cómo funciona Servicios 360 — Para clientes y profesionales"
+        description="Aprendé cómo usar Servicios 360: buscá profesionales verificados, compará presupuestos y pagá con MercadoPago. Si sos prestador, descubrí cómo sumarte y conseguir más clientes."
+        canonicalPath="/como-funciona"
+      />
       {/* Hero */}
       <div className="relative bg-secondary pt-16 pb-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-secondary to-background opacity-90" />

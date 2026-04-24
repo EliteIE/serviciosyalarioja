@@ -100,7 +100,7 @@ const Login = () => {
         {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios 360" className="w-10 h-10 rounded-xl shadow-lg" />
+            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-xl shadow-lg" />
             <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
@@ -164,7 +164,7 @@ const Login = () => {
           <div className="text-center mb-10 mt-8 lg:mt-0">
             {/* Logo para mobile */}
             <div className="lg:hidden flex items-center justify-center mb-6">
-              <img src={logo} alt="Servicios 360" className="w-16 h-16 rounded-2xl shadow-lg" />
+              <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-2xl shadow-lg" />
             </div>
             {confirmed && (
               <div className="mb-6 flex items-center gap-3 rounded-xl bg-success/10 border border-success/20 p-4 text-left">

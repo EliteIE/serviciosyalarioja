@@ -1,6 +1,13 @@
+import Seo from "@/components/Seo";
+
 const PrivacyPolicy = () => {
   return (
     <div className="container max-w-4xl py-12">
+      <Seo
+        title="Política de Privacidad"
+        description="Cómo Servicios 360 recopila, usa y protege tus datos personales, en cumplimiento de la Ley 25.326 de Protección de Datos Personales de la República Argentina."
+        canonicalPath="/privacidad"
+      />
       <h1 className="text-3xl font-bold mb-2">Política de Privacidad</h1>
       <p className="text-muted-foreground mb-8">Última actualización: 13 de marzo de 2026</p>
 

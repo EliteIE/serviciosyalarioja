@@ -5,12 +5,44 @@ import { ProviderCTA } from "@/components/home/ProviderCTA";
 import { Hero } from "@/components/home/Hero";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { TestimoniosSection } from "@/components/home/TestimoniosSection";
+import Seo from "@/components/Seo";
 
 const Index = () => {
   return (
     <div>
+      <Seo
+        title="Servicios 360 — Profesionales verificados para tu hogar en La Rioja"
+        description="Encontrá plomeros, electricistas, limpieza, pintura y más profesionales verificados en La Rioja. Presupuestos gratis, reseñas reales y pagos seguros con MercadoPago."
+        canonicalPath="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Servicios 360",
+          url: "https://www.servicios360.com.ar",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://www.servicios360.com.ar/buscar?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "Servicios 360",
+            url: "https://www.servicios360.com.ar",
+            logo: "https://www.servicios360.com.ar/logo.png",
+            sameAs: [],
+          },
+        }}
+      />
       {/* Hero */}
       <Hero />
+
+      {/* Pequeña aclaración legal de cuotas — Res. BCRA 38.878 */}
+      <div className="bg-secondary border-t border-secondary-foreground/10">
+        <p className="container py-2 text-center text-[11px] text-secondary-foreground/50 leading-relaxed">
+          * Cuotas sin interés sujetas a promociones vigentes de MercadoPago y bancos adheridos.
+          Consultá el detalle al momento del pago.
+        </p>
+      </div>
 
       {/* Categories */}
       <CategoriesSection />

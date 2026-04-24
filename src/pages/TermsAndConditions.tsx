@@ -1,6 +1,13 @@
+import Seo from "@/components/Seo";
+
 const TermsAndConditions = () => {
   return (
     <div className="container max-w-4xl py-12">
+      <Seo
+        title="Términos y Condiciones de Uso"
+        description="Términos y condiciones de uso de Servicios 360, plataforma de servicios profesionales del hogar en Argentina. Regidos por Ley 24.240 de Defensa del Consumidor."
+        canonicalPath="/terminos"
+      />
       <h1 className="text-3xl font-bold mb-2">Términos y Condiciones de Uso</h1>
       <p className="text-muted-foreground mb-8">Última actualización: 13 de marzo de 2026</p>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Mail, Send, Loader2, Phone, MapPin, MessageSquare } from "lucide-react";
+import { Mail, Send, Loader2, MapPin, MessageSquare, MessageCircle } from "lucide-react";
+import Seo from "@/components/Seo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { CONTACT, SITE, buildWhatsAppLink } from "@/config/site";
 
 const Contacto = () => {
   const [sending, setSending] = useState(false);
@@ -46,6 +48,11 @@ const Contacto = () => {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-5xl">
+      <Seo
+        title="Contacto y Soporte"
+        description="Escribinos tu consulta, problema o sugerencia. Te respondemos lo antes posible por email o WhatsApp."
+        canonicalPath="/contacto"
+      />
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold mb-3">Contacto y Soporte</h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -65,21 +72,29 @@ const Contacto = () => {
                 <div>
                   <h3 className="font-semibold mb-1">Email</h3>
                   <a
-                    href="mailto:soporte@servicios360.com.ar"
-                    className="text-sm text-primary hover:underline"
+                    href={`mailto:${CONTACT.email}`}
+                    className="text-sm text-primary hover:underline break-all"
                   >
-                    soporte@servicios360.com.ar
+                    {CONTACT.email}
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-primary/10 p-3 shrink-0">
-                  <Phone className="h-5 w-5 text-primary" />
+                <div className="rounded-full bg-green-500/10 p-3 shrink-0">
+                  <MessageCircle className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">WhatsApp</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <a
+                    href={buildWhatsAppLink("Hola, quiero hacer una consulta sobre Servicios 360.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline font-medium"
+                  >
+                    {CONTACT.whatsappDisplay}
+                  </a>
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Lunes a Viernes, 9 a 18 hs
                   </p>
                 </div>
@@ -91,7 +106,7 @@ const Contacto = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Ubicación</h3>
-                  <p className="text-sm text-muted-foreground">La Rioja, Argentina</p>
+                  <p className="text-sm text-muted-foreground">{SITE.region}, Argentina</p>
                 </div>
               </div>
             </CardContent>

@@ -673,7 +673,7 @@ const ClientDashboard = () => {
           <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-1">
               <ShieldCheck size={14} className="text-green-500" />
-              <span className="font-semibold text-foreground">100% Garantizado</span>
+              <span className="font-semibold text-foreground">Pago protegido</span>
             </div>
             <p className="text-[10px] text-muted-foreground">Tus datos están protegidos. Solo compartimos tu info con el prestador asignado.</p>
           </div>
