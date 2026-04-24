@@ -21,51 +21,19 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: "es2020",
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 800,
     sourcemap: mode === "development" ? true : "hidden",
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Keep node_modules split by logical vendor groups
-          if (id.includes("node_modules")) {
-            if (id.includes("react-dom") || id.includes("react-router") || /[\\/]react[\\/]/.test(id)) {
-              return "react-vendor";
-            }
-            if (id.includes("@supabase")) {
-              return "supabase";
-            }
-            if (id.includes("@radix-ui")) {
-              return "radix";
-            }
-            // NOTE: recharts + d3 deliberately NOT in a manual chunk.
-            // Recharts 2.x has internal circular imports that hit a Temporal
-            // Dead Zone ("Cannot access '_' before initialization") when
-            // combined with d3 into a single forced chunk under Rollup's
-            // minifier. Let Vite/Rollup chunk them automatically to avoid
-            // the TDZ and keep the app from white-screening on load.
-            if (id.includes("react-hook-form") || id.includes("@hookform") || id.includes("zod")) {
-              return "forms";
-            }
-            if (id.includes("date-fns") || id.includes("react-day-picker")) {
-              return "dates";
-            }
-            if (id.includes("lucide-react")) {
-              return "icons";
-            }
-            if (
-              id.includes("embla-carousel") ||
-              id.includes("react-resizable-panels") ||
-              id.includes("input-otp") ||
-              id.includes("vaul") ||
-              id.includes("cmdk") ||
-              id.includes("sonner")
-            ) {
-              return "ui-extras";
-            }
-          }
-        },
-      },
-    },
+    // NOTE: rollupOptions.output.manualChunks removed intentionally.
+    // A hand-rolled vendor split (react-vendor, radix, charts, supabase,
+    // forms, dates, icons, ui-extras) repeatedly produced white-screen
+    // TDZ / "Cannot read properties of undefined (reading 'forwardRef')"
+    // errors in production because Rollup emitted modules whose top-level
+    // code dereferenced exports from chunks that weren't fully initialized
+    // yet. Recharts' internal circular imports and Radix's shared React
+    // dereferences are especially sensitive. Letting Vite/Rollup chunk
+    // automatically produces slightly different vendor boundaries but
+    // guarantees correct init order. Route code splitting is still done
+    // per-file via React.lazy() in src/App.tsx.
   },
   test: {
     globals: true,
