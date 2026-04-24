@@ -1,13 +1,13 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
+import {
   User,
-  Mail, 
+  Mail,
   Phone,
   MapPin,
-  Lock, 
-  Eye, 
-  EyeOff, 
+  Lock,
+  Eye,
+  EyeOff,
   ArrowLeft,
   ShieldCheck,
   TrendingUp,
@@ -17,7 +17,9 @@ import {
   UploadCloud,
   ChevronDown,
   FileText,
-  X
+  X,
+  CheckCircle2,
+  Info,
 } from "lucide-react";
 import { CATEGORIES } from "@/constants/categories";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +29,8 @@ import logo from "@/assets/logo.png";
 const MAX_DOC_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
+// File magic-byte sniffing so we don't trust a renamed .exe with a .pdf
+// extension. We only let JPG / PNG / WEBP / PDF through.
 const validateMagicBytes = async (file: File): Promise<boolean> => {
   const buffer = await file.slice(0, 4).arrayBuffer();
   const bytes = new Uint8Array(buffer);
@@ -41,11 +45,32 @@ const validateMagicBytes = async (file: File): Promise<boolean> => {
   return false;
 };
 
+// Three mandatory documents. Keying the state by slot makes it obvious
+// to the admin team which file is which and lets us gate submission.
+type DocSlot = "dniFront" | "dniBack" | "criminalRecord";
+
+const DOC_META: Record<DocSlot, { label: string; hint: string }> = {
+  dniFront: {
+    label: "DNI — Frente",
+    hint: "Foto clara del frente de tu DNI. No recortes los bordes.",
+  },
+  dniBack: {
+    label: "DNI — Dorso",
+    hint: "Foto clara del dorso. Tiene que verse el código de barras.",
+  },
+  criminalRecord: {
+    label: "Antecedentes Penales",
+    hint: "Certificado emitido por el Registro Nacional de Reincidencia (vigente).",
+  },
+};
+
+const DOC_SLOTS: DocSlot[] = ["dniFront", "dniBack", "criminalRecord"];
+
 const RegisterProvider = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Estado do formulário
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
@@ -53,61 +78,99 @@ const RegisterProvider = () => {
     categoria: "",
     descripcion: "",
     zona: "",
-    password: ""
+    password: "",
   });
 
-  const [docFiles, setDocFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [docs, setDocs] = useState<Record<DocSlot, File | null>>({
+    dniFront: null,
+    dniBack: null,
+    criminalRecord: null,
+  });
+  const fileRefs: Record<DocSlot, React.RefObject<HTMLInputElement>> = {
+    dniFront: useRef<HTMLInputElement>(null),
+    dniBack: useRef<HTMLInputElement>(null),
+    criminalRecord: useRef<HTMLInputElement>(null),
+  };
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const valid: File[] = [];
-    for (const f of files) {
-      if (!ACCEPTED_TYPES.includes(f.type)) {
-        toast.error(`Formato no soportado: ${f.name}. Usá JPG, PNG, WEBP o PDF.`);
-        continue;
-      }
-      if (f.size > MAX_DOC_SIZE) {
-        toast.error(`${f.name} supera los 5MB.`);
-        continue;
-      }
-      const validBytes = await validateMagicBytes(f);
-      if (!validBytes) {
-        toast.error(`${f.name} no parece ser un archivo válido. Verificá que sea JPG, PNG, WEBP o PDF.`);
-        continue;
-      }
-      valid.push(f);
+  const handleDocSelect = async (slot: DocSlot, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      toast.error(`Formato no soportado en ${DOC_META[slot].label}. Usá JPG, PNG, WEBP o PDF.`);
+      if (fileRefs[slot].current) fileRefs[slot].current!.value = "";
+      return;
     }
-    setDocFiles((prev) => [...prev, ...valid].slice(0, 3));
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (file.size > MAX_DOC_SIZE) {
+      toast.error(`${DOC_META[slot].label} supera los 5MB.`);
+      if (fileRefs[slot].current) fileRefs[slot].current!.value = "";
+      return;
+    }
+    const validBytes = await validateMagicBytes(file);
+    if (!validBytes) {
+      toast.error(`${file.name} no parece ser un archivo válido. Verificá que sea JPG, PNG, WEBP o PDF.`);
+      if (fileRefs[slot].current) fileRefs[slot].current!.value = "";
+      return;
+    }
+
+    setDocs((prev) => ({ ...prev, [slot]: file }));
   };
 
-  const removeFile = (idx: number) => setDocFiles((prev) => prev.filter((_, i) => i !== idx));
+  const removeDoc = (slot: DocSlot) => {
+    setDocs((prev) => ({ ...prev, [slot]: null }));
+    if (fileRefs[slot].current) fileRefs[slot].current!.value = "";
+  };
 
-  const uploadDocs = async (userId: string): Promise<string[]> => {
-    const urls: string[] = [];
-    for (const file of docFiles) {
-      const ext = file.name.split(".").pop();
-      const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from("provider-docs").upload(path, file);
+  const allDocsPresent = DOC_SLOTS.every((s) => docs[s] !== null);
+
+  // Upload each slot to its own deterministic path under the user's folder.
+  // Storage RLS already enforces (foldername)[1] = auth.uid()::text.
+  const uploadDocs = async (userId: string) => {
+    const uploaded: Partial<Record<DocSlot, string>> = {};
+    for (const slot of DOC_SLOTS) {
+      const file = docs[slot];
+      if (!file) continue;
+      const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+      const path = `${userId}/${slot}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("provider-docs").upload(path, file, {
+        upsert: false,
+        contentType: file.type,
+      });
       if (error) throw error;
-      urls.push(path);
+      uploaded[slot] = path;
     }
-    return urls;
+    return uploaded;
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!formData.nombre.trim() || !formData.email.trim() || !formData.password || !formData.categoria) {
-      toast.error("Completá los campos obligatorios"); return;
+      toast.error("Completá los campos obligatorios");
+      return;
     }
-    if (formData.password.length < 8 || !/[A-Z]/.test(formData.password) || !/[0-9]/.test(formData.password)) {
-      toast.error("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número"); return;
+    if (
+      formData.password.length < 8 ||
+      !/[A-Z]/.test(formData.password) ||
+      !/[0-9]/.test(formData.password)
+    ) {
+      toast.error("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número");
+      return;
+    }
+    if (!allDocsPresent) {
+      toast.error("Subí los 3 documentos obligatorios: DNI frente, DNI dorso y Antecedentes penales.");
+      return;
+    }
+    if (!termsAccepted) {
+      toast.error("Tenés que aceptar los Términos de Servicio y la Política de Privacidad para continuar.");
+      return;
     }
 
     setIsSubmitting(true);
@@ -128,18 +191,35 @@ const RegisterProvider = () => {
         },
       });
 
-      if (error) { toast.error(error.message); return; }
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
 
-      // Upload documents if any
-      if (docFiles.length > 0 && authData.user && authData.session) {
+      // Upload only works if the signup returned an immediate session
+      // (i.e. email confirmations disabled OR already confirmed). If it
+      // didn't, we persist nothing — the provider will finish uploading
+      // from their dashboard after confirming their email, and their
+      // status stays 'pending' (verification blocked until docs + admin
+      // review).
+      if (authData.user && authData.session) {
         try {
-          const docUrls = await uploadDocs(authData.user.id);
-          await supabase.from("profiles").update({
-            provider_doc_urls: docUrls,
-            provider_verification_status: "pending",
-          }).eq("id", authData.user.id);
-        } catch {
-          toast.warning("Los documentos se podrán subir después de confirmar tu email.");
+          const urls = await uploadDocs(authData.user.id);
+          await supabase
+            .from("profiles")
+            .update({
+              provider_dni_front_url: urls.dniFront ?? null,
+              provider_dni_back_url: urls.dniBack ?? null,
+              provider_criminal_record_url: urls.criminalRecord ?? null,
+              provider_verification_status: "pending",
+              terms_accepted_at: new Date().toISOString(),
+            })
+            .eq("id", authData.user.id);
+        } catch (uploadErr) {
+          console.error("[register-provider] doc upload failed", uploadErr);
+          toast.warning(
+            "Tu cuenta se creó pero no pudimos subir los documentos ahora. Vas a poder terminar desde tu panel.",
+          );
         }
       }
 
@@ -151,27 +231,28 @@ const RegisterProvider = () => {
 
   return (
     <div className="min-h-screen flex bg-background font-sans">
-      
-      {/* LADO ESQUERDO: Proposta de Valor para o Prestador (Oculto em Mobile) */}
+
+      {/* LEFT PANEL — provider value proposition */}
       <div className="hidden lg:flex lg:w-5/12 xl:w-1/2 bg-secondary relative flex-col justify-between p-12 overflow-hidden">
-        
-        {/* Efeitos Visuais de Fundo */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary rounded-full opacity-20 blur-[120px]"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-600 rounded-full opacity-10 blur-[100px]"></div>
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--secondary-foreground)/0.1)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--secondary-foreground)/0.1)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20"></div>
+
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary rounded-full opacity-20 blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-600 rounded-full opacity-10 blur-[100px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--secondary-foreground)/0.1)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--secondary-foreground)/0.1)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
         </div>
 
-        {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
             <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="text-2xl font-bold tracking-tight text-secondary-foreground">Servicios <span className="text-primary">360</span></span>
-            <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-wider">Profesionales</span>
+            <span className="text-2xl font-bold tracking-tight text-secondary-foreground">
+              Servicios <span className="text-primary">360</span>
+            </span>
+            <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-wider">
+              Profesionales
+            </span>
           </div>
         </div>
 
-        {/* Meio: Mensagem Principal para Prestador */}
         <div className="relative z-10 max-w-lg mt-12">
           <h1 className="text-4xl lg:text-5xl font-extrabold text-secondary-foreground mb-6 leading-[1.1]">
             Convertite en el profesional más buscado.
@@ -180,7 +261,6 @@ const RegisterProvider = () => {
             Unite a la red de expertos de Servicios 360. Conseguí nuevos clientes todas las semanas, gestioná tus presupuestos y hacé crecer tu negocio.
           </p>
 
-          {/* Badges de Confiança (Benefícios Prestador) */}
           <div className="space-y-6">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-1">
@@ -188,7 +268,9 @@ const RegisterProvider = () => {
               </div>
               <div>
                 <h3 className="text-secondary-foreground font-bold text-lg">Multiplicá tus ingresos</h3>
-                <p className="text-secondary-foreground/70 text-sm mt-1">Accedé a cientos de solicitudes de servicio en tu zona de cobertura.</p>
+                <p className="text-secondary-foreground/70 text-sm mt-1">
+                  Accedé a cientos de solicitudes de servicio en tu zona de cobertura.
+                </p>
               </div>
             </div>
 
@@ -198,150 +280,149 @@ const RegisterProvider = () => {
               </div>
               <div>
                 <h3 className="text-secondary-foreground font-bold text-lg">Construí tu reputación</h3>
-                <p className="text-secondary-foreground/70 text-sm mt-1">Las buenas reseñas de tus clientes te destacarán por encima de la competencia.</p>
+                <p className="text-secondary-foreground/70 text-sm mt-1">
+                  Las buenas reseñas de tus clientes te destacarán por encima de la competencia.
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Rodapé do lado esquerdo */}
         <div className="relative z-10 mt-12 pt-8 border-t border-secondary-foreground/20">
           <div className="flex items-center gap-3">
             <ShieldCheck className="text-green-500" size={20} />
-            <p className="text-sm text-secondary-foreground/80">Tu perfil será validado por nuestro equipo de seguridad.</p>
+            <p className="text-sm text-secondary-foreground/80">
+              Tu perfil será validado por nuestro equipo de seguridad.
+            </p>
           </div>
         </div>
 
       </div>
 
-      {/* LADO DIREITO: Formulário de Registo */}
+      {/* RIGHT PANEL — form */}
       <div className="w-full lg:w-7/12 xl:w-1/2 flex flex-col h-screen overflow-y-auto bg-background">
-        
         <div className="flex-1 flex flex-col justify-center px-6 py-10 lg:px-16 relative">
-          
-          {/* Botão Voltar */}
-          <Link to="/" className="absolute top-8 left-6 lg:left-12 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer z-10">
+
+          <Link
+            to="/"
+            className="absolute top-8 left-6 lg:left-12 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer z-10"
+          >
             <ArrowLeft size={16} />
             Volver al inicio
           </Link>
 
           <div className="w-full max-w-xl mx-auto mt-12 lg:mt-0">
-            
-            {/* Header do Formulário */}
+
             <div className="mb-8 text-center lg:text-left">
-              {/* Logo para mobile */}
               <div className="lg:hidden flex justify-center mb-6">
                 <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-2xl shadow-lg" />
               </div>
               <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Registro de Prestador</h2>
-              <p className="text-muted-foreground mt-2">Completá tus datos para empezar a ofrecer servicios.</p>
+              <p className="text-muted-foreground mt-2">
+                Completá tus datos y subí la documentación para empezar a ofrecer servicios.
+              </p>
             </div>
 
-            {/* Google Login */}
-            <button
-              onClick={async () => {
-                const { error } = await supabase.auth.signInWithOAuth({
-                  provider: "google",
-                  options: {
-                    redirectTo: `${window.location.origin}/login?oauth_role=provider`,
-                    queryParams: { prompt: "select_account" }
-                  }
-                });
-                if (error) toast.error("Error al registrar con Google");
-              }}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-xl hover:bg-muted/50 hover:border-primary/30 transition-all text-sm font-semibold text-foreground shadow-sm mb-4"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-              </svg>
-              Registrate con Google
-            </button>
-
-            <div className="relative flex items-center py-2 mb-2">
-              <div className="flex-grow border-t border-border"></div>
-              <span className="flex-shrink-0 mx-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">O completá el formulario</span>
-              <div className="flex-grow border-t border-border"></div>
+            {/* Documentation notice — Google sign-in was removed here on
+                purpose: provider verification requires three uploads, and
+                that flow doesn't fit inside an OAuth redirect. */}
+            <div className="flex items-start gap-3 rounded-xl border border-info/30 bg-info/5 p-4 mb-6">
+              <Info size={18} className="text-info mt-0.5 shrink-0" />
+              <p className="text-sm text-foreground/80 leading-relaxed">
+                Para tu seguridad y la de los clientes, el registro de prestador exige subir DNI (frente y dorso) y un certificado de antecedentes penales vigente. Por eso este registro es sólo por email.
+              </p>
             </div>
 
-            {/* Formulário Completo */}
-            <form onSubmit={handleRegister} className="space-y-5">
-              
-              {/* Secção 1: Dados Pessoais (Grid) */}
+            <form onSubmit={handleRegister} className="space-y-5" noValidate>
+
+              {/* Section 1 — personal info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-foreground">Nombre completo <span className="text-red-500">*</span></label>
+                  <label htmlFor="rp-nombre" className="text-sm font-bold text-foreground">
+                    Nombre completo <span className="text-red-500" aria-hidden="true">*</span>
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <User className="text-muted-foreground" size={18} />
+                      <User className="text-muted-foreground" size={18} aria-hidden="true" />
                     </div>
-                    <input 
-                      type="text" 
+                    <input
+                      id="rp-nombre"
+                      type="text"
                       name="nombre"
                       required
                       value={formData.nombre}
                       onChange={handleChange}
-                      placeholder="Tu nombre completo" 
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      placeholder="Tu nombre completo"
+                      autoComplete="name"
+                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-foreground">Teléfono <span className="text-red-500">*</span></label>
+                  <label htmlFor="rp-telefono" className="text-sm font-bold text-foreground">
+                    Teléfono <span className="text-red-500" aria-hidden="true">*</span>
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Phone className="text-muted-foreground" size={18} />
+                      <Phone className="text-muted-foreground" size={18} aria-hidden="true" />
                     </div>
-                    <input 
-                      type="tel" 
+                    <input
+                      id="rp-telefono"
+                      type="tel"
                       name="telefono"
                       required
                       value={formData.telefono}
                       onChange={handleChange}
-                      placeholder="+54 380 ..." 
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      placeholder="+54 380 ..."
+                      autoComplete="tel"
+                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-sm font-bold text-foreground">Email <span className="text-red-500">*</span></label>
+                  <label htmlFor="rp-email" className="text-sm font-bold text-foreground">
+                    Email <span className="text-red-500" aria-hidden="true">*</span>
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Mail className="text-muted-foreground" size={18} />
+                      <Mail className="text-muted-foreground" size={18} aria-hidden="true" />
                     </div>
-                    <input 
-                      type="email" 
+                    <input
+                      id="rp-email"
+                      type="email"
                       name="email"
                       required
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="tu@email.com" 
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      placeholder="tu@email.com"
+                      autoComplete="email"
+                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="w-full h-px bg-border my-2"></div>
+              <div className="w-full h-px bg-border my-2" />
 
-              {/* Secção 2: Dados Profissionais */}
+              {/* Section 2 — professional info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-foreground">Categoría principal <span className="text-red-500">*</span></label>
+                  <label htmlFor="rp-categoria" className="text-sm font-bold text-foreground">
+                    Categoría principal <span className="text-red-500" aria-hidden="true">*</span>
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Briefcase className="text-muted-foreground" size={18} />
+                      <Briefcase className="text-muted-foreground" size={18} aria-hidden="true" />
                     </div>
-                    <select 
+                    <select
+                      id="rp-categoria"
                       name="categoria"
                       required
                       value={formData.categoria}
                       onChange={handleChange}
-                      className="w-full appearance-none rounded-xl border border-border bg-background pl-11 pr-10 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium cursor-pointer"
+                      className="w-full appearance-none rounded-xl border border-border bg-background pl-11 pr-10 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium cursor-pointer"
                     >
                       <option value="" disabled>Seleccioná tu oficio</option>
                       {CATEGORIES.map((cat) => (
@@ -353,137 +434,215 @@ const RegisterProvider = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-foreground">Zona de cobertura <span className="text-red-500">*</span></label>
+                  <label htmlFor="rp-zona" className="text-sm font-bold text-foreground">
+                    Zona de cobertura <span className="text-red-500" aria-hidden="true">*</span>
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MapPin className="text-muted-foreground" size={18} />
+                      <MapPin className="text-muted-foreground" size={18} aria-hidden="true" />
                     </div>
-                    <input 
-                      type="text" 
+                    <input
+                      id="rp-zona"
+                      type="text"
                       name="zona"
                       required
                       value={formData.zona}
                       onChange={handleChange}
-                      placeholder="Ej: Capital, Barrio Norte" 
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      placeholder="Ej: Capital, Barrio Norte"
+                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">Descripción de tus servicios</label>
-                <textarea 
+                <label htmlFor="rp-descripcion" className="text-sm font-bold text-foreground">
+                  Descripción de tus servicios
+                </label>
+                <textarea
+                  id="rp-descripcion"
                   name="descripcion"
                   rows={3}
                   value={formData.descripcion}
                   onChange={handleChange}
-                  placeholder="Contá qué servicios ofrecés y cuál es tu experiencia..." 
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none"
-                ></textarea>
+                  placeholder="Contá qué servicios ofrecés y cuál es tu experiencia..."
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none"
+                />
               </div>
 
-              {/* Upload de Documentação */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">
-                  Documentación (DNI, matrícula) <span className="text-muted-foreground font-normal ml-1">— máx. 3 archivos</span>
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.webp,.pdf"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
-                <div 
-                  onClick={() => docFiles.length < 3 && fileInputRef.current?.click()}
-                  className={`w-full border-2 border-dashed border-border rounded-xl bg-background hover:bg-muted/50 hover:border-primary/50 transition-colors flex flex-col items-center justify-center py-6 ${
-                    docFiles.length < 3 ? "cursor-pointer group" : "opacity-60"
-                  }`}
-                >
-                  <div className="w-12 h-12 bg-muted rounded-full shadow-sm flex items-center justify-center mb-2 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all">
-                    <UploadCloud size={24} />
-                  </div>
-                  <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors text-center px-4">
-                    Hacé clic acá para subir archivos
-                  </p>
+              <div className="w-full h-px bg-border my-2" />
+
+              {/* Section 3 — mandatory documents */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">
+                    Documentación obligatoria <span className="text-red-500" aria-hidden="true">*</span>
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {docFiles.length < 3 ? "JPG, PNG, WEBP o PDF (máx. 5MB)" : "Máximo 3 archivos alcanzado"}
+                    Los tres archivos son obligatorios. Formato JPG, PNG, WEBP o PDF. Máx. 5 MB cada uno.
                   </p>
                 </div>
-                {docFiles.length > 0 && (
-                  <div className="space-y-2 mt-2">
-                    {docFiles.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 rounded-lg border border-border p-2 text-sm bg-background">
-                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="truncate flex-1 text-foreground">{f.name}</span>
-                        <span className="text-muted-foreground text-xs shrink-0">{(f.size / 1024).toFixed(0)}KB</span>
-                        <button type="button" onClick={() => removeFile(i)} className="text-destructive hover:text-destructive/80 transition-colors">
-                          <X className="h-4 w-4" />
-                        </button>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {DOC_SLOTS.map((slot) => {
+                    const file = docs[slot];
+                    const { label, hint } = DOC_META[slot];
+                    return (
+                      <div key={slot}>
+                        <input
+                          ref={fileRefs[slot]}
+                          type="file"
+                          accept=".jpg,.jpeg,.png,.webp,.pdf"
+                          className="hidden"
+                          onChange={(e) => handleDocSelect(slot, e)}
+                          aria-label={label}
+                        />
+
+                        {!file ? (
+                          <button
+                            type="button"
+                            onClick={() => fileRefs[slot].current?.click()}
+                            className="w-full flex items-center gap-3 rounded-xl border-2 border-dashed border-border bg-background hover:bg-muted/40 hover:border-primary/50 transition-colors p-4 text-left group"
+                          >
+                            <div className="w-11 h-11 rounded-lg bg-muted text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 flex items-center justify-center shrink-0 transition-colors">
+                              <UploadCloud size={20} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-foreground">
+                                {label}
+                                <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-red-500">
+                                  Requerido
+                                </span>
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>
+                            </div>
+                          </button>
+                        ) : (
+                          <div className="w-full flex items-center gap-3 rounded-xl border border-success/30 bg-success/5 p-3">
+                            <div className="w-11 h-11 rounded-lg bg-success/15 text-success flex items-center justify-center shrink-0">
+                              <CheckCircle2 size={20} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-foreground">{label}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                                <FileText size={12} className="shrink-0" />
+                                <span className="truncate">{file.name}</span>
+                                <span className="shrink-0">· {(file.size / 1024).toFixed(0)} KB</span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeDoc(slot)}
+                              className="text-muted-foreground hover:text-destructive transition-colors shrink-0 p-1"
+                              aria-label={`Quitar ${label}`}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
-                <p className="text-[11px] text-muted-foreground mt-1 text-center bg-muted/50 p-2 rounded-lg">
-                  Tus documentos serán revisados por nuestro equipo para verificar tu cuenta y garantizar la seguridad de la plataforma.
+                    );
+                  })}
+                </div>
+
+                <p className="text-[11px] text-muted-foreground bg-muted/50 p-2.5 rounded-lg leading-relaxed">
+                  Tus documentos se guardan cifrados y solo los ven nuestros verificadores. No se publican en tu perfil.
                 </p>
               </div>
 
-              <div className="w-full h-px bg-border my-2"></div>
+              <div className="w-full h-px bg-border my-2" />
 
-              {/* Senha */}
+              {/* Password */}
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">Contraseña <span className="text-red-500">*</span></label>
+                <label htmlFor="rp-password" className="text-sm font-bold text-foreground">
+                  Contraseña <span className="text-red-500" aria-hidden="true">*</span>
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="text-muted-foreground" size={18} />
+                    <Lock className="text-muted-foreground" size={18} aria-hidden="true" />
                   </div>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
+                  <input
+                    id="rp-password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Mínimo 8 caracteres, 1 mayúscula, 1 número" 
-                    className="w-full rounded-xl border border-border bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                    placeholder="Mínimo 8 caracteres, 1 mayúscula, 1 número"
+                    autoComplete="new-password"
+                    className="w-full rounded-xl border border-border bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              {/* Botão de Submit */}
-              <button 
-                type="submit" 
-                disabled={isSubmitting}
-                className={`w-full flex items-center justify-center gap-2 py-4 mt-6 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${isSubmitting ? 'bg-primary/70 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
+              {/* Terms + privacy acceptance */}
+              <label className="flex items-start gap-3 cursor-pointer select-none pt-2">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/30 cursor-pointer"
+                  required
+                />
+                <span className="text-xs text-muted-foreground leading-relaxed">
+                  Declaro que la información y documentación son verídicas y acepto los{" "}
+                  <Link to="/terminos" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                    Términos de Servicio
+                  </Link>{" "}
+                  y la{" "}
+                  <Link to="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                    Política de Privacidad
+                  </Link>{" "}
+                  de Servicios 360. <span className="text-red-500" aria-hidden="true">*</span>
+                </span>
+              </label>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting || !allDocsPresent || !termsAccepted}
+                className={`w-full flex items-center justify-center gap-2 py-4 mt-4 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${
+                  isSubmitting || !allDocsPresent || !termsAccepted
+                    ? "bg-primary/50 cursor-not-allowed shadow-none"
+                    : "bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5"
+                }`}
               >
                 {isSubmitting ? (
                   <><Loader2 className="animate-spin" size={20} /> Enviando solicitud...</>
                 ) : (
-                  'Crear Cuenta de Prestador'
+                  "Crear Cuenta de Prestador"
                 )}
               </button>
+
+              {!allDocsPresent && (
+                <p className="text-xs text-muted-foreground text-center -mt-1">
+                  Subí los 3 documentos obligatorios para poder enviar la solicitud.
+                </p>
+              )}
             </form>
 
-            {/* Links Inferiores */}
+            {/* Footer links */}
             <div className="mt-8 pb-8 space-y-4 text-center">
               <p className="text-muted-foreground font-medium text-sm">
-                ¿Ya tenés cuenta?{' '}
+                ¿Ya tenés cuenta?{" "}
                 <Link to="/login" className="font-bold text-primary hover:text-primary/80 hover:underline underline-offset-4 transition-all">
                   Iniciá sesión
                 </Link>
               </p>
-              
+
               <div className="pt-4 border-t border-border mt-6 flex justify-center">
-                <Link to="/registro/cliente" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-card hover:bg-muted border border-border text-sm font-semibold text-card-foreground transition-colors group">
+                <Link
+                  to="/registro/cliente"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-card hover:bg-muted border border-border text-sm font-semibold text-card-foreground transition-colors group"
+                >
                   <User size={18} className="text-muted-foreground group-hover:text-blue-500 transition-colors" />
                   ¿Querés contratar servicios? <span className="text-blue-600 group-hover:underline">Registrate como cliente</span>
                 </Link>
