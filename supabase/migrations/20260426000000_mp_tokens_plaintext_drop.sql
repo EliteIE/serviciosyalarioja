@@ -1,22 +1,18 @@
 -- =====================================================================
 -- Drop MercadoPago plaintext token columns + remove plaintext fallback.
 --
--- Precondition: the previous migration (20260424000002_encrypt_mp_tokens)
--- must have backfilled every row's *_enc columns and the OAuth edge
--- function must be deployed writing via set_provider_mp_tokens RPC.
+-- Handles pre-existing DB objects that depended on the plaintext columns:
+--   * view  public.my_mp_account         (exposed tokens via decrypt_sensitive)
+--   * trigger encrypt_mp_tokens_before_upsert + function trigger_encrypt_mp_tokens
+--     (legacy base64 encryption under platform_settings.encryption_key,
+--      replaced by vault+pgcrypto via set_provider_mp_tokens RPC)
 --
--- This migration fails LOUDLY if any row still has plaintext data that
--- has not been encrypted — we refuse to silently drop secrets. If it
--- fires, set the vault key, rerun the backfill in 20260424000002, and
--- re-apply this migration.
+-- Safety-gate aborts if any row still has plaintext data without an
+-- encrypted counterpart. Empty-string plaintext is treated as "no
+-- plaintext present" because the old edge function wrote '' to satisfy
+-- NOT NULL.
 -- =====================================================================
 
--- -----------------------------------------------------------------
--- Safety gate: abort if any provider row holds a plaintext token
--- that was never encrypted. An empty string is considered "no
--- plaintext present" because the edge function writes '' to satisfy
--- the old NOT NULL constraint (see mercadopago-oauth/index.ts).
--- -----------------------------------------------------------------
 DO $$
 DECLARE
   v_unmigrated int;
@@ -29,17 +25,22 @@ BEGIN
 
   IF v_unmigrated > 0 THEN
     RAISE EXCEPTION
-      'Refusing to drop plaintext columns: % row(s) still have unencrypted tokens. '
-      'Set vault secret mp_token_key and rerun the backfill in 20260424000002.',
+      'Refusing to drop plaintext columns: % row(s) still unencrypted.',
       v_unmigrated;
   END IF;
 END $$;
 
--- -----------------------------------------------------------------
--- Recreate the read accessor without the plaintext fallback. Any row
--- without an *_enc value now returns NULL — the caller (edge fn) must
--- surface this as a configuration error instead of silently failing.
--- -----------------------------------------------------------------
+-- ---------------------------------------------------------------
+-- Drop dependents first.
+-- ---------------------------------------------------------------
+DROP VIEW IF EXISTS public.my_mp_account;
+
+DROP TRIGGER IF EXISTS encrypt_mp_tokens_before_upsert ON public.provider_mp_accounts;
+DROP FUNCTION IF EXISTS public.trigger_encrypt_mp_tokens();
+
+-- ---------------------------------------------------------------
+-- Recreate read accessor without plaintext fallback.
+-- ---------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.get_provider_mp_access_token(p_user_id uuid)
 RETURNS text
 LANGUAGE plpgsql
@@ -66,12 +67,11 @@ REVOKE ALL ON FUNCTION public.get_provider_mp_access_token(uuid) FROM PUBLIC, au
 GRANT EXECUTE ON FUNCTION public.get_provider_mp_access_token(uuid) TO service_role;
 
 COMMENT ON FUNCTION public.get_provider_mp_access_token(uuid) IS
-  'Service-role only. Returns decrypted MP access token. Returns NULL if the provider has no encrypted token on file (caller must treat as misconfigured).';
+  'Service-role only. Returns decrypted MP access token or NULL if none on file.';
 
--- -----------------------------------------------------------------
--- Drop the plaintext columns. After this, at-rest storage of MP OAuth
--- tokens is encrypted-only.
--- -----------------------------------------------------------------
+-- ---------------------------------------------------------------
+-- Drop the plaintext columns.
+-- ---------------------------------------------------------------
 ALTER TABLE public.provider_mp_accounts
   DROP COLUMN IF EXISTS mp_access_token,
   DROP COLUMN IF EXISTS mp_refresh_token;
