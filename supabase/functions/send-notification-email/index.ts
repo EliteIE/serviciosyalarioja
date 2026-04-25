@@ -7,9 +7,9 @@
 //
 // Required env (Supabase Dashboard -> Edge Functions -> Secrets):
 //   - RESEND_API_KEY     : Resend API key
-//   - RESEND_FROM_EMAIL  : e.g. "Servicios 360 <noreply@serviciosyalr.com.ar>"
+//   - RESEND_FROM_EMAIL  : e.g. "Servicios 360 <noreply@servicios360.com.ar>"
 //   - WEBHOOK_SECRET     : shared secret used by the DB webhook
-//   - APP_URL            : base URL for CTA links (e.g. https://serviciosyalr.com.ar)
+//   - APP_URL            : base URL for CTA links (e.g. https://servicios360.com.ar)
 //
 // Behavior:
 //   * If RESEND_API_KEY is missing -> logs and returns 200 (no-op),
@@ -165,9 +165,9 @@ Deno.serve(async (req: Request) => {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const RESEND_FROM_EMAIL =
     Deno.env.get("RESEND_FROM_EMAIL") ??
-    "Servicios 360 <noreply@serviciosyalr.com.ar>";
+    "Servicios 360 <noreply@servicios360.com.ar>";
   const WEBHOOK_SECRET = Deno.env.get("WEBHOOK_SECRET");
-  const APP_URL = Deno.env.get("APP_URL") ?? "https://serviciosyalr.com.ar";
+  const APP_URL = Deno.env.get("APP_URL") ?? "https://servicios360.com.ar";
 
   // Auth via shared webhook secret (only if configured).
   if (WEBHOOK_SECRET) {

@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
-const PROD_ORIGINS = ["https://servicios360.com.ar", "https://www.servicios360.com.ar", "https://serviciosyalr.com", "https://www.serviciosyalr.com", "https://serviciosyalarioja.vercel.app", "https://serviciosyalr.lovable.app"];
+const PROD_ORIGINS = ["https://servicios360.com.ar", "https://www.servicios360.com.ar"];
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:8080"];
 const ALLOWED_ORIGINS = Deno.env.get("ENVIRONMENT") === "production"
   ? PROD_ORIGINS
