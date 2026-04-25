@@ -14,11 +14,6 @@ export const ProviderCTA = () => {
               src="/plumber-hero.png" 
               alt="Profesional" 
               className="absolute bottom-[-64px] max-h-[480px] w-auto object-contain object-bottom drop-shadow-2xl z-10"
-              onError={(e) => {
-                // Fallback visual caso a imagem ainda não exista
-                e.currentTarget.src = "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=500&h=600&fit=crop";
-                e.currentTarget.className = "max-h-[400px] w-full object-cover rounded-2xl shadow-xl";
-              }}
             />
           </div>
 
@@ -125,8 +120,10 @@ export const ProviderCTA = () => {
                 <button className="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
                   <X size={14} />
                 </button>
-                <div className="w-14 h-14 rounded-full mb-3 bg-slate-100 overflow-hidden border-2 border-white shadow-md">
-                  <img src="https://ui-avatars.com/api/?name=Profissional&background=082345&color=fff" alt="User" className="w-full h-full object-cover" />
+                <div className="w-14 h-14 rounded-full mb-3 bg-slate-100 overflow-hidden border-2 border-white shadow-md flex items-center justify-center">
+                  <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
                 </div>
                 <h4 className="font-extrabold text-sm text-[#082345] mb-1.5">Tu Perfil Destacado</h4>
                 <p className="text-[10px] text-slate-500 mb-4 leading-relaxed">
