@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, AlertTriangle, TrendingUp,
   Home, Briefcase, Image, DollarSign, UserCircle,
-  ClipboardList, MessageSquare, Star, Shield, PlusCircle, FileText
+  ClipboardList, MessageSquare, Star, Shield, PlusCircle, FileText, Scale
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -38,6 +38,7 @@ const clientItems = [
   { title: "Mis Servicios", url: "/cliente/servicios", icon: ClipboardList },
   { title: "Chat", url: "/cliente/chat", icon: MessageSquare },
   { title: "Reseñas", url: "/cliente/resenas", icon: Star },
+  { title: "Mis Disputas", url: "/cliente/disputas", icon: Scale },
   { title: "Mi Perfil", url: "/cliente/perfil", icon: UserCircle },
 ];
 

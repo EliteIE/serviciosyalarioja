@@ -22,6 +22,9 @@ import { STATUS_LABELS, STATUS_COLORS } from "@/constants/categories";
 import { useClientRequests, useCancelServiceRequest } from "@/hooks/useServiceRequests";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useCreateReview, useMyReviewedServiceIds } from "@/hooks/useReviews";
+import { useActiveDisputeIds } from "@/hooks/useDisputes";
+import DisputeDialog from "@/components/client/DisputeDialog";
+import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -69,6 +72,19 @@ export default function ClientServices() {
 
   // Cancel confirmation
   const [cancelServiceId, setCancelServiceId] = useState<string | null>(null);
+
+  // Dispute dialog
+  const [disputeFor, setDisputeFor] = useState<{ id: string; title: string } | null>(null);
+
+  // Dispute eligibility — services in/after work
+  const disputeEligibleIds = useMemo(
+    () =>
+      (services || [])
+        .filter((s) => ["en_progreso", "finalizado_prestador", "completado"].includes(s.status))
+        .map((s) => s.id),
+    [services]
+  );
+  const { data: activeDisputeIds } = useActiveDisputeIds(disputeEligibleIds);
 
   // Modal de Avaliação
   const [servicioACalificar, setServicioACalificar] = useState<unknown>(null);
@@ -356,6 +372,25 @@ export default function ClientServices() {
                         Cancelar
                       </button>
                     )}
+                    {['en_progreso', 'finalizado_prestador', 'completado'].includes(solicitud.status) &&
+                      !activeDisputeIds?.has(solicitud.id) && (
+                        <button
+                          onClick={() => setDisputeFor({ id: solicitud.id, title: solicitud.title })}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:text-red-600 hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30 font-semibold text-sm rounded-lg transition-colors shadow-sm"
+                        >
+                          <AlertTriangle size={14} />
+                          Reportar problema
+                        </button>
+                    )}
+                    {activeDisputeIds?.has(solicitud.id) && (
+                      <Link
+                        to="/cliente/disputas"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-700 dark:text-amber-400 font-semibold text-sm rounded-lg transition-colors"
+                      >
+                        <AlertTriangle size={14} />
+                        Disputa abierta
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -480,6 +515,16 @@ export default function ClientServices() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Dispute Dialog */}
+      {disputeFor && (
+        <DisputeDialog
+          open={!!disputeFor}
+          onOpenChange={(open) => { if (!open) setDisputeFor(null); }}
+          serviceRequestId={disputeFor.id}
+          serviceTitle={disputeFor.title}
+        />
+      )}
     </div>
   );
 }

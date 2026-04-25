@@ -120,6 +120,7 @@ const App = () => (
                     <Route path="/cliente/chat" element={<ClientChat />} />
                     <Route path="/cliente/servicios" element={<ClientServices />} />
                     <Route path="/cliente/resenas" element={<ClientReviews />} />
+                    <Route path="/cliente/disputas" element={<ClientDisputes />} />
                     <Route path="/cliente/perfil" element={<ClientProfile />} />
                   </Route>
                 </Route>
