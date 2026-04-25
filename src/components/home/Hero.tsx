@@ -82,7 +82,7 @@ export const Hero = () => {
       />
 
       {/* Gradiente de Overlay para Leitura do Texto */}
-      <div className="absolute inset-0 z-10 bg-white/90 md:bg-gradient-to-r md:from-white/95 md:via-white/80 md:to-transparent" />
+      <div className="absolute inset-0 z-10 bg-white/90 md:bg-gradient-to-r md:from-white/95 md:via-white/60 md:via-40% md:to-transparent md:to-70%" />
 
       {/* Container do Conteúdo */}
       <div className="container relative z-20 mx-auto px-4 py-16 md:py-24">
