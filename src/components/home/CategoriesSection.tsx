@@ -5,18 +5,18 @@ import { ArrowRight } from "lucide-react";
 // live in /constants/categories.ts and show up on /buscar. Images ship in
 // two widths via <img srcSet> so low-DPR phones don't download the 960
 // variant. All imports are static so Vite hashes + emits them as assets.
-import plomeria640 from "@/assets/categories/serviciosya-plomeria-640.webp";
-import plomeria960 from "@/assets/categories/serviciosya-plomeria-960.webp";
-import electricidad640 from "@/assets/categories/serviciosya-electricidad-640.webp";
-import electricidad960 from "@/assets/categories/serviciosya-electricidad-960.webp";
-import limpieza640 from "@/assets/categories/serviciosya-limpieza-640.webp";
-import limpieza960 from "@/assets/categories/serviciosya-limpieza-960.webp";
-import aire640 from "@/assets/categories/serviciosya-arcondicionado-640.webp";
-import aire960 from "@/assets/categories/serviciosya-arcondicionado-960.webp";
-import jardineria640 from "@/assets/categories/serviciosya-jardineria-640.webp";
-import jardineria960 from "@/assets/categories/serviciosya-jardineria-960.webp";
-import carpinteria640 from "@/assets/categories/serviciosya-carpinteria-640.webp";
-import carpinteria960 from "@/assets/categories/serviciosya-carpinteria-960.webp";
+import plomeria640 from "@/assets/categories/plomero-640.png";
+import plomeria960 from "@/assets/categories/plomeria_960x1200.png";
+import electricidad640 from "@/assets/categories/electricista-640.png";
+import electricidad960 from "@/assets/categories/electricidad_960x1200.png";
+import limpieza640 from "@/assets/categories/Limpieza-640.png";
+import limpieza960 from "@/assets/categories/limpieza_960x1200.png";
+import aire640 from "@/assets/categories/aireacondicionado-640.png";
+import aire960 from "@/assets/categories/aire_acondicionado_960x1200.png";
+import jardineria640 from "@/assets/categories/jardineria-640.png";
+import jardineria960 from "@/assets/categories/jardineria_960x1200.png";
+import carpinteria640 from "@/assets/categories/carpinteria-640.png";
+import carpinteria960 from "@/assets/categories/carpinteria_960x1200.png";
 
 type CategoryTile = {
   name: string;
