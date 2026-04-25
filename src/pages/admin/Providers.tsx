@@ -178,13 +178,13 @@ const AdminProviders = () => {
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Buscar por nombre, categoría o teléfono..."
-            className="pl-10 rounded-xl border-border bg-card h-10"
+            className="pl-10 rounded-[16px] border-border bg-card h-10"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           />
         </div>
         <Select value={statusFilter} onValueChange={handleFilterChange(setStatusFilter)}>
-          <SelectTrigger className="w-40 rounded-xl border-border bg-card h-10">
+          <SelectTrigger className="w-40 rounded-[16px] border-border bg-card h-10">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
@@ -195,7 +195,7 @@ const AdminProviders = () => {
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={handleFilterChange(setCategoryFilter)}>
-          <SelectTrigger className="w-44 rounded-xl border-border bg-card h-10">
+          <SelectTrigger className="w-44 rounded-[16px] border-border bg-card h-10">
             <SelectValue placeholder="Categoría" />
           </SelectTrigger>
           <SelectContent>
@@ -208,7 +208,7 @@ const AdminProviders = () => {
       </div>
 
       {/* Table Card */}
-      <Card className="rounded-3xl shadow-lg border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+      <Card className="rounded-[24px] shadow-lg border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -274,7 +274,7 @@ const AdminProviders = () => {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 text-xs gap-1.5 rounded-lg hover:bg-primary/10 hover:text-primary"
+                          className="h-8 text-xs gap-1.5 rounded-full hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                           onClick={() => openReview(p)}
                         >
                           <Eye className="h-3.5 w-3.5" /> Revisar
@@ -297,7 +297,7 @@ const AdminProviders = () => {
                       variant="outline"
                       disabled={page === 0}
                       onClick={() => setPage(p => p - 1)}
-                      className="h-8 w-8 p-0 rounded-full border-slate-200 dark:border-slate-600"
+                      className="h-8 w-8 p-0 rounded-full border-slate-200 dark:border-slate-600 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -311,7 +311,7 @@ const AdminProviders = () => {
                           size="sm"
                           variant={pageNum === page ? "default" : "outline"}
                           onClick={() => setPage(pageNum)}
-                          className={`h-8 w-8 p-0 rounded-full text-xs ${pageNum === page ? "" : "border-slate-200 dark:border-slate-600"}`}
+                          className={`h-8 w-8 p-0 rounded-full text-xs hover:-translate-y-0.5 active:scale-[0.98] transition-all ${pageNum === page ? "" : "border-slate-200 dark:border-slate-600"}`}
                         >
                           {pageNum + 1}
                         </Button>
@@ -322,7 +322,7 @@ const AdminProviders = () => {
                       variant="outline"
                       disabled={page >= totalPages - 1}
                       onClick={() => setPage(p => p + 1)}
-                      className="h-8 w-8 p-0 rounded-full border-slate-200 dark:border-slate-600"
+                      className="h-8 w-8 p-0 rounded-full border-slate-200 dark:border-slate-600 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -336,7 +336,7 @@ const AdminProviders = () => {
 
       {/* Review Dialog */}
       <Dialog open={!!selectedProvider} onOpenChange={(o) => { if (!o) { setSelectedProvider(null); setCriminalDocUrl(""); } }}>
-        <DialogContent className="max-w-2xl rounded-3xl p-0 overflow-hidden dark:bg-slate-900">
+        <DialogContent className="max-w-2xl rounded-[24px] p-0 overflow-hidden dark:bg-slate-900">
           <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
             <DialogTitle className="text-lg font-bold text-slate-900 dark:text-primary-foreground flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
@@ -349,7 +349,7 @@ const AdminProviders = () => {
 
           <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
             {/* Provider Info Card */}
-            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[16px] p-4">
               <h4 className="text-sm font-semibold text-foreground mb-3">Información del Prestador</h4>
               <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
@@ -386,7 +386,7 @@ const AdminProviders = () => {
             </div>
 
             {/* Documents Card */}
-            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[16px] p-4">
               <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                 <FileText className="h-4 w-4 text-primary" />
                 Documentos ({docUrls.length})
@@ -401,7 +401,7 @@ const AdminProviders = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="border border-border rounded-xl p-3 flex items-center gap-2.5 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
+                      className="border border-border rounded-[16px] p-3 flex items-center gap-2.5 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
                     >
                       <FileText className="h-5 w-5 text-primary shrink-0" />
                       <span className="text-foreground group-hover:text-primary transition-colors">Documento {i + 1}</span>
@@ -420,7 +420,7 @@ const AdminProviders = () => {
                 onChange={(e) => setVerifyNotes(e.target.value)}
                 placeholder="Observaciones sobre los documentos..."
                 rows={2}
-                className="rounded-xl border-border bg-card resize-none"
+                className="rounded-[16px] border-border bg-card resize-none"
               />
             </div>
 
@@ -428,14 +428,14 @@ const AdminProviders = () => {
             <div className="flex gap-2 justify-end">
               <Button
                 variant="outline"
-                className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                className="rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                 disabled={verifyMutation.isPending}
                 onClick={() => verifyMutation.mutate({ id: selectedProvider.id, status: "rejected", notes: verifyNotes })}
               >
                 <Ban className="h-4 w-4 mr-1.5" /> Rechazar Prestador
               </Button>
               <Button
-                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"
+                className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-primary-foreground hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                 disabled={verifyMutation.isPending}
                 onClick={() => verifyMutation.mutate({ id: selectedProvider.id, status: "approved", notes: verifyNotes })}
               >
@@ -448,7 +448,7 @@ const AdminProviders = () => {
             <div className="border-t border-border" />
 
             {/* Antecedentes Penales Section */}
-            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 space-y-4">
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[16px] p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <ShieldAlert className="h-4 w-4 text-orange-500" />
@@ -463,7 +463,7 @@ const AdminProviders = () => {
                   href={criminalDocUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 border border-border rounded-xl p-3 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
+                  className="flex items-center gap-2.5 border border-border rounded-[16px] p-3 hover:bg-white dark:hover:bg-slate-700/50 hover:shadow-sm transition-all text-sm group"
                 >
                   <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
                   <span className="text-foreground group-hover:text-primary transition-colors">
@@ -484,7 +484,7 @@ const AdminProviders = () => {
                   type="date"
                   value={criminalExpiry}
                   onChange={(e) => setCriminalExpiry(e.target.value)}
-                  className="rounded-xl border-border bg-card max-w-xs h-10"
+                  className="rounded-[16px] border-border bg-card max-w-xs h-10"
                 />
               </div>
 
@@ -496,7 +496,7 @@ const AdminProviders = () => {
                   onChange={(e) => setCriminalNotes(e.target.value)}
                   placeholder="Observaciones sobre los antecedentes penales..."
                   rows={2}
-                  className="rounded-xl border-border bg-card resize-none"
+                  className="rounded-[16px] border-border bg-card resize-none"
                 />
               </div>
 
@@ -505,7 +505,7 @@ const AdminProviders = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                  className="rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                   disabled={updateCriminalRecord.isPending}
                   onClick={() => updateCriminalRecord.mutate({
                     id: selectedProvider.id,
@@ -517,7 +517,7 @@ const AdminProviders = () => {
                 </Button>
                 <Button
                   size="sm"
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"
+                  className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-primary-foreground hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                   disabled={updateCriminalRecord.isPending}
                   onClick={() => updateCriminalRecord.mutate({
                     id: selectedProvider.id,
@@ -536,7 +536,7 @@ const AdminProviders = () => {
           <DialogFooter className="px-6 py-4 border-t border-border bg-slate-50/50 dark:bg-slate-800/30">
             <Button
               variant="outline"
-              className="rounded-xl"
+              className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all"
               onClick={() => { setSelectedProvider(null); setCriminalDocUrl(""); }}
             >
               Cerrar

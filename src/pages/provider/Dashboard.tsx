@@ -140,7 +140,7 @@ const ProviderDashboard = () => {
 
       {/* Profile completion alert */}
       {profileCompletion < 100 && (
-        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div className="bg-primary/5 border border-primary/20 rounded-[24px] p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <Target className="h-5 w-5 text-primary" />
@@ -161,7 +161,7 @@ const ProviderDashboard = () => {
 
       {/* Awaiting client confirmation alert */}
       {awaitingClientServices.length > 0 && (
-        <div className="bg-warning/5 border border-warning/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div className="bg-warning/5 border border-warning/20 rounded-[24px] p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
               <Clock className="h-5 w-5 text-warning" />
@@ -182,7 +182,7 @@ const ProviderDashboard = () => {
 
       {/* Pending review banner */}
       {pendingReviewServices.length > 0 && (
-        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-[24px] p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
               <Star className="h-5 w-5 text-yellow-500" />
@@ -206,9 +206,9 @@ const ProviderDashboard = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-card rounded-2xl p-6 border border-border shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+            <div key={index} className="bg-card rounded-[24px] p-6 border border-border/50 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
               <div className="flex justify-between items-start mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
                   <Icon size={24} />
                 </div>
                 {stat.label === 'Nuevos Pedidos' && parseInt(stat.value) > 0 && (
@@ -244,20 +244,20 @@ const ProviderDashboard = () => {
                 Solicitudes Pendientes
               </h2>
               {pendingServices.length > 0 && (
-                <span className="text-sm font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">
+                <span className="text-sm font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-[16px]">
                   {pendingServices.length} {pendingServices.length === 1 ? 'Nueva' : 'Nuevas'}
                 </span>
               )}
             </div>
 
             {pendingServices.length === 0 ? (
-              <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground shadow-sm">
+              <div className="bg-card rounded-[24px] border border-border/50 p-8 text-center text-muted-foreground shadow-sm">
                 No tienes solicitudes pendientes. ¡Buen trabajo!
               </div>
             ) : (
               <div className="space-y-4">
                 {pendingServices.map((req) => (
-                  <div key={req.id} className="bg-card rounded-2xl border-2 border-primary/20 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4">
+                  <div key={req.id} className="bg-card rounded-[24px] border-2 border-primary/20 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {req.client_avatar ? (
                         <img src={req.client_avatar} alt={req.client_name || ""} className="w-full h-full object-cover" />
@@ -280,7 +280,7 @@ const ProviderDashboard = () => {
                     <div className="flex flex-col justify-center sm:pl-4 sm:border-l border-border mt-4 sm:mt-0">
                       <button
                         onClick={() => navigate(`/prestador/servicios/${req.id}`)}
-                        className="w-full sm:w-auto px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-sm transition-colors text-sm"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-sm hover:-translate-y-0.5 active:scale-[0.98] transition-all text-sm"
                       >
                         Revisar
                       </button>
@@ -294,7 +294,7 @@ const ProviderDashboard = () => {
           {/* Trabajos en Curso */}
           <section>
             <h2 className="text-lg font-bold text-foreground mb-4 px-1">Trabajos en Curso</h2>
-            <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+            <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm">
               <ul className="divide-y divide-border">
                 {inProgressServices.length === 0 ? (
                   <li className="p-8 text-center text-muted-foreground">
@@ -351,7 +351,7 @@ const ProviderDashboard = () => {
                 <Clock className="text-warning" size={20} />
                 Esperando Confirmación del Cliente
               </h2>
-              <div className="bg-card rounded-2xl border border-warning/20 overflow-hidden shadow-sm">
+              <div className="bg-card rounded-[24px] border border-warning/20 overflow-hidden shadow-sm">
                 <ul className="divide-y divide-border">
                   {awaitingClientServices.map((trabajo) => (
                     <li
@@ -400,7 +400,7 @@ const ProviderDashboard = () => {
               </button>
             </div>
 
-            <div className="bg-card rounded-2xl border border-border shadow-sm p-6">
+            <div className="bg-card rounded-[24px] border border-border/50 shadow-sm p-6">
               {earnings?.hasPayments ? (
                 <div className="space-y-4">
                   <div>
@@ -439,7 +439,7 @@ const ProviderDashboard = () => {
           </section>
 
           {/* Tip */}
-          <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:to-slate-900 rounded-2xl p-6 text-primary-foreground shadow-lg relative overflow-hidden border border-slate-700/50">
+          <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:to-slate-900 rounded-[24px] p-6 text-primary-foreground shadow-lg relative overflow-hidden border border-slate-700/50">
             <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary rounded-full opacity-20 blur-xl pointer-events-none"></div>
             <h3 className="font-bold mb-2 relative z-10 flex items-center gap-2">
               <Zap size={18} className="text-yellow-400" />
@@ -452,7 +452,7 @@ const ProviderDashboard = () => {
               }
             </p>
             <Link to={!profile?.bio ? "/prestador/perfil" : "/prestador/portafolio"} className="block relative z-10">
-              <button className="w-full bg-white text-slate-900 hover:bg-slate-50 font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm flex items-center justify-center gap-2">
+              <button className="w-full bg-white text-slate-900 hover:bg-slate-50 font-semibold py-2.5 rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98] text-sm shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex items-center justify-center gap-2">
                 <ImageIcon size={16} />
                 {!profile?.bio ? "Completar perfil" : "Ir a mi Portafolio"}
               </button>
@@ -460,7 +460,7 @@ const ProviderDashboard = () => {
           </section>
 
           {/* Quick Stats */}
-          <section className="bg-card rounded-2xl border border-border shadow-sm p-6 space-y-4">
+          <section className="bg-card rounded-[24px] border border-border/50 shadow-sm p-6 space-y-4">
             <h3 className="font-bold text-foreground text-sm">Resumen Rápido</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center text-sm">

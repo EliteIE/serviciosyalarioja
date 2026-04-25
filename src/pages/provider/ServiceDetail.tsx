@@ -145,7 +145,7 @@ const ServiceDetail = () => {
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <Button variant="ghost" className="gap-2" onClick={() => navigate("/prestador/servicios")}>
+      <Button variant="ghost" className="gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => navigate("/prestador/servicios")}>
         <ArrowLeft className="h-4 w-4" /> Volver a Servicios
       </Button>
 
@@ -153,7 +153,7 @@ const ServiceDetail = () => {
         {/* Left column - Service details (2/3) */}
         <div className="flex-1 lg:w-2/3 space-y-6">
           {/* Unified card: header + client info + metadata */}
-          <Card>
+          <Card className="rounded-[24px] border-border/50">
             <CardContent className="p-6 space-y-6">
               {/* Service header */}
               <div className="flex items-start justify-between gap-3">
@@ -163,9 +163,9 @@ const ServiceDetail = () => {
 
               {/* Client info */}
               <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12 rounded-xl">
+                <Avatar className="h-12 w-12 rounded-[16px]">
                   {service.client_avatar && <AvatarImage src={service.client_avatar} alt={service.client_name || "Cliente"} />}
-                  <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-bold text-lg">
+                  <AvatarFallback className="rounded-[16px] bg-primary/10 text-primary font-bold text-lg">
                     {service.client_name?.[0] || "?"}
                   </AvatarFallback>
                 </Avatar>
@@ -177,7 +177,7 @@ const ServiceDetail = () => {
 
               {/* Metadata grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                <div className="flex flex-col gap-1 p-3 rounded-[16px] bg-accent/50">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Dirección</span>
@@ -186,7 +186,7 @@ const ServiceDetail = () => {
                 </div>
 
                 {parsed.preferredDate && (
-                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                  <div className="flex flex-col gap-1 p-3 rounded-[16px] bg-accent/50">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Fecha Pref.</span>
@@ -196,7 +196,7 @@ const ServiceDetail = () => {
                 )}
 
                 {parsed.preferredTime && (
-                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                  <div className="flex flex-col gap-1 p-3 rounded-[16px] bg-accent/50">
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Horario</span>
@@ -205,7 +205,7 @@ const ServiceDetail = () => {
                   </div>
                 )}
 
-                <div className={`flex flex-col gap-1 p-3 rounded-xl border ${URGENCY_BG[service.urgency]}`}>
+                <div className={`flex flex-col gap-1 p-3 rounded-[16px] border ${URGENCY_BG[service.urgency]}`}>
                   <div className="flex items-center gap-1.5">
                     <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${URGENCY_COLORS[service.urgency]}`} />
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Urgencia</span>
@@ -214,7 +214,7 @@ const ServiceDetail = () => {
                 </div>
 
                 {!parsed.preferredDate && !parsed.preferredTime && (
-                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                  <div className="flex flex-col gap-1 p-3 rounded-[16px] bg-accent/50">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Creado</span>
@@ -224,7 +224,7 @@ const ServiceDetail = () => {
                 )}
 
                 {service.budget && (
-                  <div className="flex flex-col gap-1 p-3 rounded-xl bg-accent/50">
+                  <div className="flex flex-col gap-1 p-3 rounded-[16px] bg-accent/50">
                     <div className="flex items-center gap-1.5">
                       <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Presup. Ref.</span>
@@ -237,7 +237,7 @@ const ServiceDetail = () => {
           </Card>
 
           {/* Description */}
-          <div className="rounded-xl bg-accent/50 p-5">
+          <div className="rounded-[16px] bg-accent/50 p-5">
             <p className="text-sm font-medium text-muted-foreground mb-2">Descripción del problema</p>
             <p className="text-sm whitespace-pre-wrap leading-relaxed">{parsed.description}</p>
           </div>
@@ -254,7 +254,7 @@ const ServiceDetail = () => {
                     <img
                       src={photo}
                       alt={`Foto ${idx + 1}`}
-                      className="w-full h-40 object-cover rounded-xl border transition-opacity duration-200 group-hover:opacity-75"
+                      className="w-full h-40 object-cover rounded-[16px] border transition-opacity duration-200 group-hover:opacity-75"
                     />
                   </a>
                 ))}
@@ -270,7 +270,7 @@ const ServiceDetail = () => {
               <CommissionBanner />
               {budgetSent ? (
                 /* Success state */
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden rounded-[24px] border-border/50">
                   <div className="h-2 bg-gradient-to-r from-green-400 to-green-600" />
                   <CardContent className="p-6 flex flex-col items-center text-center space-y-4 py-12">
                     <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center animate-in zoom-in-50 duration-300">
@@ -283,7 +283,7 @@ const ServiceDetail = () => {
                       </p>
                     </div>
                     <Button
-                      className="w-full gap-2 rounded-xl mt-4"
+                      className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all mt-4"
                       onClick={() => navigate("/prestador/servicios")}
                     >
                       <ArrowLeft className="h-4 w-4" /> Volver a mis servicios
@@ -292,7 +292,7 @@ const ServiceDetail = () => {
                 </Card>
               ) : (
                 /* Budget form */
-                <Card className="overflow-hidden shadow-lg">
+                <Card className="overflow-hidden shadow-lg rounded-[24px] border-border/50">
                   <div className="h-2 bg-gradient-to-r from-orange-400 to-orange-600" />
                   <CardContent className="p-6 space-y-5">
                     {/* Header */}
@@ -314,7 +314,7 @@ const ServiceDetail = () => {
                           value={budgetAmount}
                           onChange={(e) => setBudgetAmount(e.target.value)}
                           min={0}
-                          className="pl-10 text-2xl font-extrabold h-14"
+                          className="pl-10 text-2xl font-extrabold h-14 rounded-[16px]"
                         />
                       </div>
                     </div>
@@ -327,11 +327,12 @@ const ServiceDetail = () => {
                         value={budgetMessage}
                         onChange={(e) => setBudgetMessage(e.target.value)}
                         rows={3}
+                        className="rounded-[16px] resize-none"
                       />
                     </div>
 
                     {/* Security note */}
-                    <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground">
+                    <div className="flex items-start gap-2 p-3 rounded-[16px] bg-muted/50 text-xs text-muted-foreground">
                       <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5 text-green-600" />
                       <span>
                         Tu información está protegida. El cliente solo verá tu presupuesto y mensaje. Los datos de contacto se comparten al aceptar.
@@ -340,7 +341,7 @@ const ServiceDetail = () => {
 
                     {/* Submit button */}
                     <Button
-                      className="w-full gap-2 rounded-xl h-12 text-base font-semibold bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-lg shadow-orange-500/25 transition-all"
+                      className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] h-12 text-base font-semibold bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-lg shadow-orange-500/25 transition-all"
                       onClick={handleSendBudget}
                       disabled={!budgetAmount || sending || isBlocked}
                       title={isBlocked ? "Pagá tus comisiones pendientes para enviar presupuestos" : undefined}
@@ -368,7 +369,7 @@ const ServiceDetail = () => {
 
       {/* Reject Confirmation Dialog */}
       <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:rounded-[24px]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Rechazar esta solicitud?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -376,11 +377,11 @@ const ServiceDetail = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all">Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmReject}
               disabled={updateStatus.isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all"
             >
               {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <XCircle className="h-4 w-4 mr-1" />}
               Sí, rechazar

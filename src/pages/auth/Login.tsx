@@ -100,7 +100,7 @@ const Login = () => {
         {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-xl shadow-lg" />
+            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-[16px] shadow-lg" />
             <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
@@ -116,14 +116,14 @@ const Login = () => {
 
           {/* Badges de Confiança */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-xl border border-secondary-foreground/20 w-fit backdrop-blur-sm">
+            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-[16px] border border-secondary-foreground/20 w-fit backdrop-blur-sm">
               <ShieldCheck className="text-primary" size={24} />
               <div>
                 <p className="font-semibold text-sm">Perfiles Verificados</p>
                 <p className="text-xs text-secondary-foreground/70">Identidad comprobada</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-xl border border-secondary-foreground/20 w-fit backdrop-blur-sm ml-8">
+            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-[16px] border border-secondary-foreground/20 w-fit backdrop-blur-sm ml-8">
               <Star className="text-yellow-400 fill-yellow-400" size={24} />
               <div>
                 <p className="font-semibold text-sm">Presupuestos sin compromiso</p>
@@ -164,10 +164,10 @@ const Login = () => {
           <div className="text-center mb-10 mt-8 lg:mt-0">
             {/* Logo para mobile */}
             <div className="lg:hidden flex items-center justify-center mb-6">
-              <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-2xl shadow-lg" />
+              <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-[24px] shadow-lg" />
             </div>
             {confirmed && (
-              <div className="mb-6 flex items-center gap-3 rounded-xl bg-success/10 border border-success/20 p-4 text-left">
+              <div className="mb-6 flex items-center gap-3 rounded-[16px] bg-success/10 border border-success/20 p-4 text-left">
                 <CheckCircle2 className="h-6 w-6 text-success shrink-0" />
                 <div>
                   <p className="font-semibold text-success">¡Cuenta activada con éxito!</p>
@@ -191,7 +191,7 @@ const Login = () => {
               });
               if (error) toast.error("Error al iniciar con Google");
             }}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-xl hover:bg-muted/50 hover:border-primary/30 transition-all text-sm font-semibold text-foreground shadow-sm"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-full hover:bg-muted/50 hover:border-primary/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all text-sm font-semibold text-foreground shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -224,7 +224,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com" 
-                  className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                  className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••" 
-                  className="w-full rounded-xl border border-border bg-background pl-11 pr-12 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium tracking-widest placeholder:tracking-normal placeholder:text-muted-foreground"
+                  className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium tracking-widest placeholder:tracking-normal placeholder:text-muted-foreground"
                 />
                 <button 
                   type="button"
@@ -263,7 +263,7 @@ const Login = () => {
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 py-4 mt-2 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${isSubmitting ? 'bg-primary/70 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
+              className={`w-full flex items-center justify-center gap-2 py-4 mt-2 text-primary-foreground font-semibold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${isSubmitting ? 'bg-primary/70 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98]'}`}
             >
               {isSubmitting ? (
                 <><Loader2 className="animate-spin" size={20} /> Ingresando...</>

@@ -106,11 +106,11 @@ const ProviderPortfolio = () => {
         </div>
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setAddSuccess(false); setTitle(""); setDescription(""); setBeforeUrl(""); setAfterUrl(""); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-primary-foreground shadow-lg shadow-orange-600/20 hover:shadow-xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
+            <Button className="gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all bg-orange-600 hover:bg-orange-500 text-primary-foreground shadow-lg shadow-orange-600/20 hover:shadow-xl hover:shadow-orange-600/30 duration-200">
               <Plus className="h-4 w-4" /> Agregar Trabajo
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-lg rounded-3xl p-0 overflow-hidden border-0">
+          <DialogContent className="sm:max-w-lg rounded-[24px] p-0 overflow-hidden border-0">
             {addSuccess ? (
               /* Success animation state */
               <div className="flex flex-col items-center justify-center py-16 px-8">
@@ -143,7 +143,7 @@ const ProviderPortfolio = () => {
                       value={title}
                       onChange={e => setTitle(e.target.value)}
                       placeholder="Ej: Reparación de baño completo"
-                      className="rounded-xl h-11"
+                      className="rounded-[16px] h-11"
                     />
                   </div>
 
@@ -159,7 +159,7 @@ const ProviderPortfolio = () => {
                       placeholder="Breve descripción del trabajo realizado..."
                       rows={2}
                       maxLength={200}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none transition-all"
+                      className="w-full rounded-[16px] border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none transition-all"
                     />
                   </div>
 
@@ -170,8 +170,8 @@ const ProviderPortfolio = () => {
                       <Label className="text-sm font-semibold">Foto Antes</Label>
                       <input type="file" ref={beforeRef} className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0], setBeforeUrl, setUploadingBefore)} />
                       {beforeUrl ? (
-                        <div className="relative group cursor-pointer rounded-xl overflow-hidden" onClick={() => beforeRef.current?.click()}>
-                          <img src={beforeUrl} className="h-36 w-full object-cover rounded-xl" />
+                        <div className="relative group cursor-pointer rounded-[16px] overflow-hidden" onClick={() => beforeRef.current?.click()}>
+                          <img src={beforeUrl} className="h-36 w-full object-cover rounded-[16px]" />
                           <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <Camera className="h-6 w-6 text-primary-foreground" />
                           </div>
@@ -180,7 +180,7 @@ const ProviderPortfolio = () => {
                         <button
                           onClick={() => beforeRef.current?.click()}
                           disabled={uploadingBefore}
-                          className="w-full h-36 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/20 dark:hover:border-orange-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-slate-400"
+                          className="w-full h-36 rounded-[16px] border border-dashed border-slate-300 dark:border-slate-600 hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/20 dark:hover:border-orange-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-slate-400"
                         >
                           {uploadingBefore ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -199,8 +199,8 @@ const ProviderPortfolio = () => {
                       <Label className="text-sm font-semibold">Foto Después</Label>
                       <input type="file" ref={afterRef} className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0], setAfterUrl, setUploadingAfter)} />
                       {afterUrl ? (
-                        <div className="relative group cursor-pointer rounded-xl overflow-hidden" onClick={() => afterRef.current?.click()}>
-                          <img src={afterUrl} className="h-36 w-full object-cover rounded-xl" />
+                        <div className="relative group cursor-pointer rounded-[16px] overflow-hidden" onClick={() => afterRef.current?.click()}>
+                          <img src={afterUrl} className="h-36 w-full object-cover rounded-[16px]" />
                           <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <Camera className="h-6 w-6 text-primary-foreground" />
                           </div>
@@ -209,7 +209,7 @@ const ProviderPortfolio = () => {
                         <button
                           onClick={() => afterRef.current?.click()}
                           disabled={uploadingAfter}
-                          className="w-full h-36 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:bg-green-50 hover:border-green-400 dark:hover:bg-green-950/20 dark:hover:border-green-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-slate-400"
+                          className="w-full h-36 rounded-[16px] border border-dashed border-slate-300 dark:border-slate-600 hover:bg-green-50 hover:border-green-400 dark:hover:bg-green-950/20 dark:hover:border-green-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-slate-400"
                         >
                           {uploadingAfter ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -231,7 +231,7 @@ const ProviderPortfolio = () => {
 
                   {/* Submit button */}
                   <Button
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-primary-foreground font-semibold shadow-lg shadow-orange-600/20 transition-all duration-200"
+                    className="w-full h-12 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-primary-foreground font-semibold shadow-lg shadow-orange-600/20 duration-200"
                     onClick={handleAdd}
                     disabled={!title || !beforeUrl || !afterUrl || saving}
                   >
@@ -253,7 +253,7 @@ const ProviderPortfolio = () => {
       ) : photos.length === 0 ? (
         /* Premium empty state */
         <div
-          className="bg-card rounded-3xl border border-border p-12 text-center cursor-pointer hover:shadow-lg transition-shadow duration-300"
+          className="bg-card rounded-[24px] border border-border/50 p-12 text-center cursor-pointer hover:shadow-lg transition-shadow duration-300"
           onClick={() => setOpen(true)}
         >
           <div className="relative inline-flex items-center justify-center mb-8">
@@ -261,10 +261,10 @@ const ProviderPortfolio = () => {
             <div className="absolute w-40 h-40 bg-orange-100 dark:bg-orange-900/30 rounded-full blur-2xl" />
             {/* Stacked illustration cards */}
             <div className="relative">
-              <div className="w-28 h-36 bg-slate-200 dark:bg-slate-700 rounded-2xl shadow-lg flex items-center justify-center -rotate-12 absolute -left-4 top-0">
+              <div className="w-28 h-36 bg-slate-200 dark:bg-slate-700 rounded-[16px] shadow-lg flex items-center justify-center -rotate-12 absolute -left-4 top-0">
                 <ImageIcon className="h-8 w-8 text-slate-400" />
               </div>
-              <div className="w-28 h-36 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-xl flex items-center justify-center rotate-6 relative z-10 ml-4">
+              <div className="w-28 h-36 bg-gradient-to-br from-orange-500 to-orange-600 rounded-[16px] shadow-xl flex items-center justify-center rotate-6 relative z-10 ml-4">
                 <Camera className="h-8 w-8 text-primary-foreground" />
               </div>
             </div>
@@ -275,7 +275,7 @@ const ProviderPortfolio = () => {
           <p className="text-sm text-muted-foreground mt-2 max-w-sm mx-auto">
             Las fotos de antes y después generan confianza con los clientes y te ayudan a conseguir más trabajos.
           </p>
-          <Button className="mt-6 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-primary-foreground font-semibold px-6 h-11 shadow-md">
+          <Button className="mt-6 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-primary-foreground font-semibold px-6 h-11 shadow-md">
             Subir mi primer trabajo
           </Button>
         </div>
@@ -283,7 +283,7 @@ const ProviderPortfolio = () => {
         /* Gallery grid */
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {photos.map((pair) => (
-            <div key={pair.id} className="group rounded-2xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div key={pair.id} className="group rounded-[24px] border border-border/50 bg-card overflow-hidden hover:shadow-lg transition-shadow duration-300">
               {/* Image area */}
               <div className="relative h-48">
                 <div className="grid grid-cols-2 h-full">
@@ -300,25 +300,19 @@ const ProviderPortfolio = () => {
                     </span>
                   </div>
                 </div>
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
-                  <button
-                    onClick={() => window.open(pair.after_url, "_blank")}
-                    className="h-10 w-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors shadow-lg"
-                  >
-                    <Eye className="h-4 w-4 text-slate-700" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(pair.id)}
-                    className="h-10 w-10 rounded-full bg-white/90 hover:bg-red-50 flex items-center justify-center transition-colors shadow-lg"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                  </button>
+                {/* Actions layer */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <Button size="icon" variant="secondary" className="h-8 w-8 rounded-full shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-transform" onClick={() => window.open(pair.after_url, "_blank")}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="destructive" className="h-8 w-8 rounded-full shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-transform" onClick={() => handleDelete(pair.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              {/* Footer */}
-              <div className="px-4 py-3">
-                <h3 className="font-semibold text-sm text-slate-900 dark:text-primary-foreground truncate">{pair.title}</h3>
+              {/* Content area */}
+              <div className="p-5 flex flex-col h-[calc(100%-12rem)]">
+                <h3 className="font-semibold text-lg line-clamp-1 mb-2 text-foreground">{pair.title}</h3>
                 {pair.description && (
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{pair.description}</p>
                 )}

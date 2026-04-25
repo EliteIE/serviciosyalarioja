@@ -293,7 +293,7 @@ const ClientDashboard = () => {
           <p className="text-muted-foreground">Acá podés gestionar todas tus solicitudes y ver su estado.</p>
         </div>
         <Link to="/cliente/solicitar">
-          <button className="flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 transition-all w-full sm:w-auto">
+          <button className="flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98] transition-all w-full sm:w-auto">
             <Plus size={20} strokeWidth={2.5} />
             Nuevo Servicio
           </button>
@@ -302,7 +302,7 @@ const ClientDashboard = () => {
 
       {/* Neurotécnica: Alerta urgente si hay presupuestos o finalizados pendientes (Loss Aversion) */}
       {(budgetReceived.length > 0 || finalizados.length > 0) && (
-        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center justify-between gap-4 mb-6 animate-in slide-in-from-top duration-500">
+        <div className="bg-primary/5 border border-primary/20 rounded-[24px] p-4 flex items-center justify-between gap-4 mb-6 animate-in slide-in-from-top duration-500">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <AlertCircle className="h-5 w-5 text-primary" />
@@ -322,7 +322,7 @@ const ClientDashboard = () => {
 
       {/* Pending review banner */}
       {pendingReviewServices.length > 0 && (
-        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4 flex items-center justify-between gap-4 mb-6">
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-[24px] p-4 flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
               <Star className="h-5 w-5 text-yellow-500" />
@@ -348,13 +348,13 @@ const ClientDashboard = () => {
         ].map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-card rounded-2xl p-6 border border-border/50 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+            <div key={index} className="bg-card rounded-[24px] p-6 border border-border/50 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">{stat.label}</p>
                   <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
                 </div>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} relative`}>
+                <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center ${stat.bg} ${stat.color} relative`}>
                   <Icon size={24} />
                   {stat.pulse && stat.value > 0 && (
                     <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -376,7 +376,7 @@ const ClientDashboard = () => {
           {/* Budget received section */}
           <div id="action-section" />
           {budgetReceived.length > 0 && (
-            <Card className="border-primary/30 rounded-2xl shadow-sm">
+            <Card className="border-primary/30 rounded-[24px] shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-primary" /> Presupuestos Recibidos
@@ -384,7 +384,7 @@ const ClientDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {budgetReceived.map((service) => (
-                  <div key={service.id} className="p-5 rounded-xl border-2 border-primary/20 bg-primary/[0.02] space-y-4 hover:border-primary/40 transition-colors">
+                  <div key={service.id} className="p-5 rounded-[16px] border-2 border-primary/20 bg-primary/[0.02] space-y-4 hover:border-primary/40 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center border border-primary/20 overflow-hidden">
@@ -410,18 +410,18 @@ const ClientDashboard = () => {
                       </div>
                     </div>
                     {service.budget_message && (
-                      <p className="text-sm bg-background/50 border border-border p-3 rounded-lg text-foreground/80 italic">"{service.budget_message}"</p>
+                      <p className="text-sm bg-background/50 border border-border p-3 rounded-[16px] text-foreground/80 italic">"{service.budget_message}"</p>
                     )}
                     <div className="flex gap-3">
                       <Button
-                        className="flex-1 gap-2 rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.25)]"
+                        className="flex-1 gap-2 rounded-full font-semibold active:scale-[0.98] shadow-[0_4px_14px_0_rgba(234,88,12,0.25)]"
                         onClick={() => handleAcceptBudget(service.id)}
                         disabled={accepting === service.id}
                       >
                         {accepting === service.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                         Aceptar Presupuesto
                       </Button>
-                      <Button variant="outline" className="gap-2 rounded-xl" onClick={() => handleRejectBudget(service.id)} disabled={rejecting === service.id}>
+                      <Button variant="outline" className="gap-2 rounded-full active:scale-[0.98]" onClick={() => handleRejectBudget(service.id)} disabled={rejecting === service.id}>
                         {rejecting === service.id ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                         Rechazar
                       </Button>
@@ -434,7 +434,7 @@ const ClientDashboard = () => {
 
           {/* Pending extra charges */}
           {pendingExtras.length > 0 && (
-            <Card className="border-warning/30 rounded-2xl shadow-sm">
+            <Card className="border-warning/30 rounded-[24px] shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5 text-warning" /> Cargos Extra Pendientes
@@ -444,7 +444,7 @@ const ClientDashboard = () => {
                 {pendingExtras.map((extra) => {
                   const service = services?.find((s) => s.id === extra.service_request_id);
                   return (
-                    <div key={extra.id} className="p-4 rounded-xl border border-border/50 bg-warning/5 space-y-2">
+                    <div key={extra.id} className="p-4 rounded-[16px] border border-border/50 bg-warning/5 space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-sm text-foreground">{extra.description}</h4>
@@ -453,10 +453,10 @@ const ClientDashboard = () => {
                         <p className="text-lg font-bold text-primary">${Number(extra.amount).toLocaleString()}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 gap-1 rounded-lg" onClick={() => handleApproveExtra(extra.id)}>
+                        <Button size="sm" className="flex-1 gap-1 rounded-full active:scale-[0.98]" onClick={() => handleApproveExtra(extra.id)}>
                           <CheckCircle2 className="h-3 w-3" /> Aprobar
                         </Button>
-                        <Button size="sm" variant="outline" className="gap-1 rounded-lg" onClick={() => handleRejectExtra(extra.id)}>
+                        <Button size="sm" variant="outline" className="gap-1 rounded-[16px]" onClick={() => handleRejectExtra(extra.id)}>
                           <X className="h-3 w-3" /> Rechazar
                         </Button>
                       </div>
@@ -469,7 +469,7 @@ const ClientDashboard = () => {
 
           {/* Provider marked as done - client needs to confirm */}
           {finalizados.length > 0 && (
-            <Card className="border-success/30 rounded-2xl shadow-sm">
+            <Card className="border-success/30 rounded-[24px] shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShieldCheck className="h-5 w-5 text-success" /> Servicios para Confirmar
@@ -481,7 +481,7 @@ const ClientDashboard = () => {
                   const extraTotal = serviceExtras.reduce((sum: number, e) => sum + Number(e.amount), 0);
                   const total = (service.budget_amount || 0) + extraTotal;
                   return (
-                    <div key={service.id} className="p-4 rounded-xl border border-border/50 bg-success/5 space-y-3">
+                    <div key={service.id} className="p-4 rounded-[16px] border border-border/50 bg-success/5 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-foreground">{service.title}</h4>
@@ -497,7 +497,7 @@ const ClientDashboard = () => {
                           )}
                         </div>
                       </div>
-                      <Button className="w-full gap-2 rounded-xl bg-success hover:bg-success/90" onClick={() => openCompletionDialog(service.id)}>
+                      <Button className="w-full gap-2 rounded-full font-semibold active:scale-[0.98] bg-success hover:bg-success/90" onClick={() => openCompletionDialog(service.id)}>
                         <DollarSign className="h-4 w-4" /> Efectuar Pago
                       </Button>
                     </div>
@@ -514,7 +514,7 @@ const ClientDashboard = () => {
               <Link to="/cliente/servicios" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">Ver todos</Link>
             </div>
             
-            <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
+            <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm">
               {isLoading ? (
                 <DashboardSkeleton />
               ) : activeServices.length === 0 ? (
@@ -550,7 +550,7 @@ const ClientDashboard = () => {
                           </span>
 
                           {servicio.status === "aceptado" && servicio.verification_code && (
-                            <div className="mt-3 inline-flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-lg px-2 py-1 w-fit">
+                            <div className="mt-3 inline-flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-[16px] px-2 py-1 w-fit">
                               <KeyRound className="h-3 w-3 text-primary flex-shrink-0" />
                               <span className="text-xs text-muted-foreground whitespace-nowrap">Código:</span>
                               <span className="font-mono font-bold text-primary text-sm tracking-widest">{servicio.verification_code}</span>
@@ -564,7 +564,7 @@ const ClientDashboard = () => {
                         <Badge className={`rounded-full px-3 py-1 whitespace-nowrap ${STATUS_COLORS[servicio.status]}`}>{STATUS_LABELS[servicio.status]}</Badge>
                         {servicio.status === "en_progreso" && (
                           <Link to={`/cliente/chat?service=${servicio.id}`}>
-                            <Button size="sm" variant="ghost" className="rounded-xl relative hover:bg-primary/10 hover:text-primary transition-colors border border-border sm:border-transparent">
+                            <Button size="sm" variant="ghost" className="rounded-full relative hover:bg-primary/10 hover:text-primary transition-colors border border-border sm:border-transparent active:scale-[0.98]">
                               <MessageSquare className="h-4 w-4 mr-2 sm:mr-0" />
                               <span className="sm:hidden">Chat</span>
                               {unreadServiceIds.has(servicio.id) && (
@@ -601,7 +601,7 @@ const ClientDashboard = () => {
             <section>
               <h2 className="text-xl font-bold text-foreground mb-4 px-1">Completados Recientemente</h2>
               
-              <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
+              <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm">
                 <ul className="divide-y divide-border/50">
                   {completedServices.slice(0, 5).map((servicio) => (
                     <li key={servicio.id} className="p-5 hover:bg-accent/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-4 opacity-80 hover:opacity-100">
@@ -636,19 +636,19 @@ const ClientDashboard = () => {
         {/* Coluna Lateral */}
         <div className="hidden xl:block space-y-6">
           {/* CTA Urgente */}
-          <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl p-6 text-primary-foreground shadow-lg relative overflow-hidden sticky top-6">
+          <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-[24px] p-6 text-primary-foreground shadow-lg relative overflow-hidden sticky top-6">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
             <h3 className="text-xl font-bold mb-2 relative z-10">¿Necesitás ayuda urgente?</h3>
             <p className="text-orange-100 text-sm mb-6 relative z-10">Tenemos profesionales disponibles 24/7 para emergencias en tu zona.</p>
             <Link to="/cliente/solicitar">
-              <button className="w-full bg-white text-orange-600 font-bold py-3 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 transition-all relative z-10 border border-transparent hover:border-orange-100">
+              <button className="w-full bg-white text-orange-600 font-bold py-3 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:scale-[0.98] transition-all relative z-10 border border-transparent hover:border-orange-100">
                 Pedir Servicio Express
               </button>
             </Link>
           </div>
 
           {/* Neurotécnica: Cognitive Fluency — "Cómo funciona" stepper */}
-          <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
+          <div className="bg-card rounded-[24px] border border-border/50 p-6 shadow-sm">
             <h3 className="font-bold text-foreground text-sm mb-4">¿Cómo funciona?</h3>
             <div className="space-y-4">
               {[
@@ -670,7 +670,7 @@ const ClientDashboard = () => {
           </div>
 
           {/* Trust Badge */}
-          <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm text-center">
+          <div className="bg-card rounded-[24px] border border-border/50 p-4 shadow-sm text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-1">
               <ShieldCheck size={14} className="text-green-500" />
               <span className="font-semibold text-foreground">Pago protegido</span>
@@ -691,12 +691,12 @@ const ClientDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="text-center py-6">
-            <div className="inline-block bg-primary/5 border-2 border-primary/30 rounded-2xl px-8 py-6">
+            <div className="inline-block bg-primary/5 border-2 border-primary/30 rounded-[24px] px-8 py-6">
               <p className="font-mono text-4xl font-bold text-primary tracking-[0.3em]">{generatedCode}</p>
             </div>
             <p className="text-sm text-muted-foreground mt-4">Este código es único para este servicio. No lo compartas hasta que el prestador esté presente.</p>
           </div>
-          <Button className="w-full rounded-xl" onClick={() => setCodeDialogOpen(false)}>Entendido</Button>
+          <Button className="w-full rounded-full font-semibold active:scale-[0.98]" onClick={() => setCodeDialogOpen(false)}>Entendido</Button>
         </DialogContent>
       </Dialog>
 
@@ -713,27 +713,27 @@ const ClientDashboard = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">1. ¿El servicio fue realizado como lo solicitaste?</p>
               <div className="flex gap-2">
-                <Button size="sm" variant={q1 === true ? "default" : "outline"} className="flex-1 rounded-lg" onClick={() => setQ1(true)}>Sí</Button>
-                <Button size="sm" variant={q1 === false ? "destructive" : "outline"} className="flex-1 rounded-lg" onClick={() => setQ1(false)}>No</Button>
+                <Button size="sm" variant={q1 === true ? "default" : "outline"} className="flex-1 rounded-full active:scale-[0.98]" onClick={() => setQ1(true)}>Sí</Button>
+                <Button size="sm" variant={q1 === false ? "destructive" : "outline"} className="flex-1 rounded-full active:scale-[0.98]" onClick={() => setQ1(false)}>No</Button>
               </div>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium">2. ¿El prestador se comportó de manera profesional?</p>
               <div className="flex gap-2">
-                <Button size="sm" variant={q2 === true ? "default" : "outline"} className="flex-1 rounded-lg" onClick={() => setQ2(true)}>Sí</Button>
-                <Button size="sm" variant={q2 === false ? "destructive" : "outline"} className="flex-1 rounded-lg" onClick={() => setQ2(false)}>No</Button>
+                <Button size="sm" variant={q2 === true ? "default" : "outline"} className="flex-1 rounded-full active:scale-[0.98]" onClick={() => setQ2(true)}>Sí</Button>
+                <Button size="sm" variant={q2 === false ? "destructive" : "outline"} className="flex-1 rounded-full active:scale-[0.98]" onClick={() => setQ2(false)}>No</Button>
               </div>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium">3. ¿Recomendarías a este prestador a otras personas?</p>
               <div className="flex gap-2">
-                <Button size="sm" variant={q3 === true ? "default" : "outline"} className="flex-1 rounded-lg" onClick={() => setQ3(true)}>Sí</Button>
-                <Button size="sm" variant={q3 === false ? "destructive" : "outline"} className="flex-1 rounded-lg" onClick={() => setQ3(false)}>No</Button>
+                <Button size="sm" variant={q3 === true ? "default" : "outline"} className="flex-1 rounded-full active:scale-[0.98]" onClick={() => setQ3(true)}>Sí</Button>
+                <Button size="sm" variant={q3 === false ? "destructive" : "outline"} className="flex-1 rounded-full active:scale-[0.98]" onClick={() => setQ3(false)}>No</Button>
               </div>
             </div>
 
             <Button
-              className="w-full gap-2 rounded-xl bg-success hover:bg-success/90"
+              className="w-full gap-2 rounded-full font-semibold active:scale-[0.98] bg-success hover:bg-success/90"
               onClick={handleQuestionnaireDone}
               disabled={q1 === null || q2 === null || q3 === null}
             >
@@ -764,9 +764,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("mercadopago")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-xl bg-blue-100 text-blue-600">
+              <div className="p-2 rounded-[16px] bg-blue-100 text-blue-600">
                 <Smartphone className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -778,9 +778,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("tarjeta")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-xl bg-purple-100 text-purple-600">
+              <div className="p-2 rounded-[16px] bg-purple-100 text-purple-600">
                 <CreditCard className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -792,9 +792,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("transferencia")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-xl bg-green-100 text-green-600">
+              <div className="p-2 rounded-[16px] bg-green-100 text-green-600">
                 <ArrowRightLeft className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -806,9 +806,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("efectivo")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-xl bg-amber-100 text-amber-600">
+              <div className="p-2 rounded-[16px] bg-amber-100 text-amber-600">
                 <Banknote className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -832,7 +832,7 @@ const ClientDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="rounded-xl bg-accent/50 border p-4 space-y-3">
+            <div className="rounded-[24px] bg-accent/50 border p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">Prestador</p>
                 <p className="font-medium">{providerProfile?.full_name || completionService?.provider_name || "—"}</p>
@@ -844,7 +844,7 @@ const ClientDashboard = () => {
             </div>
 
             {providerProfile?.bank_alias || providerProfile?.bank_cvu ? (
-              <div className="rounded-xl border p-4 space-y-3">
+              <div className="rounded-[24px] border p-4 space-y-3">
                 {providerProfile.bank_alias && (
                   <div className="flex items-center justify-between">
                     <div>
@@ -879,14 +879,14 @@ const ClientDashboard = () => {
                 )}
               </div>
             ) : (
-              <div className="rounded-xl bg-warning/5 border border-warning/20 p-4">
+              <div className="rounded-[16px] bg-warning/5 border border-warning/20 p-4">
                 <p className="text-sm text-warning font-medium">⚠️ El prestador no ha registrado datos bancarios.</p>
                 <p className="text-xs text-muted-foreground mt-1">Contactalo por chat para obtener sus datos de transferencia.</p>
               </div>
             )}
 
             <Button
-              className="w-full gap-2 rounded-xl bg-success hover:bg-success/90"
+              className="w-full gap-2 rounded-full font-semibold active:scale-[0.98] bg-success hover:bg-success/90"
               onClick={handleTransferConfirm}
             >
               <CheckCircle2 className="h-4 w-4" /> Ya realicé la transferencia
@@ -907,13 +907,13 @@ const ClientDashboard = () => {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              className="flex-1 rounded-xl"
+              className="flex-1 rounded-full active:scale-[0.98]"
               onClick={() => setTransferConfirmOpen(false)}
             >
               Cancelar
             </Button>
             <Button
-              className="flex-1 gap-2 rounded-xl bg-success hover:bg-success/90"
+              className="flex-1 gap-2 rounded-full font-semibold active:scale-[0.98] bg-success hover:bg-success/90"
               onClick={handleTransferComplete}
               disabled={confirming}
             >

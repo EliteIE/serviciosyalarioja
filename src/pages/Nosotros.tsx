@@ -112,7 +112,7 @@ const Nosotros = () => {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-secondary p-8">
+        <div className="rounded-[24px] border border-border bg-secondary p-8">
           <div className="grid grid-cols-2 gap-6 text-center">
             <div>
               <p className="text-2xl md:text-3xl font-extrabold text-primary">Los oficios</p>
@@ -144,9 +144,9 @@ const Nosotros = () => {
           {VALORES.map((v) => (
             <div
               key={v.title}
-              className="flex gap-4 rounded-2xl border border-border bg-card p-6"
+              className="flex gap-4 rounded-[24px] border border-border bg-card p-6"
             >
-              <div className="rounded-xl bg-primary/10 p-3 h-12 w-12 shrink-0 flex items-center justify-center">
+              <div className="rounded-[16px] bg-primary/10 p-3 h-12 w-12 shrink-0 flex items-center justify-center">
                 <v.icon className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -159,7 +159,7 @@ const Nosotros = () => {
       </section>
 
       {/* Nuestra Misión */}
-      <section className="rounded-2xl bg-secondary text-secondary-foreground p-8 md:p-12 mb-20">
+      <section className="rounded-[24px] bg-secondary text-secondary-foreground p-8 md:p-12 mb-20">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">Nuestra misión</h2>
           <p className="text-lg md:text-xl leading-relaxed text-secondary-foreground/90 mb-8">
@@ -185,7 +185,7 @@ const Nosotros = () => {
       </section>
 
       {/* CTA */}
-      <section className="text-center rounded-2xl border-2 border-primary/20 bg-primary/5 p-8 md:p-12">
+      <section className="text-center rounded-[24px] border-2 border-primary/20 bg-primary/5 p-8 md:p-12">
         <h2 className="text-2xl md:text-3xl font-bold mb-3">
           Sumate a la comunidad de Servicios 360.
         </h2>
@@ -193,10 +193,10 @@ const Nosotros = () => {
           Ya sea que busques contratar o quieras ofrecer tus servicios, empezar es gratis y lleva menos de 2 minutos.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild size="lg" className="rounded-xl">
+          <Button asChild size="lg" className="rounded-[16px]">
             <Link to="/registro/cliente">Registrate como Cliente</Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="rounded-xl">
+          <Button asChild size="lg" variant="outline" className="rounded-[16px]">
             <Link to="/registro/prestador">
               <Briefcase className="mr-2 h-4 w-4" /> Ofrecer Servicios
             </Link>

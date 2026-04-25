@@ -90,7 +90,7 @@ const AdminModeration = () => {
 
       {/* Providers Tab */}
       {activeTab === "providers" && (
-        <Card className="rounded-3xl shadow-lg border-0 dark:bg-slate-900">
+        <Card className="rounded-[24px] shadow-lg border-0 dark:bg-slate-900">
           <CardContent className="p-0">
             {!pendingProviders?.length ? (
               <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -149,7 +149,7 @@ const AdminModeration = () => {
                         <div className="flex gap-2">
                           <Button
                             size="sm"
-                            className="h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-primary-foreground text-xs gap-1.5 px-3 shadow-sm"
+                            className="h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 text-primary-foreground text-xs gap-1.5 px-3 shadow-sm hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                             onClick={() => verifyProvider.mutate({ id: p.id, status: "approved" })}
                             disabled={verifyProvider.isPending}
                           >
@@ -157,7 +157,7 @@ const AdminModeration = () => {
                           </Button>
                           <Button
                             size="sm"
-                            className="h-8 rounded-xl bg-red-600 hover:bg-red-700 text-primary-foreground text-xs gap-1.5 px-3 shadow-sm"
+                            className="h-8 rounded-full bg-red-600 hover:bg-red-700 text-primary-foreground text-xs gap-1.5 px-3 shadow-sm hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                             onClick={() => verifyProvider.mutate({ id: p.id, status: "rejected" })}
                             disabled={verifyProvider.isPending}
                           >
@@ -182,10 +182,10 @@ const AdminModeration = () => {
               {filteredReviews?.length || 0} reseña{(filteredReviews?.length || 0) !== 1 ? "s" : ""}
             </p>
             <Select value={ratingFilter} onValueChange={setRatingFilter}>
-              <SelectTrigger className="w-48 rounded-xl border-border bg-card text-sm">
+              <SelectTrigger className="w-48 rounded-[16px] border-border bg-card text-sm">
                 <SelectValue placeholder="Filtrar por rating" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl">
+              <SelectContent className="rounded-[16px]">
                 <SelectItem value="all">Todas las reseñas</SelectItem>
                 <SelectItem value="bad">Negativas (1-2 ★)</SelectItem>
                 <SelectItem value="good">Positivas (4-5 ★)</SelectItem>
@@ -193,7 +193,7 @@ const AdminModeration = () => {
             </Select>
           </div>
 
-          <Card className="rounded-3xl shadow-lg border-0 dark:bg-slate-900">
+          <Card className="rounded-[24px] shadow-lg border-0 dark:bg-slate-900">
             <CardContent className="p-0">
               {reviewsLoading ? (
                 <div className="flex flex-col items-center justify-center py-16">
@@ -273,7 +273,7 @@ const AdminModeration = () => {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-8 rounded-xl text-xs gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-primary-foreground dark:hover:bg-slate-800"
+                              className="h-8 rounded-full text-xs gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-primary-foreground dark:hover:bg-slate-800 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                               onClick={() => setSelectedReview(r)}
                             >
                               <Eye className="h-3.5 w-3.5" /> Ver
@@ -281,7 +281,7 @@ const AdminModeration = () => {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-8 rounded-xl text-xs gap-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                              className="h-8 rounded-full text-xs gap-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                               onClick={() => setDeleteTarget(r)}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -300,7 +300,7 @@ const AdminModeration = () => {
 
       {/* Review Detail Dialog */}
       <Dialog open={!!selectedReview} onOpenChange={(o) => !o && setSelectedReview(null)}>
-        <DialogContent className="rounded-3xl border-0 shadow-2xl dark:bg-slate-900 sm:max-w-md">
+        <DialogContent className="rounded-[24px] border-0 shadow-2xl dark:bg-slate-900 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-slate-900 dark:text-primary-foreground">Detalle de Reseña</DialogTitle>
           </DialogHeader>
@@ -326,7 +326,7 @@ const AdminModeration = () => {
                 </span>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 space-y-2">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[16px] p-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-slate-400 dark:text-slate-500 font-medium">De:</span>
                   <span className="text-foreground font-semibold">{selectedReview.reviewer?.full_name || "—"}</span>
@@ -352,20 +352,20 @@ const AdminModeration = () => {
           )}
           <DialogFooter className="gap-2 pt-2">
             <Button
-              className="rounded-xl bg-red-600 hover:bg-red-700 text-primary-foreground shadow-sm"
+              className="rounded-full bg-red-600 hover:bg-red-700 text-primary-foreground shadow-sm hover:-translate-y-0.5 active:scale-[0.98] transition-all"
               size="sm"
               onClick={() => { setSelectedReview(null); setDeleteTarget(selectedReview); }}
             >
               <Trash2 className="h-4 w-4 mr-1.5" /> Eliminar
             </Button>
-            <Button variant="outline" className="rounded-xl" onClick={() => setSelectedReview(null)}>Cerrar</Button>
+            <Button variant="outline" className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => setSelectedReview(null)}>Cerrar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent className="rounded-3xl border-0 shadow-2xl dark:bg-slate-900">
+        <AlertDialogContent className="rounded-[24px] border-0 shadow-2xl dark:bg-slate-900">
           <AlertDialogHeader>
             <div className="mx-auto h-14 w-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3">
               <AlertTriangle className="h-7 w-7 text-red-600 dark:text-red-400" />
@@ -380,9 +380,9 @@ const AdminModeration = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:justify-center pt-2">
-            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all">Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-xl bg-red-600 text-primary-foreground hover:bg-red-700 shadow-sm"
+              className="rounded-full bg-red-600 text-primary-foreground hover:bg-red-700 shadow-sm hover:-translate-y-0.5 active:scale-[0.98] transition-all"
               onClick={() => handleDeleteSuccess(deleteTarget.id)}
               disabled={deleteReview.isPending}
             >

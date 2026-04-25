@@ -67,7 +67,7 @@ const AppSidebar = ({ variant }: AppSidebarProps) => {
         <div className="p-4">
           {!collapsed && (
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="Servicios 360" className="h-8 w-8 rounded-lg" />
+              <img src={logo} alt="Servicios 360" className="h-8 w-8 rounded-[16px]" />
               <span className="text-lg font-bold text-sidebar-foreground">
                 Servicios <span className="text-sidebar-primary">360</span>
               </span>

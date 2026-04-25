@@ -79,10 +79,10 @@ export const CategoriesSection = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
               Categorías populares
             </h2>
-            <p className="text-muted-foreground mt-3 text-base md:text-lg">
+            <p className="text-muted-foreground mt-3 text-base md:text-lg tracking-tight leading-snug font-medium">
               Elegí el rubro y encontrá profesionales verificados cerca tuyo.
             </p>
           </div>
@@ -102,7 +102,7 @@ export const CategoriesSection = () => {
             <Link
               key={tile.slug}
               to={`/buscar?q=${encodeURIComponent(tile.name)}&category=${tile.slug}`}
-              className="group relative block overflow-hidden rounded-2xl md:rounded-3xl aspect-[4/5] md:aspect-[5/4] bg-muted shadow-sm hover:shadow-2xl transition-all duration-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
+              className="group relative block overflow-hidden rounded-[24px] md:rounded-[24px] aspect-[4/5] md:aspect-[5/4] bg-muted shadow-sm hover:shadow-2xl transition-all duration-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
               aria-label={`Ver prestadores de ${tile.name}`}
             >
               <img
@@ -128,7 +128,7 @@ export const CategoriesSection = () => {
               />
 
               <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 flex items-end justify-between gap-3">
-                <h3 className="text-white font-bold text-lg md:text-xl drop-shadow-sm">
+                <h3 className="text-white font-bold text-lg md:text-xl drop-shadow-sm tracking-tight">
                   {tile.name}
                 </h3>
                 <span
@@ -145,7 +145,7 @@ export const CategoriesSection = () => {
         {/* Mobile CTA */}
         <div className="mt-10 flex justify-center sm:hidden">
           <Link to="/buscar" className="w-full">
-            <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-card border border-border rounded-xl text-foreground font-semibold hover:bg-secondary transition-colors">
+            <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-card border border-border rounded-[16px] text-foreground font-semibold hover:bg-secondary transition-colors">
               Ver todas las categorías
               <ArrowRight size={18} />
             </button>

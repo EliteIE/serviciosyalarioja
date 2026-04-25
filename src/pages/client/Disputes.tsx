@@ -55,9 +55,9 @@ export default function ClientDisputes() {
       </div>
 
       {!disputes?.length ? (
-        <Card className="rounded-2xl border-border shadow-sm">
+        <Card className="rounded-[24px] border-border shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
-            <div className="h-20 w-20 rounded-2xl bg-secondary flex items-center justify-center mb-5">
+            <div className="h-20 w-20 rounded-[24px] bg-secondary flex items-center justify-center mb-5">
               <Scale className="h-10 w-10 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-1.5">
@@ -82,12 +82,12 @@ export default function ClientDisputes() {
             return (
               <Card
                 key={d.id}
-                className="rounded-2xl border-border shadow-sm hover:shadow-md transition-shadow"
+                className="rounded-[24px] border-border shadow-sm hover:shadow-md transition-shadow"
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div
-                      className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${statusClasses[d.status]}`}
+                      className={`h-11 w-11 rounded-[16px] flex items-center justify-center shrink-0 ${statusClasses[d.status]}`}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
@@ -109,8 +109,8 @@ export default function ClientDisputes() {
                       </p>
 
                       {d.service_title && (
-                        <div className="mt-3 p-3 bg-secondary/50 rounded-xl flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <div className="mt-3 p-3 bg-secondary/50 rounded-[16px] flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-[16px] bg-primary/10 flex items-center justify-center shrink-0">
                             <Briefcase className="h-4 w-4 text-primary" />
                           </div>
                           <div className="min-w-0 flex-1">
@@ -130,7 +130,7 @@ export default function ClientDisputes() {
                       )}
 
                       {d.status === "resuelta" && d.resolution && (
-                        <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/40 rounded-xl">
+                        <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/40 rounded-[16px]">
                           <p className="text-[10px] font-semibold uppercase tracking-wider text-green-700 dark:text-green-400 mb-1">
                             Resolución
                           </p>

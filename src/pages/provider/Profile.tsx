@@ -369,7 +369,7 @@ const ProviderProfile = () => {
         {/* ─── Left Column: Progress Widget (Sticky) ─── */}
         <div className="w-full lg:w-1/3 lg:sticky lg:top-6 space-y-5">
           {/* Profile Completeness Widget */}
-          <Card className="rounded-3xl shadow-xl shadow-slate-200/40 dark:shadow-none overflow-hidden">
+          <Card className="rounded-[24px] shadow-xl shadow-slate-200/40 dark:shadow-none overflow-hidden border-border/50">
             <div className="h-1 bg-muted">
               <div className="h-full bg-gradient-to-r from-primary to-orange-400 transition-all duration-500" style={{ width: `${profileCompleteness.percent}%` }} />
             </div>
@@ -379,14 +379,14 @@ const ProviderProfile = () => {
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Progreso</p>
                   <h3 className="text-2xl font-extrabold">{profileCompleteness.percent}% <span className="text-lg text-muted-foreground font-medium">completo</span></h3>
                 </div>
-                <span className="text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-950/30 px-2.5 py-1 rounded-lg">{profileCompleteness.completed}/{profileCompleteness.total} Pasos</span>
+                <span className="text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-950/30 px-2.5 py-1 rounded-[16px]">{profileCompleteness.completed}/{profileCompleteness.total} Pasos</span>
               </div>
               <p className="text-xs text-muted-foreground mb-5">
                 Los perfiles completos reciben hasta un <strong className="text-foreground">80% más de solicitudes</strong>.
               </p>
               <div className="space-y-2.5">
                 {profileCompleteness.fields.map((f) => (
-                  <div key={f.name} className={`flex items-center gap-3 text-sm font-medium p-2 rounded-lg transition-colors ${
+                  <div key={f.name} className={`flex items-center gap-3 text-sm font-medium p-2 rounded-[16px] transition-colors ${
                     f.done ? "bg-success/10 text-success" : "border border-border hover:border-orange-200 dark:hover:border-orange-800 text-muted-foreground cursor-pointer"
                   }`}>
                     {f.done ? (
@@ -405,7 +405,7 @@ const ProviderProfile = () => {
           <Button
             onClick={handleSaveProfile}
             disabled={saving}
-            className="w-full gap-2 rounded-2xl h-12 text-base font-bold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+            className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all h-12 text-base font-bold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Cambios
@@ -416,7 +416,7 @@ const ProviderProfile = () => {
         <div className="w-full lg:w-2/3 space-y-6">
 
       {/* ─── Avatar & Email ──────────────────────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
           <div className="shrink-0 [&_span]:!h-32 [&_span]:!w-32 [&_.h-24]:!h-32 [&_.w-24]:!w-32">
             <AvatarUpload currentUrl={profile?.avatar_url} initials={initials} />
@@ -436,7 +436,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Personal Info + Category + Bio ────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2"><User className="h-5 w-5" /> Información Personal</CardTitle>
         </CardHeader>
@@ -446,14 +446,14 @@ const ProviderProfile = () => {
               <Label>Nombre completo</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9 rounded-xl bg-slate-50 focus:border-orange-500" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                <Input className="pl-9 rounded-[16px] bg-slate-50 focus:border-orange-500" value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Teléfono</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9 rounded-xl bg-slate-50 focus:border-orange-500" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 380 123-4567" />
+                <Input className="pl-9 rounded-[16px] bg-slate-50 focus:border-orange-500" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 380 123-4567" />
               </div>
             </div>
           </div>
@@ -463,7 +463,7 @@ const ProviderProfile = () => {
               <Label>Ubicación</Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9 rounded-xl bg-slate-50 focus:border-orange-500" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="La Rioja, Capital" />
+                <Input className="pl-9 rounded-[16px] bg-slate-50 focus:border-orange-500" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="La Rioja, Capital" />
               </div>
             </div>
             <div className="space-y-2">
@@ -473,7 +473,7 @@ const ProviderProfile = () => {
                 <select
                   value={providerCategory}
                   onChange={(e) => setProviderCategory(e.target.value)}
-                  className="w-full h-10 pl-9 pr-4 rounded-xl border border-input bg-slate-50 text-sm font-medium appearance-none cursor-pointer focus:border-orange-500 focus:outline-none"
+                  className="w-full h-10 pl-9 pr-4 rounded-[16px] border border-input bg-slate-50 text-sm font-medium appearance-none cursor-pointer focus:border-orange-500 focus:outline-none"
                 >
                   <option value="">Seleccionar categoría</option>
                   {CATEGORIES.map((cat) => (
@@ -495,7 +495,7 @@ const ProviderProfile = () => {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Describí tu experiencia, qué servicios ofrecés, años de experiencia, certificaciones..."
-              className="rounded-xl bg-slate-50 focus:border-orange-500"
+              className="rounded-[16px] bg-slate-50 focus:border-orange-500"
             />
             {bio.length > 0 && bio.length < 50 && (
               <p className="text-[11px] text-amber-600 flex items-center gap-1">
@@ -513,9 +513,9 @@ const ProviderProfile = () => {
                 onChange={(e) => setCoverageInput(e.target.value)}
                 placeholder="Ej: Capital, Sanagasta..."
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddCoverage(); } }}
-                className="rounded-xl bg-slate-50 focus:border-orange-500"
+                className="rounded-[16px] bg-slate-50 focus:border-orange-500"
               />
-              <Button type="button" variant="outline" size="sm" onClick={handleAddCoverage}>
+              <Button type="button" variant="outline" size="sm" onClick={handleAddCoverage} className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -540,11 +540,11 @@ const ProviderProfile = () => {
               value={priceRange}
               onChange={(e) => setPriceRange(e.target.value)}
               placeholder="Ej: $5.000 - $50.000 según el trabajo"
-              className="rounded-xl bg-slate-50 focus:border-orange-500"
+              className="rounded-[16px] bg-slate-50 focus:border-orange-500"
             />
           </div>
 
-          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-xl lg:hidden">
+          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all lg:hidden">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Información
           </Button>
@@ -552,14 +552,14 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Schedule / Availability ──────────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2"><Calendar className="h-5 w-5" /> Horarios de Disponibilidad</CardTitle>
           <CardDescription>Configurá los días y horarios en que atendés. Los clientes verán esto en tu perfil público.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {schedule.map((slot, i) => (
-            <div key={slot.day_of_week} className={`flex items-center gap-3 p-3 rounded-2xl border transition-colors ${slot.is_active ? "bg-orange-50/30 dark:bg-orange-950/10 border-orange-200 dark:border-orange-800" : "bg-muted/30 border-transparent"}`}>
+            <div key={slot.day_of_week} className={`flex items-center gap-3 p-3 rounded-[16px] border transition-colors ${slot.is_active ? "bg-orange-50/30 dark:bg-orange-950/10 border-orange-200 dark:border-orange-800" : "bg-muted/30 border-transparent"}`}>
               {/* Toggle */}
               <button
                 type="button"
@@ -581,14 +581,14 @@ const ProviderProfile = () => {
                     type="time"
                     value={slot.start_time}
                     onChange={(e) => setSchedule((prev) => prev.map((s, j) => j === i ? { ...s, start_time: e.target.value } : s))}
-                    className="h-9 px-2 rounded-lg border border-input bg-background text-sm font-medium"
+                    className="h-9 px-2 rounded-[16px] border border-input bg-background text-sm font-medium"
                   />
                   <span className="text-muted-foreground text-sm">a</span>
                   <input
                     type="time"
                     value={slot.end_time}
                     onChange={(e) => setSchedule((prev) => prev.map((s, j) => j === i ? { ...s, end_time: e.target.value } : s))}
-                    className="h-9 px-2 rounded-lg border border-input bg-background text-sm font-medium"
+                    className="h-9 px-2 rounded-[16px] border border-input bg-background text-sm font-medium"
                   />
                 </div>
               ) : (
@@ -600,7 +600,7 @@ const ProviderProfile = () => {
           <Button
             onClick={handleSaveSchedule}
             disabled={saveScheduleMutation.isPending}
-            className="w-full gap-2 rounded-xl mt-2"
+            className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all mt-2"
           >
             {saveScheduleMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Horarios
@@ -609,14 +609,14 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Services Offered ──────────────────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg flex items-center gap-2"><Briefcase className="h-5 w-5" /> Servicios que Ofrezco</CardTitle>
               <CardDescription>Agregá los servicios específicos que realizás para que los clientes sepan qué pueden contratar.</CardDescription>
             </div>
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => setShowAddService(true)}>
+            <Button size="sm" variant="outline" className="gap-1 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => setShowAddService(true)}>
               <Plus className="h-4 w-4" /> Agregar
             </Button>
           </div>
@@ -625,8 +625,8 @@ const ProviderProfile = () => {
           {/* Existing Services */}
           {myServices && myServices.length > 0 ? (
             myServices.map((svc) => (
-              <div key={svc.id} className="flex items-start gap-3 p-4 rounded-xl border bg-card group">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
+              <div key={svc.id} className="flex items-start gap-3 p-4 rounded-[16px] border border-border/50 bg-card group">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
                   <Briefcase className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -650,7 +650,7 @@ const ProviderProfile = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive/80 transition-opacity"
+                  className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive/80 transition-opacity"
                   onClick={() => deleteServiceMutation.mutate(svc.id)}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -666,7 +666,7 @@ const ProviderProfile = () => {
 
           {/* Add Service Form */}
           {showAddService && (
-            <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5 space-y-3 animate-in fade-in duration-200">
+            <div className="p-4 rounded-[16px] border border-primary/20 bg-primary/5 space-y-3 animate-in fade-in duration-200">
               <p className="font-semibold text-sm">Nuevo Servicio</p>
               <Input
                 placeholder="Nombre del servicio (ej: Instalación de termotanque)"
@@ -685,11 +685,11 @@ const ProviderProfile = () => {
                 <Input type="number" placeholder="Precio hasta" value={newServicePriceTo} onChange={(e) => setNewServicePriceTo(e.target.value)} />
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="gap-1" onClick={handleAddService} disabled={addServiceMutation.isPending}>
+                <Button size="sm" className="gap-1 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={handleAddService} disabled={addServiceMutation.isPending}>
                   {addServiceMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   Guardar Servicio
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setShowAddService(false)}>Cancelar</Button>
+                <Button size="sm" variant="outline" className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => setShowAddService(false)}>Cancelar</Button>
               </div>
             </div>
           )}
@@ -697,7 +697,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Finanzas y Cobros ──────────────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2"><CreditCard className="h-5 w-5" /> Finanzas y Cobros</CardTitle>
           <CardDescription>Configurá tus métodos de cobro para recibir pagos</CardDescription>
@@ -709,17 +709,17 @@ const ProviderProfile = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Alias</Label>
-                <Input value={bankAlias} onChange={(e) => setBankAlias(e.target.value)} placeholder="mi.alias.mp" className="rounded-xl bg-slate-50 focus:border-orange-500" />
+                <Input value={bankAlias} onChange={(e) => setBankAlias(e.target.value)} placeholder="mi.alias.mp" className="rounded-[16px] bg-slate-50 focus:border-orange-500" />
               </div>
               <div className="space-y-2">
                 <Label>CVU</Label>
-                <Input value={bankCvu} onChange={(e) => setBankCvu(e.target.value)} placeholder="0000003100000000000000" className="rounded-xl bg-slate-50 focus:border-orange-500" />
+                <Input value={bankCvu} onChange={(e) => setBankCvu(e.target.value)} placeholder="0000003100000000000000" className="rounded-[16px] bg-slate-50 focus:border-orange-500" />
               </div>
             </div>
           </div>
 
           {/* MercadoPago Integration */}
-          <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-5 space-y-4">
+          <div className="rounded-[16px] border border-border/50 bg-blue-50/50 dark:bg-blue-950/10 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -734,21 +734,21 @@ const ProviderProfile = () => {
               <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Cargando...</div>
             ) : mpAccount ? (
               <>
-                <div className="rounded-xl bg-success/5 border border-success/20 p-4 space-y-2">
+                <div className="rounded-[16px] bg-success/5 border border-success/20 p-4 space-y-2">
                   <p className="text-sm font-medium">Tu cuenta de MercadoPago está conectada</p>
                   {mpAccount.mp_email && <p className="text-sm text-muted-foreground">Email: <span className="font-medium">{mpAccount.mp_email}</span></p>}
                 </div>
-                <Button variant="outline" size="sm" onClick={handleDisconnectMP} className="gap-2 text-destructive hover:text-destructive rounded-xl">
+                <Button variant="outline" size="sm" onClick={handleDisconnectMP} className="gap-2 text-destructive hover:text-destructive rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all">
                   <Unlink className="h-4 w-4" /> Desconectar cuenta
                 </Button>
               </>
             ) : (
               <>
-                <div className="rounded-xl bg-warning/5 border border-warning/20 p-4 space-y-2">
+                <div className="rounded-[16px] bg-warning/5 border border-warning/20 p-4 space-y-2">
                   <p className="text-sm font-medium text-warning">Cuenta no conectada</p>
                   <p className="text-xs text-muted-foreground">Para recibir pagos, necesitás conectar tu cuenta de MercadoPago.</p>
                 </div>
-                <Button onClick={handleConnectMP} disabled={connectingMP} className="gap-2 rounded-xl">
+                <Button onClick={handleConnectMP} disabled={connectingMP} className="gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all">
                   {connectingMP ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
                   Conectar MercadoPago
                 </Button>
@@ -756,7 +756,7 @@ const ProviderProfile = () => {
             )}
           </div>
 
-          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-xl lg:hidden">
+          <Button onClick={handleSaveProfile} disabled={saving} className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all lg:hidden">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Datos Bancarios
           </Button>
@@ -764,7 +764,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Antecedentes Penales ────────────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -777,14 +777,14 @@ const ProviderProfile = () => {
         <CardContent className="space-y-4">
           {/* Approved expiry date */}
           {criminalRecordStatus === "approved" && criminalRecordExpiry && (
-            <div className="rounded-xl bg-green-50 dark:bg-green-950/10 border border-green-200 dark:border-green-800 p-4">
+            <div className="rounded-[16px] bg-green-50 dark:bg-green-950/10 border border-green-200 dark:border-green-800 p-4">
               <p className="text-sm text-green-700 dark:text-green-400">Válido hasta: <span className="font-semibold">{criminalRecordExpiry}</span></p>
             </div>
           )}
 
           {/* Rejected notes */}
           {criminalRecordStatus === "rejected" && criminalRecordNotes && (
-            <div className="rounded-xl bg-destructive/5 border border-destructive/20 p-4">
+            <div className="rounded-[16px] bg-destructive/5 border border-destructive/20 p-4">
               <p className="text-sm font-medium text-destructive mb-1">Motivo del rechazo:</p>
               <p className="text-sm text-destructive/80">{criminalRecordNotes}</p>
             </div>
@@ -794,7 +794,7 @@ const ProviderProfile = () => {
           {signedCriminalUrl && (
             <div className="space-y-2">
               <Label>Documento subido</Label>
-              <div className="flex items-center gap-3 rounded-lg border p-3">
+              <div className="flex items-center gap-3 rounded-[16px] border p-3">
                 <FileText className="h-5 w-5 text-primary shrink-0" />
                 <a href={signedCriminalUrl} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm font-medium hover:underline truncate">
                   Ver antecedentes penales
@@ -808,7 +808,7 @@ const ProviderProfile = () => {
             <input ref={criminalFileInputRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleCriminalFileSelect} />
             <div
               onClick={() => !criminalUploading && criminalFileInputRef.current?.click()}
-              className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/10 dark:hover:border-orange-700 transition-colors"
+              className="border border-dashed rounded-[16px] p-8 text-center cursor-pointer hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/10 dark:hover:border-orange-700 transition-colors"
             >
               {criminalUploading ? (
                 <div className="flex flex-col items-center gap-2">
@@ -833,7 +833,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Documents & Verification ────────── */}
-      <Card className="rounded-3xl">
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -845,7 +845,7 @@ const ProviderProfile = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {fullProfile?.provider_verification_notes && verificationStatus === "rejected" && (
-            <div className="rounded-xl bg-destructive/5 border border-destructive/20 p-4">
+            <div className="rounded-[16px] bg-destructive/5 border border-destructive/20 p-4">
               <p className="text-sm font-medium text-destructive mb-1">Motivo del rechazo:</p>
               <p className="text-sm text-destructive/80">{fullProfile.provider_verification_notes}</p>
             </div>
@@ -855,7 +855,7 @@ const ProviderProfile = () => {
             <div className="space-y-2">
               <Label>Documentos subidos ({signedDocs.length}/3)</Label>
               {signedDocs.map((doc) => (
-                <div key={doc.path} className="flex items-center gap-3 rounded-lg border p-3">
+                <div key={doc.path} className="flex items-center gap-3 rounded-[16px] border p-3">
                   <FileText className="h-5 w-5 text-primary shrink-0" />
                   <a href={doc.url} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm font-medium hover:underline truncate">{doc.name}</a>
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive/80" onClick={() => handleRemoveDoc(doc.path)}>
@@ -869,7 +869,7 @@ const ProviderProfile = () => {
           {docPaths.length < 3 && (
             <div>
               <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple className="hidden" onChange={handleFileSelect} />
-              <div onClick={() => !uploading && fileInputRef.current?.click()} className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/10 dark:hover:border-orange-700 transition-colors">
+              <div onClick={() => !uploading && fileInputRef.current?.click()} className="border border-dashed rounded-[16px] p-8 text-center cursor-pointer hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950/10 dark:hover:border-orange-700 transition-colors">
                 {uploading ? (
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -889,7 +889,7 @@ const ProviderProfile = () => {
       </Card>
 
       {/* ─── Danger Zone ─────────────────────── */}
-      <Card className="border-destructive/30 bg-red-50/50 dark:bg-red-950/10 rounded-3xl">
+      <Card className="border-destructive/30 bg-red-50/50 dark:bg-red-950/10 rounded-[24px]">
         <CardHeader>
           <CardTitle className="text-lg text-destructive flex items-center gap-2"><Trash2 className="h-5 w-5" /> Zona de Peligro</CardTitle>
         </CardHeader>
@@ -899,7 +899,7 @@ const ProviderProfile = () => {
           </p>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="gap-2 rounded-xl"><Trash2 className="h-4 w-4" /> Eliminar mi cuenta</Button>
+              <Button variant="destructive" className="gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all"><Trash2 className="h-4 w-4" /> Eliminar mi cuenta</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -923,7 +923,7 @@ const ProviderProfile = () => {
         <Button
           onClick={handleSaveProfile}
           disabled={saving}
-          className="w-full gap-2 rounded-2xl h-12 text-base font-bold bg-orange-600 hover:bg-orange-500 shadow-lg"
+          className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all h-12 text-base font-bold bg-orange-600 hover:bg-orange-500 shadow-lg"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Guardar Cambios

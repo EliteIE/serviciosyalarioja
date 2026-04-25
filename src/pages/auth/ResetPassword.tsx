@@ -52,7 +52,7 @@ const ResetPassword = () => {
   if (!isRecovery) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-accent p-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md rounded-[24px] border-border/50 shadow-sm">
           <CardContent className="p-6 text-center text-muted-foreground">
             Link inválido o expirado. <a href="/login" className="text-primary hover:underline">Volver al login</a>
           </CardContent>
@@ -63,7 +63,7 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-accent p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md rounded-[24px] border-border/50 shadow-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Nueva Contraseña</CardTitle>
           <CardDescription>Ingresá tu nueva contraseña</CardDescription>
@@ -74,10 +74,10 @@ const ResetPassword = () => {
               <Label>Nueva contraseña</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input type="password" placeholder="Mínimo 8 caracteres, 1 mayúscula y 1 número" className="pl-9" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input type="password" placeholder="Mínimo 8 caracteres, 1 mayúscula y 1 número" className="pl-9 rounded-full border-border/50" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
             </div>
-            <Button className="w-full rounded-xl" size="lg" type="submit" disabled={loading}>
+            <Button className="w-full rounded-full font-semibold hover:-translate-y-0.5 active:scale-[0.98] transition-all shadow-[0_4px_14px_0_rgba(234,88,12,0.39)]" size="lg" type="submit" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Actualizar Contraseña
             </Button>

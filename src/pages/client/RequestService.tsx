@@ -126,7 +126,7 @@ export default function RequestService() {
     <div className="font-sans flex justify-center pb-10 px-4 md:px-8 min-h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.16))]">
 
       {/* Contentor Principal */}
-      <div className="w-full max-w-7xl bg-card rounded-[2rem] shadow-sm border border-border flex flex-col lg:h-full overflow-hidden">
+      <div className="w-full max-w-7xl bg-card rounded-[24px] shadow-sm border border-border flex flex-col lg:h-full overflow-hidden">
 
         {/* Cabeçalho do Formulário */}
         <div className="bg-slate-900 px-8 py-8 md:py-10 relative shrink-0">
@@ -197,7 +197,7 @@ export default function RequestService() {
                 Los profesionales de tu zona ya fueron notificados. Muy pronto empezarás a recibir presupuestos en tu panel.
               </p>
               {/* Neurotécnica: Peak-End Rule + Anchoring — timeline de expectativa */}
-              <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 rounded-xl px-5 py-3 mb-8">
+              <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 rounded-[16px] px-5 py-3 mb-8">
                 <Clock size={18} className="text-amber-500 shrink-0" />
                 <p className="text-sm text-foreground">
                   <strong>Tiempo promedio de respuesta:</strong> menos de 2 horas
@@ -208,12 +208,12 @@ export default function RequestService() {
                 <button 
                   type="button"
                   onClick={resetForm}
-                  className="px-6 py-3 bg-secondary hover:bg-secondary/80 text-foreground font-semibold rounded-xl transition-colors"
+                  className="px-6 py-3 bg-secondary hover:bg-secondary/80 text-foreground font-semibold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                 >
                   Solicitar otro servicio
                 </button>
                 <Link to="/cliente">
-                  <button type="button" className="w-full sm:w-auto px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-md hover:shadow-lg transition-all">
+                  <button type="button" className="w-full sm:w-auto px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 active:scale-[0.98]">
                     Ir a mi Dashboard
                   </button>
                 </Link>
@@ -238,7 +238,7 @@ export default function RequestService() {
                           value={category}
                           onChange={(e) => setCategory(e.target.value)}
                           required
-                          className="w-full appearance-none rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 cursor-pointer font-medium"
+                          className="w-full appearance-none rounded-[16px] border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 cursor-pointer font-medium"
                         >
                           <option value="" disabled>¿Qué tipo de servicio?</option>
                           {CATEGORIES.map((cat) => (
@@ -258,7 +258,7 @@ export default function RequestService() {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Ej: Reparación..." 
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                        className="w-full rounded-[16px] border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                       />
                     </div>
                   </div>
@@ -278,7 +278,7 @@ export default function RequestService() {
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Describí el problema con el mayor detalle posible. ¿Cuándo empezó? ¿Qué intentaste hacer?"
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal resize-none"
+                      className="w-full rounded-[16px] border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal resize-none"
                     ></textarea>
                     {/* Neurotécnica: Loss Aversion — solicitudes com mais detalhes recebem mais propostas */}
                     {description.length > 0 && description.length < 50 && (
@@ -299,7 +299,7 @@ export default function RequestService() {
                     
                     <div 
                       onClick={() => fileRef.current?.click()}
-                      className="w-full border-2 border-dashed border-border rounded-xl bg-secondary/30 hover:bg-primary/5 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-6"
+                      className="w-full border-2 border-dashed border-border rounded-[16px] bg-secondary/30 hover:bg-primary/5 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-6"
                     >
                       {uploading ? (
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -317,7 +317,7 @@ export default function RequestService() {
                       <div className="flex gap-2 flex-wrap mt-2">
                         {photos.map((url, i) => (
                           <div key={i} className="relative group">
-                            <img src={url} alt="" className="h-16 w-16 rounded-xl object-cover border border-border shadow-sm" />
+                            <img src={url} alt="" className="h-16 w-16 rounded-[16px] object-cover border border-border shadow-sm" />
                             <button type="button" onClick={() => setPhotos((p) => p.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:scale-110">
                               <X className="h-3 w-3" />
                             </button>
@@ -349,7 +349,7 @@ export default function RequestService() {
                           value={street}
                           onChange={(e) => setStreet(e.target.value)}
                           placeholder="Ej: Av. San Martín"
-                          className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                          className="w-full rounded-[16px] border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                         />
                       </div>
                     </div>
@@ -361,7 +361,7 @@ export default function RequestService() {
                         value={streetNumber}
                         onChange={(e) => setStreetNumber(e.target.value)}
                         placeholder="1234"
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                        className="w-full rounded-[16px] border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                       />
                     </div>
                   </div>
@@ -391,7 +391,7 @@ export default function RequestService() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-3">
                       
                       {/* Opção Baixa */}
-                      <label className={`relative flex xl:flex-col items-center xl:justify-center p-3 cursor-pointer rounded-xl border-2 transition-all duration-200 ${urgencia === 'baja' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
+                      <label className={`relative flex xl:flex-col items-center xl:justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'baja' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                         <input type="radio" name="urgencia" value="baja" className="sr-only" onChange={() => setUrgencia('baja')} checked={urgencia === 'baja'} />
                         <div className={`w-8 h-8 xl:mb-2 rounded-full flex items-center justify-center mr-3 xl:mr-0 flex-shrink-0 ${urgencia === 'baja' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
                           <Clock size={16} />
@@ -406,7 +406,7 @@ export default function RequestService() {
                       </label>
 
                       {/* Opção Média */}
-                      <label className={`relative flex xl:flex-col items-center xl:justify-center p-3 cursor-pointer rounded-xl border-2 transition-all duration-200 ${urgencia === 'media' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
+                      <label className={`relative flex xl:flex-col items-center xl:justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'media' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                         <input type="radio" name="urgencia" value="media" className="sr-only" onChange={() => setUrgencia('media')} checked={urgencia === 'media'} />
                         <div className={`w-8 h-8 xl:mb-2 rounded-full flex items-center justify-center mr-3 xl:mr-0 flex-shrink-0 ${urgencia === 'media' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
                           <AlertCircle size={16} />
@@ -421,7 +421,7 @@ export default function RequestService() {
                       </label>
 
                       {/* Opção Alta */}
-                      <label className={`relative flex xl:flex-col items-center xl:justify-center p-3 cursor-pointer rounded-xl border-2 transition-all duration-200 ${urgencia === 'alta' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
+                      <label className={`relative flex xl:flex-col items-center xl:justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'alta' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                         <input type="radio" name="urgencia" value="alta" className="sr-only" onChange={() => setUrgencia('alta')} checked={urgencia === 'alta'} />
                         <div className={`w-8 h-8 xl:mb-2 rounded-full flex items-center justify-center mr-3 xl:mr-0 flex-shrink-0 ${urgencia === 'alta' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
                           <Zap size={16} />
@@ -454,7 +454,7 @@ export default function RequestService() {
                         value={budget}
                         onChange={(e) => setBudget(e.target.value)}
                         placeholder="0"
-                        className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-bold placeholder:text-muted-foreground font-normal text-lg"
+                        className="w-full rounded-[16px] border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-bold placeholder:text-muted-foreground font-normal text-lg"
                       />
                     </div>
                     {/* Neurotécnica: Anchoring — referencia de preço para reduzir incerteza */}
@@ -468,7 +468,7 @@ export default function RequestService() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`w-full flex items-center justify-center gap-2 px-8 py-4 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${isSubmitting ? 'bg-primary/80 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
+                      className={`w-full flex items-center justify-center gap-2 px-8 py-4 text-primary-foreground font-bold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all hover:-translate-y-0.5 active:scale-[0.98] text-lg ${isSubmitting ? 'bg-primary/80 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)]'}`}
                     >
                       {isSubmitting ? (
                         <>

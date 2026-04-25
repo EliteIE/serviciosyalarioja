@@ -213,7 +213,7 @@ const ClientProfile = () => {
             />
           </div>
 
-          <Button className="w-full rounded-xl gap-2" onClick={handleSave} disabled={saving}>
+          <Button className="w-full rounded-[16px] gap-2" onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Guardar Cambios
           </Button>
@@ -234,7 +234,7 @@ const ClientProfile = () => {
           </p>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="gap-2 rounded-xl">
+              <Button variant="destructive" className="gap-2 rounded-[16px]">
                 <Trash2 className="h-4 w-4" />
                 Eliminar mi cuenta
               </Button>

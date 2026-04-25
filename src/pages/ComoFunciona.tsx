@@ -86,11 +86,11 @@ export default function ComoFunciona() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {clientSteps.map((step, i) => (
-            <div key={step.title} className="relative bg-card rounded-2xl border border-border p-6 text-center hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+            <div key={step.title} className="relative bg-card rounded-[24px] border border-border p-6 text-center hover:shadow-lg hover:border-primary/30 transition-all duration-300">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
                 {i + 1}
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mt-4 mb-4">
+              <div className="w-14 h-14 rounded-[24px] bg-primary/10 flex items-center justify-center mx-auto mt-4 mb-4">
                 <step.icon size={28} className="text-primary" />
               </div>
               <h3 className="text-lg font-bold text-foreground mb-2">{step.title}</h3>
@@ -121,11 +121,11 @@ export default function ComoFunciona() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {providerSteps.map((step, i) => (
-            <div key={step.title} className="relative bg-card rounded-2xl border border-border p-6 text-center hover:shadow-lg hover:border-blue-500/30 transition-all duration-300">
+            <div key={step.title} className="relative bg-card rounded-[24px] border border-border p-6 text-center hover:shadow-lg hover:border-blue-500/30 transition-all duration-300">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-blue-500 text-primary-foreground flex items-center justify-center text-sm font-bold">
                 {i + 1}
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mt-4 mb-4">
+              <div className="w-14 h-14 rounded-[24px] bg-blue-500/10 flex items-center justify-center mx-auto mt-4 mb-4">
                 <step.icon size={28} className="text-blue-500" />
               </div>
               <h3 className="text-lg font-bold text-foreground mb-2">{step.title}</h3>
@@ -137,7 +137,7 @@ export default function ComoFunciona() {
 
       {/* CTA Section */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="bg-secondary rounded-3xl p-8 md:p-12 text-center border border-border">
+        <div className="bg-secondary rounded-[24px] p-8 md:p-12 text-center border border-border">
           <h2 className="text-2xl md:text-3xl font-extrabold text-secondary-foreground mb-4">
             Listo para empezar?
           </h2>
@@ -146,12 +146,12 @@ export default function ComoFunciona() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/buscar">
-              <button className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl">
+              <button className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-[16px] transition-all duration-300 shadow-lg hover:shadow-xl">
                 Buscar un profesional
               </button>
             </Link>
             <Link to="/registro/prestador">
-              <button className="w-full sm:w-auto px-8 py-4 bg-transparent hover:bg-secondary-foreground/5 text-secondary-foreground font-semibold rounded-xl transition-all duration-300 border border-secondary-foreground/20 hover:border-secondary-foreground/40">
+              <button className="w-full sm:w-auto px-8 py-4 bg-transparent hover:bg-secondary-foreground/5 text-secondary-foreground font-semibold rounded-[16px] transition-all duration-300 border border-secondary-foreground/20 hover:border-secondary-foreground/40">
                 Registrarme como prestador
               </button>
             </Link>

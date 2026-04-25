@@ -257,7 +257,7 @@ const ProviderServices = () => {
       <h1 className="text-2xl font-bold">Gestión de Servicios</h1>
 
       {profile?.is_provider && !profile?.provider_verified && (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/20 p-4">
+        <div className="flex items-start gap-3 rounded-[24px] border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/20 p-4">
           <ShieldCheck className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <p className="text-sm text-amber-800 dark:text-amber-200">
             Tu cuenta está en proceso de verificación. Serás visible para los clientes una vez que nuestro equipo apruebe tu perfil y documentación.
@@ -272,7 +272,7 @@ const ProviderServices = () => {
       ) : (
         <div className="space-y-5">
           {/* Toolbar bar */}
-          <div className="bg-card rounded-2xl shadow-sm border border-border p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <div className="bg-card rounded-[24px] shadow-sm border border-border/50 p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             {/* Filter pills */}
             <div className="flex-1 overflow-x-auto no-scrollbar">
               <div className="flex gap-2">
@@ -280,7 +280,7 @@ const ProviderServices = () => {
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                    className={`whitespace-nowrap px-4 py-2 rounded-[16px] text-sm font-medium transition-all ${
                       activeTab === tab.key
                         ? "bg-slate-900 text-primary-foreground dark:bg-white dark:text-slate-900 shadow-sm"
                         : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-muted dark:text-slate-300 dark:border-slate-700"
@@ -305,7 +305,7 @@ const ProviderServices = () => {
                 placeholder="Buscar servicio..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-[16px] text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
               />
             </div>
           </div>
@@ -318,7 +318,7 @@ const ProviderServices = () => {
               filteredServices.map((service) => {
                 const { base, extras, total } = getServiceTotal(service);
                 return (
-                  <Card key={service.id} className="overflow-hidden border-border hover:shadow-md transition-shadow">
+                  <Card key={service.id} className="overflow-hidden border-border/50 rounded-[24px] hover:shadow-md transition-shadow">
                     {/* Card header */}
                     <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-border">
                       <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shrink-0 overflow-hidden">
@@ -377,7 +377,7 @@ const ProviderServices = () => {
                             {service.status === "nuevo" && (
                               <Button
                                 size="sm"
-                                className="gap-1.5 rounded-xl"
+                                className="gap-1.5 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                                 onClick={() => navigate(`/prestador/servicios/${service.id}`)}
                                 disabled={isBlocked}
                                 title={isBlocked ? "Pagá tus comisiones pendientes para enviar presupuestos" : undefined}
@@ -391,7 +391,7 @@ const ProviderServices = () => {
                             {service.status === "aceptado" && (
                               <Button
                                 size="sm"
-                                className="gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-primary-foreground shadow-md shadow-orange-500/20"
+                                className="gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-primary-foreground shadow-md shadow-orange-500/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                                 onClick={() => handleStartWithCode(service.id)}
                                 disabled={verifying || isBlocked}
                                 title={isBlocked ? "Pagá tus comisiones pendientes para iniciar servicios" : undefined}
@@ -401,16 +401,16 @@ const ProviderServices = () => {
                             )}
                             {service.status === "en_progreso" && (
                               <>
-                                <Button size="sm" variant="outline" className="gap-1.5 rounded-xl" onClick={() => handleRequestExtra(service.id)}>
+                                <Button size="sm" variant="outline" className="gap-1.5 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => handleRequestExtra(service.id)}>
                                   <Plus className="h-3.5 w-3.5" /> Cargo Extra
                                 </Button>
-                                <Button size="sm" className="gap-1.5 rounded-xl bg-success hover:bg-success/90" onClick={() => handleComplete(service.id)} disabled={updateStatus.isPending}>
+                                <Button size="sm" className="gap-1.5 rounded-full bg-success hover:bg-success/90 hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => handleComplete(service.id)} disabled={updateStatus.isPending}>
                                   <CheckCircle2 className="h-3.5 w-3.5" /> Finalizar
                                 </Button>
                               </>
                             )}
                             {service.status === "completado" && !reviewedIds?.has(service.id) && (
-                              <Button size="sm" variant="outline" className="gap-1.5 rounded-xl" onClick={() => openReviewModal(service)}>
+                              <Button size="sm" variant="outline" className="gap-1.5 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => openReviewModal(service)}>
                                 <Star className="h-3.5 w-3.5 text-yellow-500" /> Calificar Cliente
                               </Button>
                             )}
@@ -418,7 +418,7 @@ const ProviderServices = () => {
                               <Badge className="bg-success/10 text-success border-success/20">Calificado</Badge>
                             )}
                             {service.provider_id && (
-                              <Button size="sm" variant="ghost" className="gap-1.5 rounded-xl relative" onClick={() => navigate(`/prestador/chat?service=${service.id}`)}>
+                              <Button size="sm" variant="ghost" className="gap-1.5 rounded-full relative hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={() => navigate(`/prestador/chat?service=${service.id}`)}>
                                 <MessageSquare className="h-3.5 w-3.5" /> Chat
                                 {unreadServiceIds.has(service.id) && (
                                   <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-destructive border-2 border-card" />
@@ -477,13 +477,13 @@ const ProviderServices = () => {
                     value={digit}
                     onChange={e => handleDigitChange(i, e.target.value)}
                     onKeyDown={e => handleDigitKeyDown(i, e)}
-                    className="w-10 h-14 text-center text-xl font-bold font-mono rounded-xl border-2 border-border bg-slate-50 dark:bg-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all text-foreground"
+                    className="w-10 h-14 text-center text-xl font-bold font-mono rounded-[16px] border-2 border-border bg-slate-50 dark:bg-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all text-foreground"
                   />
                 ))}
               </div>
 
               <Button
-                className="w-full gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-primary-foreground shadow-md shadow-orange-500/20"
+                className="w-full gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-primary-foreground shadow-md shadow-orange-500/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                 onClick={handleVerifyCode}
                 disabled={verifying || codeInput.length < 6}
               >
@@ -519,7 +519,7 @@ const ProviderServices = () => {
               <label className="text-sm font-medium mb-1 block">Monto ($)</label>
               <Input type="number" placeholder="Ej: 5000" value={extraAmount} onChange={(e) => setExtraAmount(e.target.value)} min={0} />
             </div>
-            <Button className="w-full gap-2 rounded-xl" onClick={handleSubmitExtra} disabled={submittingExtra || !extraDesc || !extraAmount}>
+            <Button className="w-full gap-2 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={handleSubmitExtra} disabled={submittingExtra || !extraDesc || !extraAmount}>
               {submittingExtra ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               Solicitar Cargo Extra
             </Button>
@@ -530,7 +530,7 @@ const ProviderServices = () => {
       {/* Review modal — provider rates client */}
       {reviewService && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card rounded-2xl shadow-xl border border-border w-full max-w-md overflow-hidden relative animate-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-card rounded-[24px] shadow-xl border border-border/50 w-full max-w-md overflow-hidden relative animate-in slide-in-from-bottom-4 duration-300">
             {!reviewSent && (
               <button onClick={closeReviewModal} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-secondary p-2 rounded-full transition-colors z-10">
                 <X size={20} />
@@ -574,17 +574,17 @@ const ProviderServices = () => {
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     placeholder="¿Cómo fue la comunicación, puntualidad, trato?"
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none h-24"
+                    className="w-full rounded-[16px] border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none h-24"
                   />
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={closeReviewModal} className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-xl hover:bg-secondary transition-colors">
+                  <button onClick={closeReviewModal} className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-full hover:bg-secondary transition-all hover:-translate-y-0.5 active:scale-[0.98]">
                     Cancelar
                   </button>
                   <button
                     onClick={handleSubmitReview}
                     disabled={reviewRating === 0 || reviewSubmitting}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-primary-foreground font-semibold rounded-xl transition-all ${reviewRating === 0 ? 'bg-primary/50 cursor-not-allowed' : reviewSubmitting ? 'bg-primary/80 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg'}`}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-primary-foreground font-semibold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98] ${reviewRating === 0 ? 'bg-primary/50 cursor-not-allowed' : reviewSubmitting ? 'bg-primary/80 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg'}`}
                   >
                     {reviewSubmitting ? (
                       <><Loader2 size={18} className="animate-spin" /> Enviando...</>
@@ -611,8 +611,8 @@ const ProviderServices = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-lg">Cancelar</AlertDialogCancel>
-            <AlertDialogAction className="rounded-lg bg-success hover:bg-success/90 gap-2" onClick={handleConfirmFinish} disabled={finishing}>
+            <AlertDialogCancel className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all">Cancelar</AlertDialogCancel>
+            <AlertDialogAction className="rounded-full bg-success hover:bg-success/90 gap-2 hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={handleConfirmFinish} disabled={finishing}>
               {finishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               Sí, Finalizar Servicio
             </AlertDialogAction>

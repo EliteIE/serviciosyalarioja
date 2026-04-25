@@ -63,7 +63,7 @@ const Contacto = () => {
       <div className="grid md:grid-cols-3 gap-8">
         {/* Contact Info */}
         <div className="space-y-6">
-          <Card className="rounded-xl">
+          <Card className="rounded-[16px]">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-primary/10 p-3 shrink-0">
@@ -112,7 +112,7 @@ const Contacto = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl bg-primary/5 border-primary/20">
+          <Card className="rounded-[16px] bg-primary/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquare className="h-5 w-5 text-primary" />
@@ -127,7 +127,7 @@ const Contacto = () => {
 
         {/* Contact Form */}
         <div className="md:col-span-2">
-          <Card className="rounded-xl">
+          <Card className="rounded-[16px]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Send className="h-5 w-5" />
@@ -200,7 +200,7 @@ const Contacto = () => {
 
                 <Button
                   type="submit"
-                  className="w-full rounded-xl gap-2"
+                  className="w-full rounded-[16px] gap-2"
                   disabled={sending}
                 >
                   {sending ? (

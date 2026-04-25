@@ -23,8 +23,8 @@ export const ProviderProfileSkeleton = () => {
               <div className="pb-2 space-y-3">
                 <Skeleton className="h-8 w-64 rounded" />
                 <div className="flex gap-3">
-                  <Skeleton className="h-6 w-24 rounded-lg" />
-                  <Skeleton className="h-6 w-32 rounded-lg" />
+                  <Skeleton className="h-6 w-24 rounded-[16px]" />
+                  <Skeleton className="h-6 w-32 rounded-[16px]" />
                 </div>
               </div>
             </div>
@@ -38,7 +38,7 @@ export const ProviderProfileSkeleton = () => {
           <div className="flex gap-8 border-t border-border py-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3 flex-shrink-0">
-                <Skeleton className="w-12 h-12 rounded-xl" />
+                <Skeleton className="w-12 h-12 rounded-[16px]" />
                 <div className="space-y-2">
                   <Skeleton className="h-5 w-16 rounded" />
                   <Skeleton className="h-3 w-24 rounded" />
@@ -57,7 +57,7 @@ export const ProviderProfileSkeleton = () => {
             {[1, 2, 3].map((i) => (
               <section
                 key={i}
-                className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm space-y-4"
+                className="bg-card rounded-[24px] border border-border p-6 md:p-8 shadow-sm space-y-4"
               >
                 <Skeleton className="h-6 w-40 rounded" />
                 <div className="space-y-2">
@@ -71,8 +71,8 @@ export const ProviderProfileSkeleton = () => {
 
           {/* Right sidebar — CTA card */}
           <div className="w-full lg:w-1/3 space-y-6">
-            <div className="bg-card rounded-2xl border-2 border-primary/20 p-6 shadow-xl space-y-4">
-              <Skeleton className="h-14 w-full rounded-xl" />
+            <div className="bg-card rounded-[24px] border-2 border-primary/20 p-6 shadow-xl space-y-4">
+              <Skeleton className="h-14 w-full rounded-[16px]" />
               <Skeleton className="h-4 w-3/4 rounded mx-auto" />
               <div className="pt-6 border-t border-border space-y-4">
                 {[1, 2].map((i) => (
@@ -87,7 +87,7 @@ export const ProviderProfileSkeleton = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
+            <div className="bg-card rounded-[24px] border border-border p-6 shadow-sm space-y-4">
               <Skeleton className="h-5 w-40 rounded" />
               {[5, 4, 3, 2, 1].map((i) => (
                 <div key={i} className="flex items-center gap-3">

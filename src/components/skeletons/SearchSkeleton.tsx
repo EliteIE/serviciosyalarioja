@@ -12,7 +12,7 @@ export const SearchSkeleton = () => {
           <Card key={i} className="h-full">
             <CardContent className="p-6 flex flex-col h-full">
               <div className="flex items-start gap-4 mb-4">
-                <Skeleton className="h-14 w-14 rounded-xl shrink-0" />
+                <Skeleton className="h-14 w-14 rounded-[16px] shrink-0" />
                 <div className="space-y-2 flex-1">
                   <Skeleton className="h-5 w-3/4 rounded" />
                   <Skeleton className="h-4 w-1/2 rounded" />

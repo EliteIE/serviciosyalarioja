@@ -95,7 +95,7 @@ export const Hero = () => {
           </div>
 
           {/* Headline (Título) */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#082345] mb-6 tracking-tight leading-[1.15]">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-[#082345] mb-6 tracking-tight leading-[1.1]">
             Encontrá al profesional{" "}
             <span className="text-primary relative inline-block">
               perfecto
@@ -112,14 +112,14 @@ export const Hero = () => {
           </h1>
 
           {/* Subheadline (Parágrafo) */}
-          <p className="text-base md:text-xl text-slate-600 mb-10 leading-relaxed max-w-lg">
+          <p className="text-base md:text-xl text-slate-600 mb-10 leading-snug tracking-tight max-w-lg font-medium">
             Profesionales verificados en toda La Rioja. Presupuestos gratis y reseñas reales de clientes como vos.
           </p>
 
           {/* Barra de Pesquisa */}
           <form
             onSubmit={handleSearch}
-            className="w-full bg-white p-2 rounded-2xl md:rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-stretch gap-2 transition-all focus-within:ring-4 focus-within:ring-primary/20 border border-slate-100"
+            className="w-full bg-white/90 backdrop-blur-md p-2 rounded-[24px] md:rounded-full shadow-xl border border-slate-200/60 flex flex-col md:flex-row items-stretch gap-2 transition-all focus-within:ring-4 focus-within:ring-primary/20 focus-within:bg-white"
             role="search"
             aria-label="Buscar servicios"
           >
@@ -141,7 +141,7 @@ export const Hero = () => {
 
             <button
               type="submit"
-              className="shrink-0 w-full md:w-auto px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-xl md:rounded-full transition-transform active:scale-95 flex items-center justify-center shadow-lg"
+              className="shrink-0 w-full md:w-auto px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-[16px] md:rounded-full transition-transform active:scale-95 flex items-center justify-center shadow-lg"
             >
               Buscar
             </button>

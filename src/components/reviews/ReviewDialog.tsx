@@ -99,7 +99,7 @@ const ReviewDialog = ({ serviceRequestId, reviewedId, reviewedName, children }: 
           />
 
           <Button
-            className="w-full rounded-xl"
+            className="w-full rounded-[16px]"
             onClick={handleSubmit}
             disabled={rating === 0 || createReview.isPending}
           >

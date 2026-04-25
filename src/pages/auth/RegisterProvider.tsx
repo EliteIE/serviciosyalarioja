@@ -243,7 +243,7 @@ const RegisterProvider = () => {
 
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-xl shadow-lg" />
+            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-[16px] shadow-lg" />
             <span className="text-2xl font-bold tracking-tight text-secondary-foreground">
               Servicios <span className="text-primary">360</span>
             </span>
@@ -315,7 +315,7 @@ const RegisterProvider = () => {
 
             <div className="mb-8 text-center lg:text-left">
               <div className="lg:hidden flex justify-center mb-6">
-                <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-2xl shadow-lg" />
+                <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-[24px] shadow-lg" />
               </div>
               <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Registro de Prestador</h2>
               <p className="text-muted-foreground mt-2">
@@ -326,7 +326,7 @@ const RegisterProvider = () => {
             {/* Documentation notice — Google sign-in was removed here on
                 purpose: provider verification requires three uploads, and
                 that flow doesn't fit inside an OAuth redirect. */}
-            <div className="flex items-start gap-3 rounded-xl border border-info/30 bg-info/5 p-4 mb-6">
+            <div className="flex items-start gap-3 rounded-[24px] border border-info/30 bg-info/5 p-4 mb-6">
               <Info size={18} className="text-info mt-0.5 shrink-0" />
               <p className="text-sm text-foreground/80 leading-relaxed">
                 Para tu seguridad y la de los clientes, el registro de prestador exige subir DNI (frente y dorso) y un certificado de antecedentes penales vigente. Por eso este registro es sólo por email.
@@ -354,7 +354,7 @@ const RegisterProvider = () => {
                       onChange={handleChange}
                       placeholder="Tu nombre completo"
                       autoComplete="name"
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -376,7 +376,7 @@ const RegisterProvider = () => {
                       onChange={handleChange}
                       placeholder="+54 380 ..."
                       autoComplete="tel"
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -398,7 +398,7 @@ const RegisterProvider = () => {
                       onChange={handleChange}
                       placeholder="tu@email.com"
                       autoComplete="email"
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -422,7 +422,7 @@ const RegisterProvider = () => {
                       required
                       value={formData.categoria}
                       onChange={handleChange}
-                      className="w-full appearance-none rounded-xl border border-border bg-background pl-11 pr-10 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium cursor-pointer"
+                      className="w-full appearance-none rounded-[16px] border border-border/50 bg-background pl-11 pr-10 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium cursor-pointer"
                     >
                       <option value="" disabled>Seleccioná tu oficio</option>
                       {CATEGORIES.map((cat) => (
@@ -449,7 +449,7 @@ const RegisterProvider = () => {
                       value={formData.zona}
                       onChange={handleChange}
                       placeholder="Ej: Capital, Barrio Norte"
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                      className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -466,7 +466,7 @@ const RegisterProvider = () => {
                   value={formData.descripcion}
                   onChange={handleChange}
                   placeholder="Contá qué servicios ofrecés y cuál es tu experiencia..."
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none"
+                  className="w-full rounded-[16px] border border-border/50 bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none"
                 />
               </div>
 
@@ -502,9 +502,9 @@ const RegisterProvider = () => {
                           <button
                             type="button"
                             onClick={() => fileRefs[slot].current?.click()}
-                            className="w-full flex items-center gap-3 rounded-xl border-2 border-dashed border-border bg-background hover:bg-muted/40 hover:border-primary/50 transition-colors p-4 text-left group"
+                            className="w-full flex items-center gap-3 rounded-[24px] border-2 border-dashed border-border/60 bg-background hover:bg-muted/40 hover:border-primary/50 transition-colors p-4 text-left group"
                           >
-                            <div className="w-11 h-11 rounded-lg bg-muted text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 flex items-center justify-center shrink-0 transition-colors">
+                            <div className="w-11 h-11 rounded-[16px] bg-muted text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 flex items-center justify-center shrink-0 transition-colors">
                               <UploadCloud size={20} />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -518,8 +518,8 @@ const RegisterProvider = () => {
                             </div>
                           </button>
                         ) : (
-                          <div className="w-full flex items-center gap-3 rounded-xl border border-success/30 bg-success/5 p-3">
-                            <div className="w-11 h-11 rounded-lg bg-success/15 text-success flex items-center justify-center shrink-0">
+                          <div className="w-full flex items-center gap-3 rounded-[24px] border border-success/30 bg-success/5 p-3">
+                            <div className="w-11 h-11 rounded-[16px] bg-success/15 text-success flex items-center justify-center shrink-0">
                               <CheckCircle2 size={20} />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -545,7 +545,7 @@ const RegisterProvider = () => {
                   })}
                 </div>
 
-                <p className="text-[11px] text-muted-foreground bg-muted/50 p-2.5 rounded-lg leading-relaxed">
+                <p className="text-[11px] text-muted-foreground bg-muted/50 p-2.5 rounded-[16px] leading-relaxed">
                   Tus documentos se guardan cifrados y solo los ven nuestros verificadores. No se publican en tu perfil.
                 </p>
               </div>
@@ -570,7 +570,7 @@ const RegisterProvider = () => {
                     onChange={handleChange}
                     placeholder="Mínimo 8 caracteres, 1 mayúscula, 1 número"
                     autoComplete="new-password"
-                    className="w-full rounded-xl border border-border bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                    className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                   />
                   <button
                     type="button"
@@ -609,10 +609,10 @@ const RegisterProvider = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || !allDocsPresent || !termsAccepted}
-                className={`w-full flex items-center justify-center gap-2 py-4 mt-4 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${
+                className={`w-full flex items-center justify-center gap-2 py-4 mt-4 text-primary-foreground font-semibold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${
                   isSubmitting || !allDocsPresent || !termsAccepted
                     ? "bg-primary/50 cursor-not-allowed shadow-none"
-                    : "bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5"
+                    : "bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98]"
                 }`}
               >
                 {isSubmitting ? (
@@ -641,7 +641,7 @@ const RegisterProvider = () => {
               <div className="pt-4 border-t border-border mt-6 flex justify-center">
                 <Link
                   to="/registro/cliente"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-card hover:bg-muted border border-border text-sm font-semibold text-card-foreground transition-colors group"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-card hover:bg-muted border border-border/50 text-sm font-semibold text-card-foreground transition-all group hover:-translate-y-0.5 active:scale-[0.98]"
                 >
                   <User size={18} className="text-muted-foreground group-hover:text-blue-500 transition-colors" />
                   ¿Querés contratar servicios? <span className="text-blue-600 group-hover:underline">Registrate como cliente</span>

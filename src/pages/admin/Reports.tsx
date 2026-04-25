@@ -109,7 +109,7 @@ const AdminReports = () => {
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 border-orange-300 text-orange-600 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-400 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/30 transition-all duration-200"
+          className="gap-2 rounded-full border-orange-300 text-orange-600 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-400 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
           onClick={exportCSV}
         >
           <Download className="h-4 w-4" />
@@ -118,10 +118,10 @@ const AdminReports = () => {
       </div>
 
       {/* Commission Settings Card */}
-      <Card className="rounded-3xl shadow-lg border-t-4 border-orange-500 overflow-hidden dark:bg-slate-900/50">
+      <Card className="rounded-[24px] shadow-lg border-t-4 border-orange-500 overflow-hidden dark:bg-slate-900/50">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-3 text-base font-semibold text-foreground">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-950/40">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-orange-100 dark:bg-orange-950/40">
               <Settings className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             Configuración de Comisiones
@@ -141,7 +141,7 @@ const AdminReports = () => {
                   step="0.5"
                   value={newRate}
                   onChange={(e) => setNewRate(e.target.value)}
-                  className="w-32 rounded-xl border-slate-300 focus:border-orange-400 focus:ring-orange-400 dark:border-slate-600"
+                  className="w-32 rounded-[16px] border-slate-300 focus:border-orange-400 focus:ring-orange-400 dark:border-slate-600"
                 />
               ) : (
                 <div className="flex items-baseline gap-1">
@@ -156,7 +156,7 @@ const AdminReports = () => {
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  className="rounded-xl bg-orange-500 hover:bg-orange-600 text-primary-foreground shadow-md"
+                  className="rounded-full bg-orange-500 hover:bg-orange-600 text-primary-foreground shadow-md transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                   onClick={handleUpdateSetting}
                   disabled={updateSetting.isPending}
                 >
@@ -166,7 +166,7 @@ const AdminReports = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="rounded-xl"
+                  className="rounded-full transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                   onClick={() => setEditingRate(false)}
                 >
                   Cancelar
@@ -176,7 +176,7 @@ const AdminReports = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="rounded-xl border-orange-300 text-orange-600 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/30"
+                className="rounded-full border-orange-300 text-orange-600 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                 onClick={() => { setNewRate(settings?.commission_rate || "10"); setEditingRate(true); }}
               >
                 <Percent className="h-3.5 w-3.5 mr-1.5" />
@@ -189,9 +189,9 @@ const AdminReports = () => {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
+        <Card className="rounded-[24px] shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
           <CardContent className="p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-blue-500/10 mb-3">
               <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-primary-foreground">${totalVolume.toLocaleString()}</p>
@@ -199,9 +199,9 @@ const AdminReports = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
+        <Card className="rounded-[24px] shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
           <CardContent className="p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-emerald-500/10 mb-3">
               <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-primary-foreground">${totalFees.toLocaleString()}</p>
@@ -209,9 +209,9 @@ const AdminReports = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
+        <Card className="rounded-[24px] shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
           <CardContent className="p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-violet-500/10 mb-3">
               <Receipt className="h-5 w-5 text-violet-600 dark:text-violet-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-primary-foreground">${Math.round(avgTicket).toLocaleString()}</p>
@@ -219,9 +219,9 @@ const AdminReports = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
+        <Card className="rounded-[24px] shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
           <CardContent className="p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-amber-500/10 mb-3">
               <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-primary-foreground">${totalRefunded.toLocaleString()}</p>
@@ -229,9 +229,9 @@ const AdminReports = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
+        <Card className="rounded-[24px] shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-slate-900/50">
           <CardContent className="p-5">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl mb-3 ${failed > 0 ? "bg-red-500/10" : "bg-slate-500/10"}`}>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-[16px] mb-3 ${failed > 0 ? "bg-red-500/10" : "bg-slate-500/10"}`}>
               <XCircle className={`h-5 w-5 ${failed > 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground"}`} />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-primary-foreground">{failed}</p>
@@ -241,10 +241,10 @@ const AdminReports = () => {
       </div>
 
       {/* Revenue Chart */}
-      <Card className="rounded-3xl shadow-lg dark:bg-slate-900/50">
+      <Card className="rounded-[24px] shadow-lg dark:bg-slate-900/50">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-orange-500/10">
               <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
@@ -277,7 +277,7 @@ const AdminReports = () => {
             </ResponsiveContainer>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[16px] bg-muted mb-4">
                 <BarChart3 className="h-8 w-8 text-slate-400 dark:text-slate-500" />
               </div>
               <p className="text-sm font-medium text-muted-foreground">Sin transacciones aún</p>
@@ -288,11 +288,11 @@ const AdminReports = () => {
       </Card>
 
       {/* Transactions Table */}
-      <Card className="rounded-3xl shadow-lg overflow-hidden dark:bg-slate-900/50">
+      <Card className="rounded-[24px] shadow-lg overflow-hidden dark:bg-slate-900/50">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-500/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-slate-500/10">
                 <FileSpreadsheet className="h-5 w-5 text-slate-600 dark:text-slate-400" />
               </div>
               <div>
@@ -305,11 +305,11 @@ const AdminReports = () => {
               </div>
             </div>
             <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-44 rounded-xl border-border">
+              <SelectTrigger className="w-44 rounded-[16px] border-border">
                 <Filter className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
                 <SelectValue placeholder="Filtrar" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl">
+              <SelectContent className="rounded-[16px]">
                 <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="pending">Pendientes</SelectItem>
                 <SelectItem value="completed">Completados</SelectItem>
@@ -327,7 +327,7 @@ const AdminReports = () => {
             </div>
           ) : !paginatedPayments?.length ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[16px] bg-muted mb-4">
                 <Receipt className="h-8 w-8 text-slate-400 dark:text-slate-500" />
               </div>
               <p className="text-sm font-medium text-muted-foreground">Sin transacciones</p>
@@ -371,7 +371,7 @@ const AdminReports = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="rounded-xl h-9 w-9 p-0 border-border disabled:opacity-40"
+                      className="rounded-full h-9 w-9 p-0 border-border disabled:opacity-40 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                       disabled={page === 0}
                       onClick={() => setPage(p => p - 1)}
                     >
@@ -383,7 +383,7 @@ const AdminReports = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="rounded-xl h-9 w-9 p-0 border-border disabled:opacity-40"
+                      className="rounded-full h-9 w-9 p-0 border-border disabled:opacity-40 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                       disabled={page >= totalPages - 1}
                       onClick={() => setPage(p => p + 1)}
                     >
@@ -398,10 +398,10 @@ const AdminReports = () => {
       </Card>
 
       {/* Pending Commission Payments */}
-      <Card className="rounded-3xl shadow-lg border-t-4 border-amber-500 overflow-hidden dark:bg-slate-900/50">
+      <Card className="rounded-[24px] shadow-lg border-t-4 border-amber-500 overflow-hidden dark:bg-slate-900/50">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-amber-500/10">
               <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
@@ -417,7 +417,7 @@ const AdminReports = () => {
         <CardContent className="p-0">
           {!pendingCommissions?.length ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[16px] bg-muted mb-4">
                 <CheckCircle2 className="h-8 w-8 text-slate-400 dark:text-slate-500" />
               </div>
               <p className="text-sm font-medium text-muted-foreground">Sin comisiones pendientes</p>
@@ -457,7 +457,7 @@ const AdminReports = () => {
                     <TableCell>
                       <Button
                         size="sm"
-                        className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-primary-foreground shadow-md text-xs"
+                        className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-primary-foreground shadow-md text-xs transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                         disabled={confirmCommission.isPending}
                         onClick={() => confirmCommission.mutate(payment.id)}
                       >

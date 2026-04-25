@@ -126,7 +126,7 @@ const RegisterClient = () => {
         {/* Topo: Logótipo */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-xl shadow-lg" />
+            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-[16px] shadow-lg" />
             <span className="text-2xl font-bold text-secondary-foreground tracking-tight">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
@@ -189,7 +189,7 @@ const RegisterClient = () => {
           <div className="mb-8 text-center xl:text-left">
             {/* Logo para mobile */}
             <div className="lg:hidden flex justify-center mb-6">
-              <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-2xl shadow-lg" />
+              <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-[24px] shadow-lg" />
             </div>
             <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Crear Cuenta</h2>
             <p className="text-muted-foreground mt-2">Registrate como cliente en Servicios 360</p>
@@ -200,9 +200,9 @@ const RegisterClient = () => {
             onClick={handleGoogleSignup}
             disabled={!termsAccepted}
             aria-disabled={!termsAccepted}
-            className={`w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-xl transition-all text-sm font-semibold shadow-sm mb-6 ${
+            className={`w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-full transition-all text-sm font-semibold shadow-sm mb-6 ${
               termsAccepted
-                ? "hover:bg-muted/50 hover:border-primary/30 text-foreground cursor-pointer"
+                ? "hover:bg-muted/50 hover:border-primary/30 hover:-translate-y-0.5 active:scale-[0.98] text-foreground cursor-pointer"
                 : "text-muted-foreground/60 cursor-not-allowed opacity-60"
             }`}
           >
@@ -239,7 +239,7 @@ const RegisterClient = () => {
                     value={formData.nombre}
                     onChange={handleChange}
                     placeholder="Tu nombre" 
-                    className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                    className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                   />
                 </div>
               </div>
@@ -257,7 +257,7 @@ const RegisterClient = () => {
                     value={formData.telefono}
                     onChange={handleChange}
                     placeholder="+54 380 ..." 
-                    className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                    className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                   />
                 </div>
               </div>
@@ -277,7 +277,7 @@ const RegisterClient = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="tu@email.com" 
-                  className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                  className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                 />
               </div>
             </div>
@@ -296,7 +296,7 @@ const RegisterClient = () => {
                   value={formData.localidad}
                   onChange={handleChange}
                   placeholder="Tu ciudad o barrio" 
-                  className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                  className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                 />
               </div>
             </div>
@@ -315,7 +315,7 @@ const RegisterClient = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Mínimo 8 caracteres, 1 mayúscula, 1 número" 
-                  className="w-full rounded-xl border border-border bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                  className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                 />
                 <button 
                   type="button"
@@ -353,10 +353,10 @@ const RegisterClient = () => {
             <button
               type="submit"
               disabled={isSubmitting || !termsAccepted}
-              className={`w-full flex items-center justify-center gap-2 py-4 mt-2 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${
+              className={`w-full flex items-center justify-center gap-2 py-4 mt-2 text-primary-foreground font-semibold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${
                 isSubmitting || !termsAccepted
                   ? 'bg-primary/50 cursor-not-allowed shadow-none'
-                  : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'
+                  : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98]'
               }`}
             >
               {isSubmitting ? (
@@ -378,7 +378,7 @@ const RegisterClient = () => {
             
             {/* Bloco destacado para Prestadores */}
             <div className="pt-4 border-t border-border mt-6 flex justify-center">
-              <Link to="/registro/prestador" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-card hover:bg-muted border border-border text-sm font-semibold text-card-foreground transition-colors group">
+              <Link to="/registro/prestador" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-card hover:bg-muted border border-border/50 text-sm font-semibold text-card-foreground transition-all group hover:-translate-y-0.5 active:scale-[0.98]">
                 <Briefcase size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 ¿Querés ofrecer servicios? <span className="text-primary group-hover:underline">Registrate como prestador</span>
               </Link>

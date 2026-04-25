@@ -31,7 +31,7 @@ const Footer = () => {
                 height={40}
                 loading="lazy"
                 decoding="async"
-                className="h-10 w-10 rounded-xl shadow-lg"
+                className="h-10 w-10 rounded-[16px] shadow-lg"
               />
               <span className="text-2xl font-bold tracking-tight text-secondary-foreground">
                 Servicios <span className="text-primary">360</span>
@@ -152,12 +152,12 @@ const Footer = () => {
                   id="newsletter-email"
                   type="email"
                   placeholder="Tu email..."
-                  className="w-full bg-secondary-foreground/5 border border-secondary-foreground/20 rounded-xl pl-10 pr-12 py-3 text-sm text-secondary-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-secondary-foreground/50"
+                  className="w-full bg-secondary-foreground/5 border border-secondary-foreground/20 rounded-[16px] pl-10 pr-12 py-3 text-sm text-secondary-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-secondary-foreground/50"
                 />
                 <button
                   type="submit"
                   aria-label="Suscribirme al newsletter"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary hover:bg-primary/90 rounded-lg flex items-center justify-center text-primary-foreground transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary hover:bg-primary/90 rounded-[16px] flex items-center justify-center text-primary-foreground transition-colors"
                 >
                   <ArrowRight size={16} />
                 </button>
@@ -230,7 +230,7 @@ const Footer = () => {
             {/* Botón de Arrepentimiento — obligatorio Res. SC 424/2020 */}
             <Link
               to="/arrepentimiento"
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/40 bg-primary/10 px-4 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 rounded-[16px] border-2 border-primary/40 bg-primary/10 px-4 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm"
             >
               <ShieldCheck size={16} />
               Botón de Arrepentimiento
@@ -265,11 +265,11 @@ const Footer = () => {
 
           {/* Trust Badges — concretos, no vagos */}
           <div className="flex items-center gap-2 flex-wrap justify-center">
-            <div className="flex items-center gap-1.5 text-secondary-foreground/80 text-xs font-medium px-3 py-1.5 rounded-lg bg-secondary-foreground/5 border border-secondary-foreground/20">
+            <div className="flex items-center gap-1.5 text-secondary-foreground/80 text-xs font-medium px-3 py-1.5 rounded-[16px] bg-secondary-foreground/5 border border-secondary-foreground/20">
               <ShieldCheck size={14} className="text-green-500" />
               <span>Verificación con DNI</span>
             </div>
-            <div className="flex items-center gap-1.5 text-secondary-foreground/80 text-xs font-medium px-3 py-1.5 rounded-lg bg-secondary-foreground/5 border border-secondary-foreground/20">
+            <div className="flex items-center gap-1.5 text-secondary-foreground/80 text-xs font-medium px-3 py-1.5 rounded-[16px] bg-secondary-foreground/5 border border-secondary-foreground/20">
               <ShieldCheck size={14} className="text-[#00A8E1]" />
               <span>Pagos MercadoPago</span>
             </div>

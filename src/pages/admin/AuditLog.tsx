@@ -113,7 +113,7 @@ const AdminAuditLog = () => {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25 transition-shadow duration-300 hover:shadow-xl hover:shadow-orange-500/30">
+          <div className="flex items-center justify-center w-14 h-14 rounded-[16px] bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25 transition-shadow duration-300 hover:shadow-xl hover:shadow-orange-500/30">
             <Shield className="h-7 w-7 text-primary-foreground" />
           </div>
           <div>
@@ -140,8 +140,8 @@ const AdminAuditLog = () => {
       {/* Summary stat cards */}
       {auditData && auditData.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 bg-card border border-border p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+          <div className="rounded-[24px] shadow-lg hover:shadow-xl transition-all duration-300 bg-card border border-border p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-[16px] bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
               <Plus className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
@@ -149,8 +149,8 @@ const AdminAuditLog = () => {
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Inserciones</p>
             </div>
           </div>
-          <div className="rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 bg-card border border-border p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+          <div className="rounded-[24px] shadow-lg hover:shadow-xl transition-all duration-300 bg-card border border-border p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-[16px] bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center flex-shrink-0">
               <Pencil className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
@@ -158,8 +158,8 @@ const AdminAuditLog = () => {
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Actualizaciones</p>
             </div>
           </div>
-          <div className="rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 bg-card border border-border p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-xl bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center flex-shrink-0">
+          <div className="rounded-[24px] shadow-lg hover:shadow-xl transition-all duration-300 bg-card border border-border p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-[16px] bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center flex-shrink-0">
               <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
@@ -171,7 +171,7 @@ const AdminAuditLog = () => {
       )}
 
       {/* Filter bar */}
-      <div className="rounded-3xl shadow-lg bg-card border border-border p-4">
+      <div className="rounded-[24px] shadow-lg bg-card border border-border p-4">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 dark:bg-orange-500/10 border border-orange-200/60 dark:border-orange-500/20">
@@ -180,11 +180,11 @@ const AdminAuditLog = () => {
             </div>
 
             <Select value={tableFilter} onValueChange={(v) => { setTableFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-48 rounded-xl border-border bg-slate-50/50 dark:bg-slate-800/50 shadow-sm hover:bg-accent transition-colors duration-200">
+              <SelectTrigger className="w-48 rounded-[16px] border-border bg-slate-50/50 dark:bg-slate-800/50 shadow-sm hover:bg-accent transition-colors duration-200">
                 <Database className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
                 <SelectValue placeholder="Tabla" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl">
+              <SelectContent className="rounded-[16px]">
                 <SelectItem value="all">Todas las tablas</SelectItem>
                 {tables.map(t => (
                   <SelectItem key={t} value={t}>{t}</SelectItem>
@@ -193,11 +193,11 @@ const AdminAuditLog = () => {
             </Select>
 
             <Select value={actionFilter} onValueChange={(v) => { setActionFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-44 rounded-xl border-border bg-slate-50/50 dark:bg-slate-800/50 shadow-sm hover:bg-accent transition-colors duration-200">
+              <SelectTrigger className="w-44 rounded-[16px] border-border bg-slate-50/50 dark:bg-slate-800/50 shadow-sm hover:bg-accent transition-colors duration-200">
                 <Activity className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
                 <SelectValue placeholder="Acción" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl">
+              <SelectContent className="rounded-[16px]">
                 <SelectItem value="all">Todas las acciones</SelectItem>
                 <SelectItem value="INSERT">INSERT</SelectItem>
                 <SelectItem value="UPDATE">UPDATE</SelectItem>
@@ -209,7 +209,7 @@ const AdminAuditLog = () => {
           <Button
             size="sm"
             variant="outline"
-            className="rounded-xl border-border hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 group transition-all duration-300"
+            className="rounded-full border-border hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 group transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
             onClick={() => queryClient.invalidateQueries({ queryKey: ["admin-audit-log"] })}
           >
             <RefreshCw className="h-4 w-4 transition-transform duration-500 group-hover:rotate-180" />
@@ -218,7 +218,7 @@ const AdminAuditLog = () => {
       </div>
 
       {/* Table card */}
-      <div className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card border border-border overflow-hidden">
+      <div className="rounded-[24px] shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card border border-border overflow-hidden">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <div className="relative">
@@ -235,8 +235,8 @@ const AdminAuditLog = () => {
         ) : !paginated?.length ? (
           <div className="flex flex-col items-center justify-center py-24 gap-5">
             <div className="relative">
-              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30 blur-sm" />
-              <div className="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-slate-100 to-white dark:from-slate-800 dark:to-slate-800/80 border border-slate-200/60 dark:border-slate-700 shadow-inner">
+              <div className="absolute -inset-3 rounded-[24px] bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30 blur-sm" />
+              <div className="relative flex items-center justify-center w-20 h-20 rounded-[16px] bg-gradient-to-br from-slate-100 to-white dark:from-slate-800 dark:to-slate-800/80 border border-slate-200/60 dark:border-slate-700 shadow-inner">
                 <Search className="h-9 w-9 text-slate-300 dark:text-slate-600" />
               </div>
             </div>
@@ -251,7 +251,7 @@ const AdminAuditLog = () => {
             <Button
               size="sm"
               variant="outline"
-              className="rounded-full px-5 border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-all duration-200"
+              className="rounded-full px-5 border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
               onClick={() => { setTableFilter("all"); setActionFilter("all"); setPage(0); }}
             >
               Limpiar filtros
@@ -288,7 +288,7 @@ const AdminAuditLog = () => {
                       >
                         {/* Icon column */}
                         <TableCell className="pl-6 pr-0">
-                          <div className={`h-10 w-10 rounded-xl ${actionIconBg[entry.action] || "bg-muted"} flex items-center justify-center transition-transform duration-200 group-hover:scale-105`}>
+                          <div className={`h-10 w-10 rounded-[16px] ${actionIconBg[entry.action] || "bg-muted"} flex items-center justify-center transition-transform duration-200 group-hover:scale-105`}>
                             <ActionIcon action={entry.action} />
                           </div>
                         </TableCell>
@@ -309,7 +309,7 @@ const AdminAuditLog = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 text-xs font-mono font-semibold text-foreground border border-slate-200/40 dark:border-slate-700/40">
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-[16px] bg-slate-100/80 dark:bg-slate-800/80 text-xs font-mono font-semibold text-foreground border border-slate-200/40 dark:border-slate-700/40">
                             {entry.table_name}
                           </span>
                         </TableCell>
@@ -320,7 +320,7 @@ const AdminAuditLog = () => {
                           </span>
                         </TableCell>
                         <TableCell className="max-w-md">
-                          <span className="inline-block text-xs text-slate-600 dark:text-slate-400 font-mono bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-lg truncate max-w-full border border-border/40">
+                          <span className="inline-block text-xs text-slate-600 dark:text-slate-400 font-mono bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-[16px] truncate max-w-full border border-border/40">
                             {formatChanges(entry)}
                           </span>
                         </TableCell>
@@ -350,7 +350,7 @@ const AdminAuditLog = () => {
                     variant="outline"
                     disabled={page === 0}
                     onClick={() => setPage(p => p - 1)}
-                    className="rounded-full px-4 border-border hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-40 transition-all duration-200"
+                    className="rounded-full px-4 border-border hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-40 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
                     Anterior
@@ -369,7 +369,7 @@ const AdminAuditLog = () => {
                     variant="outline"
                     disabled={page >= totalPages - 1}
                     onClick={() => setPage(p => p + 1)}
-                    className="rounded-full px-4 border-border hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-40 transition-all duration-200"
+                    className="rounded-full px-4 border-border hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-40 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                   >
                     Siguiente
                     <ChevronRight className="h-4 w-4 ml-1" />

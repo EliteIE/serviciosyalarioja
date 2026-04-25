@@ -192,7 +192,7 @@ export default function RequestBudget() {
         <div className="w-full lg:w-1/3 lg:sticky lg:top-8 space-y-6">
           
           {/* Cartão do Profissional */}
-          <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+          <div className="bg-card rounded-[24px] border border-border p-6 shadow-sm">
             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Solicitando a</h2>
             
             <div className="flex items-center gap-4">
@@ -218,7 +218,7 @@ export default function RequestBudget() {
           </div>
 
           {/* Timeline de "Como Funciona" */}
-          <div className="bg-card rounded-2xl border border-border p-6 shadow-sm hidden md:block">
+          <div className="bg-card rounded-[24px] border border-border p-6 shadow-sm hidden md:block">
             <h3 className="font-bold text-foreground mb-6 flex items-center gap-2">
               <Info size={18} className="text-primary" />
               ¿Cómo es el proceso?
@@ -244,7 +244,7 @@ export default function RequestBudget() {
           </div>
 
           {/* Badge de Segurança */}
-          <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-500/10 rounded-xl border border-green-100 dark:border-green-500/20">
+          <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-500/10 rounded-[16px] border border-green-100 dark:border-green-500/20">
             <ShieldCheck className="text-green-600 dark:text-green-500 flex-shrink-0" size={20} />
             <p className="text-xs text-green-800 dark:text-green-200 leading-relaxed">
               <strong>Transacción segura.</strong> No te cobraremos nada hasta que aceptes el presupuesto final del profesional.
@@ -277,12 +277,12 @@ export default function RequestBudget() {
                 
                 <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                   <Link to={`/p/${provider.id}`}>
-                    <button className="w-full px-8 py-3.5 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-xl transition-colors">
+                    <button className="w-full px-8 py-3.5 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-[16px] transition-colors">
                       Volver al perfil
                     </button>
                   </Link>
                   <Link to="/cliente">
-                    <button className="w-full px-8 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-md transition-all">
+                    <button className="w-full px-8 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-[16px] shadow-md transition-all">
                       Ir a mi Dashboard
                     </button>
                   </Link>
@@ -306,7 +306,7 @@ export default function RequestBudget() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describí con el mayor detalle posible qué necesitás que haga el profesional..." 
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal resize-none"
+                    className="w-full rounded-[16px] border border-border bg-background px-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal resize-none"
                   ></textarea>
                 </div>
 
@@ -321,7 +321,7 @@ export default function RequestBudget() {
                   
                   <div 
                     onClick={() => fileRef.current?.click()}
-                    className="w-full border-2 border-dashed border-primary/30 rounded-2xl bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-8"
+                    className="w-full border-2 border-dashed border-primary/30 rounded-[24px] bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-8"
                   >
                     {uploading ? (
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -340,7 +340,7 @@ export default function RequestBudget() {
                     <div className="flex gap-2 flex-wrap mt-2">
                       {photos.map((url, i) => (
                         <div key={i} className="relative group">
-                          <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border border-border" />
+                          <img src={url} alt="" className="h-16 w-16 rounded-[16px] object-cover border border-border" />
                           <button
                             type="button"
                             onClick={(e) => {
@@ -373,7 +373,7 @@ export default function RequestBudget() {
                         value={street}
                         onChange={(e) => setStreet(e.target.value)}
                         placeholder="Ej: Av. San Martín"
-                        className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                        className="w-full rounded-[16px] border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                       />
                     </div>
                     <input
@@ -382,7 +382,7 @@ export default function RequestBudget() {
                       value={streetNumber}
                       onChange={(e) => setStreetNumber(e.target.value)}
                       placeholder="Número"
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
+                      className="w-full rounded-[16px] border border-border bg-background px-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground font-normal"
                     />
                   </div>
                 </div>
@@ -397,7 +397,7 @@ export default function RequestBudget() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-full rounded-xl border-border bg-background pl-11 pr-4 py-6 text-left font-medium hover:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10",
+                              "w-full rounded-[16px] border-border bg-background pl-11 pr-4 py-6 text-left font-medium hover:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10",
                               !preferredDate && "text-muted-foreground font-normal"
                             )}
                           >
@@ -433,7 +433,7 @@ export default function RequestBudget() {
                       <select 
                         value={preferredTime}
                         onChange={(e) => setPreferredTime(e.target.value)}
-                        className="w-full appearance-none rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium font-normal cursor-pointer"
+                        className="w-full appearance-none rounded-[16px] border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium font-normal cursor-pointer"
                       >
                         <option value="" disabled>Seleccionar horario</option>
                         {availableTimeSlots.map((slot) => (
@@ -450,7 +450,7 @@ export default function RequestBudget() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     
                     {/* Baixa */}
-                    <label className={`relative flex flex-col p-4 cursor-pointer rounded-xl border-2 transition-all duration-200 ${urgency === 'baja' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 bg-background'}`}>
+                    <label className={`relative flex flex-col p-4 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgency === 'baja' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 bg-background'}`}>
                       <input type="radio" name="urgencia" value="baja" className="sr-only" onChange={() => setUrgency('baja')} checked={urgency === 'baja'} />
                       <div className="flex items-center justify-between mb-2">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${urgency === 'baja' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
@@ -465,7 +465,7 @@ export default function RequestBudget() {
                     </label>
 
                     {/* Média */}
-                    <label className={`relative flex flex-col p-4 cursor-pointer rounded-xl border-2 transition-all duration-200 ${urgency === 'media' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 bg-background'}`}>
+                    <label className={`relative flex flex-col p-4 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgency === 'media' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 bg-background'}`}>
                       <input type="radio" name="urgencia" value="media" className="sr-only" onChange={() => setUrgency('media')} checked={urgency === 'media'} />
                       <div className="flex items-center justify-between mb-2">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${urgency === 'media' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
@@ -480,7 +480,7 @@ export default function RequestBudget() {
                     </label>
 
                     {/* Alta */}
-                    <label className={`relative flex flex-col p-4 cursor-pointer rounded-xl border-2 transition-all duration-200 ${urgency === 'alta' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 bg-background'}`}>
+                    <label className={`relative flex flex-col p-4 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgency === 'alta' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 bg-background'}`}>
                       <input type="radio" name="urgencia" value="alta" className="sr-only" onChange={() => setUrgency('alta')} checked={urgency === 'alta'} />
                       <div className="flex items-center justify-between mb-2">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${urgency === 'alta' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
@@ -502,7 +502,7 @@ export default function RequestBudget() {
                   <button 
                     type="submit" 
                     disabled={createRequest.isPending || !description || !address}
-                    className={`w-full flex items-center justify-center gap-2 px-8 py-4 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${(createRequest.isPending || !description || !address) ? 'bg-primary/50 cursor-not-allowed opacity-90 text-primary-foreground/70' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
+                    className={`w-full flex items-center justify-center gap-2 px-8 py-4 text-primary-foreground font-bold rounded-[16px] shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] transition-all text-lg ${(createRequest.isPending || !description || !address) ? 'bg-primary/50 cursor-not-allowed opacity-90 text-primary-foreground/70' : 'bg-primary hover:bg-primary/90 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'}`}
                   >
                     {createRequest.isPending ? (
                       <><Loader2 className="animate-spin" size={20} strokeWidth={2.5} /> Enviando al profesional...</>

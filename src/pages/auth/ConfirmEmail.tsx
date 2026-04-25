@@ -37,7 +37,7 @@ const ConfirmEmail = () => {
             </div>
 
             <div className="space-y-2">
-              <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="mx-auto h-10 w-10 rounded-xl" />
+              <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="mx-auto h-10 w-10 rounded-[16px]" />
               <h1 className="text-2xl font-bold text-foreground">¡Revisá tu correo!</h1>
               <p className="text-muted-foreground">
                 Enviamos un enlace de verificación a
@@ -47,7 +47,7 @@ const ConfirmEmail = () => {
               )}
             </div>
 
-            <div className="rounded-xl bg-secondary p-4 space-y-2">
+            <div className="rounded-[16px] bg-secondary p-4 space-y-2">
               <p className="text-sm text-secondary-foreground/80">
                 Hacé clic en el enlace del email para activar tu cuenta. Si no lo encontrás, revisá la carpeta de <span className="font-medium">spam</span>.
               </p>
@@ -60,7 +60,7 @@ const ConfirmEmail = () => {
 
             <div className="pt-2 space-y-3">
               <Link to="/login">
-                <Button variant="outline" className="w-full rounded-xl">
+                <Button variant="outline" className="w-full rounded-[16px]">
                   Ya confirmé, ir a Iniciar sesión
                 </Button>
               </Link>

@@ -46,7 +46,7 @@ const DashboardLayout = ({ variant }: DashboardLayoutProps) => {
             <div className="flex items-center gap-2">
               <SidebarTrigger className="hidden md:flex" />
               <Link to="/" className="md:hidden flex items-center gap-2">
-                <img src={logo} alt="Servicios 360" className="h-7 w-7 rounded-lg" />
+                <img src={logo} alt="Servicios 360" className="h-7 w-7 rounded-[16px]" />
                 <span className="text-lg font-bold">Servicios <span className="text-primary">360</span></span>
               </Link>
             </div>

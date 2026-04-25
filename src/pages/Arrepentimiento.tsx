@@ -34,7 +34,7 @@ const Arrepentimiento = () => {
         <ArrowLeft size={16} /> Volver al inicio
       </Link>
 
-      <div className="rounded-2xl border-2 border-primary/20 bg-primary/5 p-6 mb-8">
+      <div className="rounded-[24px] border-2 border-primary/20 bg-primary/5 p-6 mb-8">
         <div className="flex items-start gap-3">
           <ShieldCheck className="h-6 w-6 text-primary shrink-0 mt-0.5" />
           <div>
@@ -73,7 +73,7 @@ const Arrepentimiento = () => {
               Comisiones cobradas por la Plataforma sobre servicios no prestados.
             </li>
           </ul>
-          <p className="mt-3 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+          <p className="mt-3 text-sm text-muted-foreground bg-muted/50 rounded-[16px] p-3">
             <strong>Importante:</strong> si el servicio ya fue ejecutado total o
             parcialmente por el Prestador, corresponde abrir una disputa dentro
             de la Plataforma (no aplica el arrepentimiento, sino los mecanismos
@@ -92,7 +92,7 @@ const Arrepentimiento = () => {
               href={buildWhatsAppLink(waMessage)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-border p-4 hover:border-primary/50 hover:bg-primary/5 transition-colors"
+              className="flex items-center gap-3 rounded-[16px] border border-border p-4 hover:border-primary/50 hover:bg-primary/5 transition-colors"
             >
               <div className="rounded-full bg-green-500/10 p-2 shrink-0">
                 <MessageCircle className="h-5 w-5 text-green-600" />
@@ -104,7 +104,7 @@ const Arrepentimiento = () => {
             </a>
             <a
               href={`mailto:${CONTACT.email}?subject=Ejercicio%20de%20derecho%20de%20arrepentimiento`}
-              className="flex items-center gap-3 rounded-xl border border-border p-4 hover:border-primary/50 hover:bg-primary/5 transition-colors"
+              className="flex items-center gap-3 rounded-[16px] border border-border p-4 hover:border-primary/50 hover:bg-primary/5 transition-colors"
             >
               <div className="rounded-full bg-primary/10 p-2 shrink-0">
                 <Mail className="h-5 w-5 text-primary" />
@@ -176,7 +176,7 @@ const Arrepentimiento = () => {
         </div>
 
         <div className="pt-6 border-t border-border">
-          <Button asChild className="rounded-xl">
+          <Button asChild className="rounded-[16px]">
             <a href={buildWhatsAppLink(waMessage)} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="mr-2 h-4 w-4" /> Iniciar arrepentimiento por WhatsApp
             </a>

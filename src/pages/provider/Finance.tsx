@@ -69,7 +69,7 @@ const ProviderFinance = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Finanzas</h1>
-        <Button variant="outline" size="sm" className="gap-1" onClick={exportCSV}>
+        <Button variant="outline" size="sm" className="gap-1 rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-all" onClick={exportCSV}>
           <Download className="h-4 w-4" /> Exportar CSV
         </Button>
       </div>
@@ -78,35 +78,35 @@ const ProviderFinance = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card>
+        <Card className="rounded-[24px] border-border/50">
           <CardContent className="p-4">
             <DollarSign className="h-5 w-5 text-success mb-1" />
             <p className="text-xl font-bold">${totalEarnings.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Ganancia Neta</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-[24px] border-border/50">
           <CardContent className="p-4">
             <TrendingUp className="h-5 w-5 text-muted-foreground mb-1" />
             <p className="text-xl font-bold">${totalCommissions.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Comisiones</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-[24px] border-border/50">
           <CardContent className="p-4">
             <DollarSign className="h-5 w-5 text-primary mb-1" />
             <p className="text-xl font-bold">${totalGross.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Bruto</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-[24px] border-border/50">
           <CardContent className="p-4">
             <CreditCard className="h-5 w-5 text-primary mb-1" />
             <p className="text-xl font-bold">{completed.length}</p>
             <p className="text-xs text-muted-foreground">Cobros Recibidos</p>
           </CardContent>
         </Card>
-        <Card className={pending.length > 0 ? "border-warning/30" : ""}>
+        <Card className={`rounded-[24px] border-border/50 ${pending.length > 0 ? "border-warning/30" : ""}`}>
           <CardContent className="p-4">
             <AlertTriangle className={`h-5 w-5 mb-1 ${pending.length > 0 ? "text-warning" : "text-muted-foreground"}`} />
             <p className="text-xl font-bold">${pendingAmount.toLocaleString()}</p>
@@ -116,7 +116,7 @@ const ProviderFinance = () => {
       </div>
 
       {/* Comisiones section */}
-      <Card>
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-orange-500" /> Comisiones
@@ -124,7 +124,7 @@ const ProviderFinance = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Total owed */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-accent/50">
+          <div className="flex items-center justify-between p-4 rounded-[16px] bg-accent/50">
             <div>
               <p className="text-sm text-muted-foreground">Total adeudado</p>
               <p className={`text-3xl font-extrabold ${totalOwed > 0 ? "text-orange-500" : "text-success"}`}>
@@ -142,9 +142,9 @@ const ProviderFinance = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Detalle de comisiones</p>
               {entries.map((entry) => (
-                <div key={entry.id} className="flex items-center justify-between p-3 rounded-xl bg-accent/50">
+                <div key={entry.id} className="flex items-center justify-between p-3 rounded-[16px] bg-accent/50">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${entry.status === "paid" ? "bg-success/10" : "bg-amber-100 dark:bg-amber-900/30"}`}>
+                    <div className={`p-2 rounded-[16px] ${entry.status === "paid" ? "bg-success/10" : "bg-amber-100 dark:bg-amber-900/30"}`}>
                       {entry.status === "paid" ? (
                         <CheckCircle2 className="h-4 w-4 text-success" />
                       ) : (
@@ -176,7 +176,7 @@ const ProviderFinance = () => {
       </Card>
 
       {/* Revenue chart */}
-      <Card>
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" /> Evolución de Ingresos</CardTitle></CardHeader>
         <CardContent>
           {monthlyData && monthlyData.some(m => m.revenue > 0) ? (
@@ -197,12 +197,12 @@ const ProviderFinance = () => {
       </Card>
 
       {/* Transactions */}
-      <Card>
+      <Card className="rounded-[24px] border-border/50">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Transacciones ({filteredPayments?.length || 0})</CardTitle>
             <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-40 rounded-[16px]">
                 <Filter className="h-3 w-3 mr-1" />
                 <SelectValue placeholder="Filtrar" />
               </SelectTrigger>
@@ -224,9 +224,9 @@ const ProviderFinance = () => {
           ) : (
             <>
               {paginatedPayments.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl bg-accent/50">
+                <div key={tx.id} className="flex items-center justify-between p-3 rounded-[16px] bg-accent/50">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${tx.status === "completed" ? "bg-success/10" : tx.status === "pending" ? "bg-warning/10" : "bg-muted"}`}>
+                    <div className={`p-2 rounded-[16px] ${tx.status === "completed" ? "bg-success/10" : tx.status === "pending" ? "bg-warning/10" : "bg-muted"}`}>
                       <DollarSign className={`h-4 w-4 ${tx.status === "completed" ? "text-success" : tx.status === "pending" ? "text-warning" : "text-muted-foreground"}`} />
                     </div>
                     <div>
@@ -249,10 +249,10 @@ const ProviderFinance = () => {
                     {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filteredPayments?.length || 0)} de {filteredPayments?.length}
                   </p>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
+                    <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage(p => p - 1)} className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-transform">
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="outline" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>
+                    <Button size="sm" variant="outline" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="rounded-full hover:-translate-y-0.5 active:scale-[0.98] transition-transform">
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

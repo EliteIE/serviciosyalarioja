@@ -34,7 +34,7 @@ const AdminDashboard = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center shadow-lg shadow-orange-500/10">
+        <div className="h-14 w-14 rounded-[16px] bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center shadow-lg shadow-orange-500/10">
           <Loader2 className="h-7 w-7 animate-spin text-orange-500" />
         </div>
         <p className="text-sm font-medium text-muted-foreground tracking-wide">Cargando panel...</p>
@@ -94,9 +94,9 @@ const AdminDashboard = () => {
 
       {/* Security Alerts */}
       {alerts.length > 0 && (
-        <div className="rounded-3xl bg-gradient-to-br from-red-50 via-orange-50 to-amber-50 dark:from-red-500/5 dark:via-orange-500/5 dark:to-amber-500/5 border-x border-b border-red-200/60 dark:border-red-500/20 border-t-4 border-t-red-500 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="rounded-[24px] bg-gradient-to-br from-red-50 via-orange-50 to-amber-50 dark:from-red-500/5 dark:via-orange-500/5 dark:to-amber-500/5 border-x border-b border-red-200/60 dark:border-red-500/20 border-t-4 border-t-red-500 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center gap-3 mb-5">
-            <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center shadow-sm">
+            <div className="h-10 w-10 rounded-[16px] bg-red-500/10 flex items-center justify-center shadow-sm">
               <Bell className="h-5 w-5 text-red-500" />
             </div>
             <div>
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
             {alerts.map((alert, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 text-sm rounded-2xl px-4 py-3 bg-white/70 dark:bg-white/5 border border-white/80 dark:border-white/10 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-white/10 transition-all duration-200 shadow-sm"
+                className="flex items-center gap-3 text-sm rounded-[16px] px-4 py-3 bg-white/70 dark:bg-white/5 border border-white/80 dark:border-white/10 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-white/10 transition-all duration-200 shadow-sm"
               >
                 <div className={`h-2.5 w-2.5 rounded-full shrink-0 animate-pulse ${
                   alert.type === "error" ? "bg-red-500 shadow-sm shadow-red-500/50" : alert.type === "warning" ? "bg-amber-500 shadow-sm shadow-amber-500/50" : "bg-blue-500 shadow-sm shadow-blue-500/50"
@@ -128,14 +128,14 @@ const AdminDashboard = () => {
         {statCards.map((stat) => (
           <div
             key={stat.label}
-            className={`group relative rounded-3xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 border-l-4 ${stat.borderColor} shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-1 overflow-hidden`}
+            className={`group relative rounded-[24px] bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 border-l-4 ${stat.borderColor} shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-1 overflow-hidden`}
             onClick={() => navigate(stat.path)}
           >
             {/* Subtle decorative gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-100/50 dark:to-slate-700/10 pointer-events-none" />
             <div className="relative p-5">
               <div className="flex items-center justify-between mb-4">
-                <div className={`h-10 w-10 rounded-xl ${stat.bgColor} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110`}>
+                <div className={`h-10 w-10 rounded-[16px] ${stat.bgColor} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110`}>
                   <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
                 </div>
                 {"trend" in stat && stat.trend !== undefined && (
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
         {kpiCards.map((kpi) => (
           <div
             key={kpi.label}
-            className={`rounded-3xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 overflow-hidden relative ${
+            className={`rounded-[24px] bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 overflow-hidden relative ${
               kpi.featured ? "border-t-4 border-t-orange-500" : ""
             }`}
           >
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
               <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-orange-500/5 to-transparent pointer-events-none" />
             )}
             <div className="relative">
-              <div className={`h-10 w-10 rounded-xl ${kpi.bgColor} flex items-center justify-center mb-3 shadow-sm`}>
+              <div className={`h-10 w-10 rounded-[16px] ${kpi.bgColor} flex items-center justify-center mb-3 shadow-sm`}>
                 <kpi.icon className={`h-5 w-5 ${kpi.iconColor}`} />
               </div>
               <p className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-primary-foreground">{kpi.value}</p>
@@ -188,10 +188,10 @@ const AdminDashboard = () => {
       {/* Charts */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Monthly Requests Chart */}
-        <div className="rounded-3xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 border-t-4 border-t-orange-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <div className="rounded-[24px] bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 border-t-4 border-t-orange-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <div className="px-6 pt-6 pb-2">
             <div className="flex items-center gap-3 mb-1">
-              <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center shadow-sm">
+              <div className="h-10 w-10 rounded-[16px] bg-orange-500/10 flex items-center justify-center shadow-sm">
                 <BarChart3 className="h-5 w-5 text-orange-500" />
               </div>
               <div>
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
               </ResponsiveContainer>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
-                <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
+                <div className="h-16 w-16 rounded-[16px] bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
                   <BarChart3 className="h-8 w-8 opacity-40" />
                 </div>
                 <p className="text-sm font-semibold">Sin datos aun</p>
@@ -234,10 +234,10 @@ const AdminDashboard = () => {
         </div>
 
         {/* Services by Category Chart */}
-        <div className="rounded-3xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <div className="rounded-[24px] bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <div className="px-6 pt-6 pb-2">
             <div className="flex items-center gap-3 mb-1">
-              <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center shadow-sm">
+              <div className="h-10 w-10 rounded-[16px] bg-blue-500/10 flex items-center justify-center shadow-sm">
                 <PieChartIcon className="h-5 w-5 text-blue-500" />
               </div>
               <div>
@@ -270,7 +270,7 @@ const AdminDashboard = () => {
                 </ResponsiveContainer>
                 <div className="space-y-3 flex-1">
                   {servicesByCategory.map((item, i) => (
-                    <div key={item.name} className="flex items-center gap-3 text-sm group hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl px-3 py-1.5 -mx-3 transition-colors duration-200">
+                    <div key={item.name} className="flex items-center gap-3 text-sm group hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-[16px] px-3 py-1.5 -mx-3 transition-colors duration-200">
                       <div className="h-3.5 w-3.5 rounded-full shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                       <span className="text-foreground truncate flex-1 font-medium">{item.name}</span>
                       <span className="font-extrabold text-slate-900 dark:text-primary-foreground tabular-nums">{item.value}</span>
@@ -280,7 +280,7 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
-                <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
+                <div className="h-16 w-16 rounded-[16px] bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
                   <PieChartIcon className="h-8 w-8 opacity-40" />
                 </div>
                 <p className="text-sm font-semibold">Sin datos aun</p>
@@ -294,10 +294,10 @@ const AdminDashboard = () => {
       {/* Providers by Category + Recent Activity */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Providers by Category */}
-        <div className="rounded-3xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <div className="rounded-[24px] bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <div className="px-6 pt-6 pb-2">
             <div className="flex items-center gap-3 mb-1">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shadow-sm">
+              <div className="h-10 w-10 rounded-[16px] bg-emerald-500/10 flex items-center justify-center shadow-sm">
                 <Users className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
@@ -330,7 +330,7 @@ const AdminDashboard = () => {
                 </ResponsiveContainer>
                 <div className="space-y-3 flex-1">
                   {providersByCategory.map((item, i) => (
-                    <div key={item.name} className="flex items-center gap-3 text-sm group hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl px-3 py-1.5 -mx-3 transition-colors duration-200">
+                    <div key={item.name} className="flex items-center gap-3 text-sm group hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-[16px] px-3 py-1.5 -mx-3 transition-colors duration-200">
                       <div className="h-3.5 w-3.5 rounded-full shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                       <span className="text-foreground truncate flex-1 font-medium">{item.name}</span>
                       <span className="font-extrabold text-slate-900 dark:text-primary-foreground tabular-nums">{item.value}</span>
@@ -340,7 +340,7 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
-                <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
+                <div className="h-16 w-16 rounded-[16px] bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
                   <PieChartIcon className="h-8 w-8 opacity-40" />
                 </div>
                 <p className="text-sm font-semibold">Sin datos aun</p>
@@ -351,11 +351,11 @@ const AdminDashboard = () => {
         </div>
 
         {/* Recent Audit Activity */}
-        <div className="rounded-3xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <div className="rounded-[24px] bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <div className="px-6 pt-6 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center shadow-sm">
+                <div className="h-10 w-10 rounded-[16px] bg-violet-500/10 flex items-center justify-center shadow-sm">
                   <Activity className="h-5 w-5 text-violet-500" />
                 </div>
                 <div>
@@ -365,7 +365,7 @@ const AdminDashboard = () => {
               </div>
               <button
                 onClick={() => navigate("/admin/audit")}
-                className="text-xs font-bold text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 transition-all duration-200 px-4 py-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-500/10 uppercase tracking-wider border border-transparent hover:border-orange-200/60 dark:hover:border-orange-500/20 shadow-sm hover:shadow"
+                className="text-xs font-bold text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 transition-all duration-200 px-4 py-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-500/10 uppercase tracking-wider border border-transparent hover:border-orange-200/60 dark:hover:border-orange-500/20 shadow-sm hover:shadow hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 Ver todo
               </button>
@@ -377,7 +377,7 @@ const AdminDashboard = () => {
                 {recentAudit.map((entry, index: number) => (
                   <div
                     key={entry.id}
-                    className="group flex items-start gap-4 text-sm rounded-2xl px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-200"
+                    className="group flex items-start gap-4 text-sm rounded-[16px] px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-200"
                   >
                     {/* Timeline dot and line */}
                     <div className="flex flex-col items-center pt-0.5">
@@ -402,7 +402,7 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
-                <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
+                <div className="h-16 w-16 rounded-[16px] bg-slate-100 dark:bg-slate-700/30 flex items-center justify-center mb-4">
                   <Activity className="h-8 w-8 opacity-40" />
                 </div>
                 <p className="text-sm font-semibold">Sin actividad reciente</p>

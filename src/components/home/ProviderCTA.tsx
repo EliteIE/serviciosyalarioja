@@ -22,11 +22,11 @@ export const ProviderCTA = () => {
             <span className="text-slate-500 font-semibold text-sm mb-3">
               Exclusivo para Profesionales
             </span>
-            <h2 className="text-4xl lg:text-5xl font-extrabold text-[#082345] mb-4 leading-[1.1]">
+            <h2 className="text-4xl lg:text-5xl font-bold text-[#082345] mb-4 leading-[1.1] tracking-tight">
               ¿Sos profesional?<br />
               Multiplicá tus ingresos.
             </h2>
-            <p className="text-slate-600 mb-8 max-w-md mx-auto lg:mx-0 text-base leading-relaxed">
+            <p className="text-slate-600 mb-8 max-w-md mx-auto lg:mx-0 text-base leading-snug tracking-tight font-medium">
               Miles de clientes en tu zona están buscando lo que hacés. Unite a Servicios 360, destacá tu talento y conseguí nuevos proyectos sin esfuerzo.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -44,7 +44,7 @@ export const ProviderCTA = () => {
           {/* 3. Lado Direito: Mockup do Dashboard */}
           <div className="w-full lg:w-1/3 flex items-center justify-center lg:justify-end relative p-4 lg:p-8 z-20">
             {/* Dashboard Window Principal */}
-            <div className="w-full max-w-[400px] bg-white rounded-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 overflow-visible flex relative aspect-[4/3]">
+            <div className="w-full max-w-[400px] bg-white rounded-[24px] shadow-2xl border border-slate-200/60 overflow-hidden flex relative aspect-[4/3]">
               
               {/* Sidebar */}
               <div className="w-[28%] bg-white border-r border-slate-100 py-4 px-2 flex flex-col gap-3">
@@ -54,7 +54,7 @@ export const ProviderCTA = () => {
                   <div className="w-full h-2.5 bg-slate-200 rounded-sm"></div>
                 </div>
                 {/* Menu Item Ativo */}
-                <div className="bg-orange-50 text-primary rounded-lg px-2 py-2.5 flex items-center gap-2">
+                <div className="bg-orange-50 text-primary rounded-[16px] px-2 py-2.5 flex items-center gap-2">
                   <div className="w-3.5 h-3.5 rounded-sm bg-primary/40 flex-shrink-0"></div>
                   <div className="w-full h-2 bg-primary/80 rounded-sm"></div>
                 </div>
@@ -71,7 +71,7 @@ export const ProviderCTA = () => {
               <div className="w-[72%] bg-slate-50/50 p-4 flex flex-col gap-4">
                 {/* Header (Busca e Avatares) */}
                 <div className="flex justify-between items-center">
-                  <div className="w-1/2 h-7 bg-white rounded-md border border-slate-200 flex items-center px-2">
+                  <div className="w-1/2 h-7 bg-white rounded-[16px] border border-slate-200 flex items-center px-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
                     <div className="w-1/2 h-1.5 bg-slate-200 rounded-sm ml-2"></div>
                   </div>
@@ -99,7 +99,7 @@ export const ProviderCTA = () => {
                 {/* Lista de Notificações */}
                 <div className="flex flex-col gap-2.5">
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex flex-col gap-2">
+                    <div key={i} className="bg-white p-3 rounded-[16px] border border-slate-100 shadow-sm flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center">
                           <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
@@ -116,7 +116,7 @@ export const ProviderCTA = () => {
               </div>
 
               {/* Popup "Tu Perfil Destacado" Sobreposto */}
-              <div className="absolute -bottom-6 -right-6 lg:-right-10 w-[220px] bg-white rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] border border-slate-100 p-5 flex flex-col items-center text-center z-30 animate-fade-in">
+              <div className="absolute -bottom-6 -right-6 lg:-right-10 w-[220px] bg-white/95 backdrop-blur-md rounded-[24px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] border border-slate-200/60 p-5 flex flex-col items-center text-center z-30 animate-fade-in">
                 <button className="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
                   <X size={14} />
                 </button>
@@ -125,11 +125,11 @@ export const ProviderCTA = () => {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                   </svg>
                 </div>
-                <h4 className="font-extrabold text-sm text-[#082345] mb-1.5">Tu Perfil Destacado</h4>
-                <p className="text-[10px] text-slate-500 mb-4 leading-relaxed">
+                <h4 className="font-bold text-sm text-[#082345] mb-1.5 tracking-tight">Tu Perfil Destacado</h4>
+                <p className="text-[10px] text-slate-500 mb-4 leading-relaxed font-medium">
                   Tu perfil profesional es uno de los más visitados de la semana en tu zona.
                 </p>
-                <button className="w-full bg-primary hover:bg-primary/90 text-white text-[11px] font-bold py-2.5 rounded-lg transition-colors">
+                <button className="w-full bg-primary hover:bg-primary/90 text-white text-[11px] font-bold py-2.5 rounded-[16px] transition-colors">
                   Ver mi perfil destacado
                 </button>
               </div>

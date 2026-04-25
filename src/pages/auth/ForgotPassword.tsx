@@ -54,7 +54,7 @@ const ForgotPassword = () => {
         {/* Topo: Logótipo Branco */}
         <div className="relative z-10">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-xl shadow-lg" />
+            <img src={logo} alt="Servicios 360" width={40} height={40} decoding="async" className="w-10 h-10 rounded-[16px] shadow-lg" />
             <span className="text-2xl font-bold tracking-tight text-secondary-foreground">Servicios <span className="text-primary">360</span></span>
           </div>
         </div>
@@ -70,14 +70,14 @@ const ForgotPassword = () => {
 
           {/* Badges de Confiança (Suporte e Segurança) */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-xl border border-secondary-foreground/20 w-fit backdrop-blur-sm">
+            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-[16px] border border-secondary-foreground/20 w-fit backdrop-blur-sm">
               <ShieldCheck className="text-green-500" size={24} />
               <div>
                 <p className="font-semibold text-sm">Recuperación Segura</p>
                 <p className="text-xs text-secondary-foreground/70">Tus datos están protegidos</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-xl border border-secondary-foreground/20 w-fit backdrop-blur-sm ml-8">
+            <div className="flex items-center gap-3 text-secondary-foreground bg-secondary-foreground/10 p-3 rounded-[16px] border border-secondary-foreground/20 w-fit backdrop-blur-sm ml-8">
               <LifeBuoy className="text-blue-500" size={24} />
               <div>
                 <p className="font-semibold text-sm">Soporte Técnico</p>
@@ -117,7 +117,7 @@ const ForgotPassword = () => {
                 <strong className="text-foreground">{email}</strong>
               </p>
               
-              <div className="bg-muted/30 border border-border rounded-xl p-4 mb-8 text-sm text-muted-foreground text-left">
+              <div className="bg-muted/30 border border-border rounded-[16px] p-4 mb-8 text-sm text-muted-foreground text-left">
                 <p><strong className="text-foreground">¿No recibiste el email?</strong></p>
                 <ul className="list-disc pl-5 mt-2 space-y-1">
                   <li>Revisá tu carpeta de Spam.</li>
@@ -127,7 +127,7 @@ const ForgotPassword = () => {
 
               <Link 
                 to="/login"
-                className="w-full flex items-center justify-center gap-2 py-4 text-foreground bg-background border border-border font-bold rounded-xl hover:bg-muted/50 transition-all text-lg shadow-sm"
+                className="w-full flex items-center justify-center gap-2 py-4 text-foreground bg-background border border-border/50 font-semibold rounded-full hover:bg-muted/50 active:scale-[0.98] transition-all text-lg shadow-sm"
               >
                 <ArrowLeft size={20} />
                 Volver al inicio de sesión
@@ -140,7 +140,7 @@ const ForgotPassword = () => {
               <div className="text-center lg:text-left mb-10 mt-8 lg:mt-0">
                 {/* Logo para mobile */}
                 <div className="lg:hidden flex justify-center mb-6">
-                  <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-2xl shadow-lg" />
+                  <img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-[24px] shadow-lg" />
                 </div>
                 <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Recuperar Contraseña</h2>
                 <p className="text-muted-foreground mt-3 text-sm lg:text-base leading-relaxed">
@@ -164,7 +164,7 @@ const ForgotPassword = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="tu@email.com" 
-                      className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-4 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground text-base"
+                      className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-4 text-foreground transition-all focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground text-base"
                     />
                   </div>
                 </div>
@@ -173,9 +173,9 @@ const ForgotPassword = () => {
                 <button 
                   type="submit" 
                   disabled={isSubmitting || !email}
-                  className={`w-full flex items-center justify-center gap-2 py-4 mt-4 text-primary-foreground font-bold rounded-xl transition-all text-lg ${
+                  className={`w-full flex items-center justify-center gap-2 py-4 mt-4 text-primary-foreground font-semibold rounded-full transition-all text-lg ${
                     !email ? 'bg-primary/50 cursor-not-allowed shadow-none' :
-                    isSubmitting ? 'bg-primary/70 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5'
+                    isSubmitting ? 'bg-primary/70 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98]'
                   }`}
                 >
                   {isSubmitting ? (

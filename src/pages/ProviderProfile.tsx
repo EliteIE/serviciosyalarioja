@@ -137,9 +137,9 @@ export default function ProviderProfilePage() {
                   {provider.provider_verified && <ShieldCheck size={24} className="text-blue-500 shrink-0" />}
                 </div>
                 <div className="flex flex-wrap items-center gap-3 text-sm">
-                  <span className="px-3 py-1 bg-primary text-primary-foreground font-bold rounded-lg uppercase tracking-wider text-xs">{categoryName}</span>
+                  <span className="px-3 py-1 bg-primary text-primary-foreground font-bold rounded-[16px] uppercase tracking-wider text-xs">{categoryName}</span>
                   {provider.provider_verified && (
-                    <span className="flex items-center gap-1 text-primary-foreground bg-primary/20 font-semibold px-2 py-1 rounded-lg text-xs border border-primary/30">
+                    <span className="flex items-center gap-1 text-primary-foreground bg-primary/20 font-semibold px-2 py-1 rounded-[16px] text-xs border border-primary/30">
                       <ShieldCheck size={14} /> Garantizado
                     </span>
                   )}
@@ -163,7 +163,7 @@ export default function ProviderProfilePage() {
           {/* Stats */}
           <div className="flex overflow-x-auto gap-8 border-t border-border py-6 no-scrollbar">
             <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600"><Star size={24} fill="currentColor" /></div>
+              <div className="w-12 h-12 rounded-[16px] bg-orange-100 flex items-center justify-center text-orange-600"><Star size={24} fill="currentColor" /></div>
               <div>
                 <p className="text-2xl font-bold text-foreground leading-none">{Number(provider.rating_avg).toFixed(1)}</p>
                 <p className="text-sm text-muted-foreground font-medium">{totalAvaliacoes} valoraciones</p>
@@ -171,7 +171,7 @@ export default function ProviderProfilePage() {
             </div>
             <div className="w-px h-10 bg-border my-auto hidden sm:block"></div>
             <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600"><CheckCircle2 size={24} /></div>
+              <div className="w-12 h-12 rounded-[16px] bg-blue-100 flex items-center justify-center text-blue-600"><CheckCircle2 size={24} /></div>
               <div>
                 <p className="text-2xl font-bold text-foreground leading-none">{provider.completed_jobs}</p>
                 <p className="text-sm text-muted-foreground font-medium">Trabajos completados</p>
@@ -181,7 +181,7 @@ export default function ProviderProfilePage() {
               <>
                 <div className="w-px h-10 bg-border my-auto hidden sm:block"></div>
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600"><Award size={24} /></div>
+                  <div className="w-12 h-12 rounded-[16px] bg-green-100 flex items-center justify-center text-green-600"><Award size={24} /></div>
                   <div><p className="text-xl font-bold text-foreground leading-tight">Top<br/>Prestador</p></div>
                 </div>
               </>
@@ -198,7 +198,7 @@ export default function ProviderProfilePage() {
           <div className="w-full lg:w-2/3 space-y-8">
 
             {/* About */}
-            <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
+            <section className="bg-card rounded-[24px] border border-border/50 p-6 md:p-8 shadow-none">
               <h2 className="text-xl font-bold text-foreground mb-4">Sobre mí</h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line mb-6">
                 {provider.bio && provider.bio.toLowerCase() !== "teste teste" ? provider.bio : "Este profesional aún no ha agregado una descripción detallada sobre sus servicios."}
@@ -211,14 +211,14 @@ export default function ProviderProfilePage() {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {coverageArea.map((area, i) => (
-                      <span key={i} className="px-3 py-1.5 bg-secondary border border-border text-secondary-foreground font-medium text-sm rounded-lg">{area}</span>
+                      <span key={i} className="px-3 py-1.5 bg-secondary border border-border text-secondary-foreground font-medium text-sm rounded-[16px]">{area}</span>
                     ))}
                   </div>
                 </div>
               )}
 
               {priceRange && (
-                <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/10 rounded-xl">
+                <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/10 rounded-[16px]">
                   <DollarSign className="h-5 w-5 text-primary shrink-0" />
                   <div>
                     <p className="text-xs text-muted-foreground font-medium">Rango de precios</p>
@@ -230,13 +230,13 @@ export default function ProviderProfilePage() {
 
             {/* Services */}
             {services && services.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
+              <section className="bg-card rounded-[24px] border border-border/50 p-6 md:p-8 shadow-none">
                 <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                   <Briefcase className="h-5 w-5" /> Servicios que realiza
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {services.map((svc) => (
-                    <div key={svc.id} className="p-4 rounded-xl border bg-muted/20 hover:bg-muted/40 transition-colors">
+                    <div key={svc.id} className="p-4 rounded-[16px] border bg-muted/20 hover:bg-muted/40 transition-colors">
                       <p className="font-semibold text-foreground mb-1">{svc.name}</p>
                       {svc.description && <p className="text-sm text-muted-foreground mb-2">{svc.description}</p>}
                       <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
@@ -258,13 +258,13 @@ export default function ProviderProfilePage() {
 
             {/* Portfolio */}
             {portfolioItems && portfolioItems.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
+              <section className="bg-card rounded-[24px] border border-border/50 p-6 md:p-8 shadow-none">
                 <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                   <Camera className="h-5 w-5" /> Portafolio de Trabajos
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {portfolioItems.map((item) => (
-                    <div key={item.id} className="rounded-2xl border border-border bg-muted/20 overflow-hidden">
+                    <div key={item.id} className="rounded-[24px] border border-border bg-muted/20 overflow-hidden">
                       <div className="grid grid-cols-2 h-40">
                         <div className="relative overflow-hidden">
                           <img src={item.before_url} alt="Foto del trabajo antes de realizarse" width={400} height={400} loading="lazy" decoding="async" className="h-full w-full object-cover" />
@@ -293,7 +293,7 @@ export default function ProviderProfilePage() {
 
             {/* Schedule */}
             {schedule && schedule.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
+              <section className="bg-card rounded-[24px] border border-border/50 p-6 md:p-8 shadow-none">
                 <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                   <Calendar className="h-5 w-5" /> Horarios de Atención
                 </h2>
@@ -302,7 +302,7 @@ export default function ProviderProfilePage() {
                     const slot = schedule.find(s => s.day_of_week === day);
                     const isToday = day === currentDay;
                     return (
-                      <div key={day} className={`text-center p-3 rounded-xl border transition-colors ${slot ? isToday ? "bg-primary/10 border-primary/30 ring-2 ring-primary/20" : "bg-card border-border" : "bg-muted/30 border-transparent"}`}>
+                      <div key={day} className={`text-center p-3 rounded-[16px] border transition-colors ${slot ? isToday ? "bg-primary/10 border-primary/30 ring-2 ring-primary/20" : "bg-card border-border" : "bg-muted/30 border-transparent"}`}>
                         <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${isToday ? "text-primary" : slot ? "text-foreground" : "text-muted-foreground"}`}>
                           {DAY_NAMES_SHORT[day]}
                         </p>
@@ -329,7 +329,7 @@ export default function ProviderProfilePage() {
 
             {/* Reviews */}
             {reviews && reviews.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
+              <section className="bg-card rounded-[24px] border border-border/50 p-6 md:p-8 shadow-none">
                 <h2 className="text-xl font-bold text-foreground mb-6">Reseñas de clientes</h2>
                 <div className="space-y-6">
                   {reviews.map((review) => (
@@ -364,9 +364,9 @@ export default function ProviderProfilePage() {
 
           {/* RIGHT SIDEBAR */}
           <div className="w-full lg:w-1/3 lg:sticky lg:top-8 space-y-6">
-            <div className="bg-card rounded-2xl border-2 border-primary/20 p-6 shadow-xl shadow-primary/5">
+            <div className="bg-card rounded-[24px] border border-border/50 p-6 shadow-sm">
               <Link to={`/solicitar/${provider.id}`}>
-                <button className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 transition-all text-lg mb-4 flex items-center justify-center gap-2">
+                <button className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98] transition-all text-lg mb-4 flex items-center justify-center gap-2">
                   <MessageSquare size={20} /> Pedir Presupuesto
                 </button>
               </Link>
@@ -393,7 +393,7 @@ export default function ProviderProfilePage() {
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+            <div className="bg-card rounded-[24px] border border-border/50 p-6 shadow-none">
               <h3 className="font-bold text-foreground mb-6">Resumen de Calificaciones</h3>
               <div className="space-y-3">
                 {ratingCounts.map((item) => (

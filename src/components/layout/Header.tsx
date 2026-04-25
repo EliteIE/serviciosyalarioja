@@ -44,7 +44,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="Servicios 360 — inicio">
-          <img src={logo} alt="Servicios 360" className="h-9 w-9 rounded-xl" />
+          <img src={logo} alt="Servicios 360" className="h-9 w-9 rounded-[16px]" />
           <span className="hidden sm:inline text-xl font-bold text-foreground leading-none">
             Servicios <span className="text-primary">360</span>
           </span>

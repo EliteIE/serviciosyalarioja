@@ -61,7 +61,7 @@ const Index = () => {
               { icon: Star, title: "3. Contratá", desc: "Coordiná por chat, recibí el servicio y pagá de forma segura." },
             ].map((step) => (
               <div key={step.title} className="text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[24px] bg-primary text-primary-foreground">
                   <step.icon className="h-7 w-7" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">{step.title}</h3>

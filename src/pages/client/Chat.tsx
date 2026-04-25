@@ -163,7 +163,7 @@ export default function ChatPage() {
   }, [services, searchTerm, isProvider]);
 
   return (
-    <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)] bg-slate-50 flex font-sans overflow-hidden rounded-xl border border-border shadow-sm">
+    <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)] bg-slate-50 flex font-sans overflow-hidden rounded-[16px] border border-border shadow-sm">
       
       {/* PAINEL ESQUERDO: Lista de Conversas
         Escondido em mobile se houver um chat ativo 
@@ -212,7 +212,7 @@ export default function ChatPage() {
               placeholder="Buscar conversaciones..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-background border border-border text-foreground rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+              className="w-full bg-background border border-border text-foreground rounded-[16px] pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
             />
           </div>
         </div>
@@ -349,7 +349,7 @@ export default function ChatPage() {
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-slate-50/50 dark:bg-background/50">
             {/* Aviso de Segurança Inicial */}
             <div className="flex justify-center mb-6">
-              <div className="bg-orange-100/50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-lg px-4 py-2 text-xs text-orange-800 dark:text-orange-400 text-center max-w-md shadow-sm">
+              <div className="bg-orange-100/50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-[16px] px-4 py-2 text-xs text-orange-800 dark:text-orange-400 text-center max-w-md shadow-sm">
                 Mantén tus comunicaciones dentro de la plataforma por tu seguridad. Nunca compartas contraseñas o datos de tarjetas bancarias.
               </div>
             </div>
@@ -371,7 +371,7 @@ export default function ChatPage() {
                 if (isSystem) {
                   return (
                     <div key={msg.id} className="flex justify-center my-4">
-                      <div className="bg-muted border border-border shadow-sm rounded-xl px-4 py-2 flex flex-col items-center">
+                      <div className="bg-muted border border-border shadow-sm rounded-[16px] px-4 py-2 flex flex-col items-center">
                         <span className="text-xs font-semibold text-foreground text-center max-w-xs">{msg.content}</span>
                         <span className="text-[10px] text-muted-foreground mt-1">
                           {new Date(msg.created_at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
@@ -399,8 +399,8 @@ export default function ChatPage() {
                       {!isMe && <span className="text-[11px] text-muted-foreground mb-1 ml-1">{msg.sender_name}</span>}
 
                       {(msg.message_type === "image" || msg.message_type === "file") && msg.content?.toLowerCase().endsWith(".pdf") ? (
-                         <div className={`px-4 py-3 rounded-2xl shadow-sm flex items-center gap-3 ${isMe ? 'bg-orange-600 text-primary-foreground' : 'bg-card border border-border text-foreground'}`}>
-                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                         <div className={`px-4 py-3 rounded-[24px] shadow-sm flex items-center gap-3 ${isMe ? 'bg-orange-600 text-primary-foreground' : 'bg-card border border-border text-foreground'}`}>
+                           <div className={`w-10 h-10 rounded-[16px] flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-red-100 dark:bg-red-900/30'}`}>
                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isMe ? 'text-primary-foreground' : 'text-red-600'}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
                            </div>
                            <div className="min-w-0 flex-1">
@@ -411,14 +411,14 @@ export default function ChatPage() {
                            </div>
                          </div>
                       ) : msg.message_type === "image" ? (
-                         <div className={`p-1 rounded-2xl shadow-sm ${isMe ? 'bg-orange-600' : 'bg-card border border-border'}`}>
-                           <img src={msg.content} alt="Attachment" className="max-w-full sm:max-w-xs rounded-xl self-end" loading="lazy" />
+                         <div className={`p-1 rounded-[24px] shadow-sm ${isMe ? 'bg-orange-600' : 'bg-card border border-border'}`}>
+                           <img src={msg.content} alt="Attachment" className="max-w-full sm:max-w-xs rounded-[16px] self-end" loading="lazy" />
                          </div>
                       ) : (
                         <div className={`px-4 py-2.5 shadow-sm text-[15px] leading-relaxed relative ${
                           isMe 
-                            ? 'bg-orange-600 text-primary-foreground rounded-2xl rounded-br-sm' 
-                            : 'bg-card text-foreground border border-border rounded-2xl rounded-bl-sm'
+                            ? 'bg-orange-600 text-primary-foreground rounded-[24px] rounded-br-sm' 
+                            : 'bg-card text-foreground border border-border rounded-[24px] rounded-bl-sm'
                         }`}>
                           <p className="break-words">{msg.content}</p>
                         </div>
@@ -471,7 +471,7 @@ export default function ChatPage() {
                 </button>
               </div>
 
-              <div className="flex-1 bg-background border border-border rounded-2xl overflow-hidden focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
+              <div className="flex-1 bg-background border border-border rounded-[24px] overflow-hidden focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
                 <textarea 
                   value={newMsg}
                   onChange={(e) => setNewMsg(e.target.value)}

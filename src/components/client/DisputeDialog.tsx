@@ -101,7 +101,7 @@ export const DisputeDialog = ({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-[16px] bg-red-500/10 flex items-center justify-center">
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <div>
@@ -114,7 +114,7 @@ export const DisputeDialog = ({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 p-3 text-xs text-amber-800 dark:text-amber-200">
+          <div className="rounded-[16px] bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 p-3 text-xs text-amber-800 dark:text-amber-200">
             Tu reporte será revisado por nuestro equipo. El prestador recibirá
             una notificación y podrá responder. Disputas falsas pueden
             llevar a la suspensión de tu cuenta.

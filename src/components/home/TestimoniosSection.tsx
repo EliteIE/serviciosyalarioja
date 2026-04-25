@@ -95,7 +95,7 @@ export function TestimoniosSection() {
         
         {/* Cabeçalho */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
             Lo que dicen nuestros usuarios
           </h2>
         </div>
@@ -149,7 +149,7 @@ export function TestimoniosSection() {
                 </div>
 
                 {/* Texto */}
-                <p className="text-slate-300 text-[14px] md:text-[15px] leading-relaxed mb-6 flex-1 min-h-[100px]">
+                <p className="text-slate-300 text-[14px] md:text-[15px] leading-snug tracking-tight font-medium mb-6 flex-1 min-h-[100px]">
                   {testimonio.texto}
                 </p>
 
@@ -159,7 +159,7 @@ export function TestimoniosSection() {
                     {testimonio.inicial}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-bold text-white text-sm truncate">
+                    <h4 className="font-bold text-white text-sm truncate tracking-tight">
                       {testimonio.nombre}
                     </h4>
                     <p className="text-xs text-slate-400 truncate">

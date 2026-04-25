@@ -53,13 +53,13 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={this.handleRetry}
-                className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center justify-center rounded-[16px] bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Reintentar
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-6 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="inline-flex items-center justify-center rounded-[16px] border border-border bg-background px-6 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 Recargar página
               </button>

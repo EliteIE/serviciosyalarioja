@@ -168,7 +168,7 @@ export default function SearchPage() {
         
         <div className="relative z-10 max-w-7xl mx-auto flex items-center gap-6">
           {/* Ícone da Categoria Gigante */}
-          <div className={`hidden md:flex w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 items-center justify-center ${tema.txtColor} shadow-xl transform transition-transform duration-500 hover:scale-105`}>
+          <div className={`hidden md:flex w-24 h-24 rounded-[24px] bg-white/10 backdrop-blur-md border border-white/20 items-center justify-center ${tema.txtColor} shadow-xl transform transition-transform duration-500 hover:scale-105`}>
             <IconoTema size={48} strokeWidth={1.5} />
           </div>
           
@@ -191,7 +191,7 @@ export default function SearchPage() {
 
       {/* BARRA DE PESQUISA E FILTROS */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-card rounded-2xl shadow-lg border border-border p-2 md:p-4 flex flex-col md:flex-row gap-3">
+        <div className="bg-card rounded-[24px] shadow-sm border border-border/50 p-2 md:p-4 flex flex-col md:flex-row gap-3">
           
           {/* Input de Pesquisa */}
           <div className="flex-1 relative">
@@ -201,7 +201,7 @@ export default function SearchPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por nombre o servicio..." 
-              className="w-full bg-muted/50 border border-transparent rounded-xl pl-12 pr-4 py-3.5 text-foreground focus:bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              className="w-full bg-muted/50 border border-transparent rounded-[16px] pl-12 pr-4 py-3.5 text-foreground focus:bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
             />
           </div>
 
@@ -212,7 +212,7 @@ export default function SearchPage() {
             <select 
               value={categoriaActiva}
               onChange={(e) => setCategoriaActiva(e.target.value)}
-              className="w-full appearance-none bg-transparent border-none rounded-xl pl-4 pr-10 py-3.5 text-foreground font-semibold cursor-pointer focus:ring-2 focus:ring-primary/20"
+              className="w-full appearance-none bg-transparent border-none rounded-[16px] pl-4 pr-10 py-3.5 text-foreground font-semibold cursor-pointer focus:ring-2 focus:ring-primary/20"
             >
               <option value="todas">Todas las categorías</option>
               {CATEGORIES.map((cat) => (
@@ -225,7 +225,7 @@ export default function SearchPage() {
           {/* Botão Extra Filtros */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`hidden md:flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-colors ${
+            className={`hidden md:flex items-center gap-2 px-6 py-3.5 font-semibold rounded-[16px] transition-colors ${
               showFilters || ratingFilter > 0 || verifiedOnly || availableNow
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-secondary hover:bg-muted text-secondary-foreground'
@@ -243,7 +243,7 @@ export default function SearchPage() {
 
         {/* Filter Panel */}
         {showFilters && (
-          <div className="mt-3 bg-card rounded-2xl shadow-lg border border-border p-4 md:p-6 animate-in slide-in-from-top-2 duration-200">
+          <div className="mt-3 bg-card rounded-[24px] shadow-sm border border-border/50 p-4 md:p-6 animate-in slide-in-from-top-2 duration-200">
             <div className="flex flex-wrap items-center gap-6">
               {/* Rating Filter */}
               <div className="flex flex-col gap-2">
@@ -257,7 +257,7 @@ export default function SearchPage() {
                     <button
                       key={opt.value}
                       onClick={() => setRatingFilter(opt.value)}
-                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                      className={`px-4 py-2 rounded-[16px] text-sm font-semibold transition-colors ${
                         ratingFilter === opt.value
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted/50 text-muted-foreground hover:bg-muted'
@@ -275,7 +275,7 @@ export default function SearchPage() {
                 <span className="text-sm font-semibold text-foreground">Solo verificados</span>
                 <button
                   onClick={() => setVerifiedOnly(!verifiedOnly)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-[16px] text-sm font-semibold transition-colors flex items-center gap-2 ${
                     verifiedOnly
                       ? 'bg-blue-500 text-primary-foreground'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
@@ -291,7 +291,7 @@ export default function SearchPage() {
                 <span className="text-sm font-semibold text-foreground">Disponible ahora</span>
                 <button
                   onClick={() => setAvailableNow(!availableNow)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-[16px] text-sm font-semibold transition-colors flex items-center gap-2 ${
                     availableNow
                       ? 'bg-green-500 text-primary-foreground'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
@@ -306,7 +306,7 @@ export default function SearchPage() {
               {(ratingFilter > 0 || verifiedOnly || availableNow) && (
                 <button
                   onClick={() => { setRatingFilter(0); setVerifiedOnly(false); setAvailableNow(false); }}
-                  className="ml-auto px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="ml-auto px-4 py-2 rounded-[16px] text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                   Limpiar filtros
                 </button>
@@ -326,7 +326,7 @@ export default function SearchPage() {
           </p>
           
           {/* Ordenação Simples */}
-          <div className="flex items-center gap-2 text-sm bg-card px-3 py-1.5 rounded-lg border border-border">
+          <div className="flex items-center gap-2 text-sm bg-card px-3 py-1.5 rounded-[16px] border border-border">
             <span className="text-muted-foreground">Ordenar por:</span>
             <select
               value={sortBy}
@@ -356,7 +356,7 @@ export default function SearchPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {prestadoresFiltrados.map((prestador) => (
               <Link to={`/p/${prestador.id}`} key={prestador.id} className="group">
-                <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full flex flex-col">
+                <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full flex flex-col hover:-translate-y-1">
                   
                   {/* Header do Cartão (Avatar e Nome) */}
                   <div className="p-6 border-b border-border relative">
@@ -385,7 +385,7 @@ export default function SearchPage() {
                             <ShieldCheck size={18} className="text-blue-500 shrink-0" title="Identidad Verificada" />
                           )}
                         </div>
-                        <span className="inline-block px-2.5 py-0.5 rounded-md bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider mb-2 truncate max-w-full">
+                        <span className="inline-block px-2.5 py-0.5 rounded-[16px] bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider mb-2 truncate max-w-full">
                           {getCategoryName(prestador.provider_category)}
                         </span>
                       </div>
@@ -405,17 +405,17 @@ export default function SearchPage() {
                     {/* Social Proof Badges */}
                     <div className="flex flex-wrap gap-1.5">
                       {prestador.rating_avg >= 4.5 && prestador.completed_jobs >= 5 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-yellow-500/10 text-yellow-600 text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[16px] bg-yellow-500/10 text-yellow-600 text-[10px] font-bold">
                           🏆 Top Prestador
                         </span>
                       )}
                       {prestador.completed_jobs >= 10 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[16px] bg-primary/10 text-primary text-[10px] font-bold">
                           🔥 Alta demanda
                         </span>
                       )}
                       {prestador.review_count >= 5 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[16px] bg-blue-500/10 text-blue-600 text-[10px] font-bold">
                           💬 Muy recomendado
                         </span>
                       )}
@@ -458,8 +458,8 @@ export default function SearchPage() {
                   </div>
 
                   {/* Rodapé do Cartão */}
-                  <div className="p-4 bg-card border-t border-border mt-auto">
-                    <button className="w-full py-3 bg-background border-2 border-primary text-primary font-bold rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                  <div className="p-4 bg-card border-t border-border/50 mt-auto">
+                    <button className="w-full py-3 bg-background border border-primary/50 text-primary font-semibold rounded-full group-hover:bg-primary group-hover:text-primary-foreground group-active:scale-[0.98] transition-all duration-300 shadow-sm">
                       Ver Perfil
                     </button>
                   </div>

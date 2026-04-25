@@ -50,14 +50,14 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="rounded-3xl max-w-md">
+      <DialogContent className="rounded-[24px] max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-extrabold tracking-tight">
             Pagar Comisiones Pendientes
           </DialogTitle>
         </DialogHeader>
 
-        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 mb-4">
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[24px] p-4 mb-4">
           <p className="text-sm text-muted-foreground">Total adeudado</p>
           <p className="text-3xl font-extrabold text-orange-600">${totalOwed.toLocaleString("es-AR")}</p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -76,9 +76,9 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
             <button
               onClick={handleMercadoPago}
               disabled={processing}
-              className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50/50 dark:border-blue-800 dark:hover:bg-blue-950/30 transition-all"
+              className="w-full flex items-center gap-3 p-4 rounded-[24px] border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50/50 dark:border-blue-800 dark:hover:bg-blue-950/30 transition-all"
             >
-              <div className="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-[16px] bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>
               <div className="text-left">
@@ -90,9 +90,9 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
 
             <button
               onClick={() => setMethod("transferencia")}
-              className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50/50 dark:border-emerald-800 dark:hover:bg-emerald-950/30 transition-all"
+              className="w-full flex items-center gap-3 p-4 rounded-[24px] border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50/50 dark:border-emerald-800 dark:hover:bg-emerald-950/30 transition-all"
             >
-              <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-[16px] bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
                 <Building2 className="h-5 w-5 text-emerald-600" />
               </div>
               <div className="text-left">
@@ -103,7 +103,7 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4">
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-[24px] p-4">
               <p className="font-semibold text-sm mb-2">Datos para transferir:</p>
               <div className="space-y-1 text-sm">
                 <p><span className="text-muted-foreground">Alias:</span> <span className="font-mono font-bold">servicios360.comisiones</span></p>
@@ -113,7 +113,7 @@ export default function CommissionPaymentDialog({ open, onOpenChange }: Props) {
             <button
               onClick={handleTransferConfirm}
               disabled={processing}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-50"
+              className="w-full py-3 rounded-[16px] bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-50"
             >
               {processing ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Ya realice la transferencia"}
             </button>

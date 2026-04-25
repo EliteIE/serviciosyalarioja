@@ -68,7 +68,7 @@ export default function ClientReviews() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 font-sans flex flex-col -mx-4 sm:-mx-6 md:mx-0 rounded-lg overflow-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 font-sans flex flex-col -mx-4 sm:-mx-6 md:mx-0 rounded-[16px] overflow-hidden">
       
       {/* Cabeçalho da Página */}
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 flex-shrink-0 sticky top-0 z-20">
@@ -86,7 +86,7 @@ export default function ClientReviews() {
           <div className="space-y-8 animate-[fadeIn_0.3s_ease-out]">
             
             {/* Bloco de Resumo (KPIs Premium) */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+            <div className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-6 md:p-8 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
               
               {/* Pontuação Global */}
               <div className="flex flex-col items-center justify-center min-w-[150px]">
@@ -132,7 +132,7 @@ export default function ClientReviews() {
                   const initial = prestador.charAt(0).toUpperCase();
 
                   return (
-                    <div key={resena.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col group relative overflow-hidden">
+                    <div key={resena.id} className="bg-white rounded-[24px] border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col group relative overflow-hidden">
                       
                       {/* Efeito decorativo de aspas */}
                       <Quote size={80} className="absolute -top-4 -right-4 text-slate-50 opacity-50 transform rotate-12 group-hover:scale-110 transition-transform" />
@@ -141,7 +141,7 @@ export default function ClientReviews() {
                         {/* Header do Cartão */}
                         <div className="flex justify-between items-start mb-4">
                           <StarDisplay rating={resena.rating} />
-                          <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
+                          <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-[16px]">
                             {new Date(resena.created_at).toLocaleDateString("es-AR", { day: '2-digit', month: 'short', year: 'numeric' })}
                           </span>
                         </div>
@@ -201,7 +201,7 @@ export default function ClientReviews() {
               Las reseñas aparecerán acá cuando un profesional finalice un servicio tuyo y deje un comentario sobre su experiencia.
             </p>
 
-            <Link to="/cliente/solicitar" className="px-6 py-3 bg-white border border-slate-200 hover:border-orange-200 hover:bg-orange-50 text-slate-700 hover:text-orange-600 font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2">
+            <Link to="/cliente/solicitar" className="px-6 py-3 bg-white border border-slate-200 hover:border-orange-200 hover:bg-orange-50 text-slate-700 hover:text-orange-600 font-semibold rounded-[16px] shadow-sm transition-all flex items-center gap-2">
               <Calendar size={18} />
               Solicitar un nuevo servicio
             </Link>

@@ -122,7 +122,7 @@ const FAQ = () => {
         {FAQ_DATA.map((group) => (
           <section key={group.category}>
             <h2 className="text-xl font-bold mb-4 text-foreground">{group.category}</h2>
-            <Accordion type="single" collapsible className="rounded-xl border border-border bg-card">
+            <Accordion type="single" collapsible className="rounded-[16px] border border-border bg-card">
               {group.items.map((item, idx) => (
                 <AccordionItem
                   key={item.q}
@@ -143,7 +143,7 @@ const FAQ = () => {
       </div>
 
       {/* Still-have-questions CTA */}
-      <div className="mt-12 rounded-2xl border-2 border-primary/20 bg-primary/5 p-6 md:p-8 text-center">
+      <div className="mt-12 rounded-[24px] border-2 border-primary/20 bg-primary/5 p-6 md:p-8 text-center">
         <h3 className="text-xl font-bold mb-2">¿No encontraste tu respuesta?</h3>
         <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
           Nuestro equipo está listo para ayudarte. Respondemos por WhatsApp o email.
@@ -153,13 +153,13 @@ const FAQ = () => {
             href={buildWhatsAppLink("Hola, tengo una consulta sobre Servicios 360.")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold px-5 py-3 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-[16px] bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold px-5 py-3 transition-colors"
           >
             <MessageCircle size={18} /> Preguntá por WhatsApp
           </a>
           <Link
             to="/contacto"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card hover:bg-muted font-semibold px-5 py-3 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-[16px] border border-border bg-card hover:bg-muted font-semibold px-5 py-3 transition-colors"
           >
             <Mail size={18} /> Escribinos un email
           </Link>
