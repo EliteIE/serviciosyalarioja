@@ -532,7 +532,7 @@ const ProviderServices = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card rounded-[24px] shadow-xl border border-border/50 w-full max-w-md overflow-hidden relative animate-in slide-in-from-bottom-4 duration-300">
             {!reviewSent && (
-              <button onClick={closeReviewModal} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-secondary p-2 rounded-full transition-colors z-10">
+              <button onClick={closeReviewModal} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-muted p-2 rounded-full transition-colors z-10">
                 <X size={20} />
               </button>
             )}
@@ -578,7 +578,7 @@ const ProviderServices = () => {
                   />
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={closeReviewModal} className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-full hover:bg-secondary transition-all hover:-translate-y-0.5 active:scale-[0.98]">
+                  <button onClick={closeReviewModal} className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-full hover:bg-muted transition-all hover:-translate-y-0.5 active:scale-[0.98]">
                     Cancelar
                   </button>
                   <button

@@ -308,7 +308,7 @@ const ProviderDashboard = () => {
                       className="p-5 hover:bg-accent/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground font-bold flex items-center justify-center border border-border overflow-hidden">
+                        <div className="w-10 h-10 rounded-full bg-muted text-secondary-foreground font-bold flex items-center justify-center border border-border overflow-hidden">
                           {trabajo.client_avatar ? (
                             <img src={trabajo.client_avatar} alt={trabajo.client_name || ""} className="w-full h-full object-cover" />
                           ) : (
@@ -333,7 +333,7 @@ const ProviderDashboard = () => {
                             {trabajo.status.replace("_", " ")}
                           </span>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-secondary text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                           <ChevronRight size={18} />
                         </div>
                       </div>
@@ -376,7 +376,7 @@ const ProviderDashboard = () => {
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide bg-warning/10 text-warning border-warning/20">
                           Esperando cliente
                         </span>
-                        <div className="w-8 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
                           <MessageSquare size={14} />
                         </div>
                       </div>
@@ -426,7 +426,7 @@ const ProviderDashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-muted-foreground mb-3 mx-auto border border-border">
+                  <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center text-muted-foreground mb-3 mx-auto border border-border">
                     <DollarSign size={20} />
                   </div>
                   <h4 className="font-bold text-foreground text-sm mb-1">Sin ingresos aún</h4>

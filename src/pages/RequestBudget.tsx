@@ -371,7 +371,7 @@ export default function RequestBudget() {
                   
                   <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                     <Link to={`/p/${provider.id}`}>
-                      <button className="w-full px-6 py-3.5 bg-secondary hover:bg-secondary/80 text-foreground font-semibold rounded-full transition-colors hover:-translate-y-0.5 active:scale-[0.98]">
+                      <button className="w-full px-6 py-3.5 bg-muted hover:bg-muted/80 text-foreground font-semibold rounded-full transition-colors hover:-translate-y-0.5 active:scale-[0.98]">
                         Volver al perfil
                       </button>
                     </Link>
@@ -434,7 +434,7 @@ export default function RequestBudget() {
                           
                           <div 
                             onClick={() => fileRef.current?.click()}
-                            className="w-full border-2 border-dashed border-border rounded-[24px] bg-secondary/30 hover:bg-primary/5 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-12"
+                            className="w-full border-2 border-dashed border-border rounded-[24px] bg-muted/30 hover:bg-primary/5 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-12"
                           >
                             {uploading ? (
                               <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -594,7 +594,7 @@ export default function RequestBudget() {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <label className={`relative flex flex-col items-center justify-center p-4 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgency === 'baja' ? 'border-primary bg-primary/5 shadow-sm scale-105' : 'border-border hover:border-primary/50 bg-background hover:-translate-y-1'}`}>
                             <input type="radio" name="urgencia" value="baja" className="sr-only" onChange={() => setUrgency('baja')} checked={urgency === 'baja'} />
-                            <div className={`w-10 h-10 mb-3 rounded-full flex items-center justify-center ${urgency === 'baja' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
+                            <div className={`w-10 h-10 mb-3 rounded-full flex items-center justify-center ${urgency === 'baja' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                               <Clock size={20} />
                             </div>
                             <h4 className={`font-bold text-sm ${urgency === 'baja' ? 'text-primary' : 'text-foreground'}`}>Baja</h4>
@@ -603,7 +603,7 @@ export default function RequestBudget() {
 
                           <label className={`relative flex flex-col items-center justify-center p-4 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgency === 'media' ? 'border-primary bg-primary/5 shadow-sm scale-105' : 'border-border hover:border-primary/50 bg-background hover:-translate-y-1'}`}>
                             <input type="radio" name="urgencia" value="media" className="sr-only" onChange={() => setUrgency('media')} checked={urgency === 'media'} />
-                            <div className={`w-10 h-10 mb-3 rounded-full flex items-center justify-center ${urgency === 'media' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
+                            <div className={`w-10 h-10 mb-3 rounded-full flex items-center justify-center ${urgency === 'media' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                               <AlertCircle size={20} />
                             </div>
                             <h4 className={`font-bold text-sm ${urgency === 'media' ? 'text-primary' : 'text-foreground'}`}>Media</h4>
@@ -612,7 +612,7 @@ export default function RequestBudget() {
 
                           <label className={`relative flex flex-col items-center justify-center p-4 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgency === 'alta' ? 'border-primary bg-primary/5 shadow-sm scale-105' : 'border-border hover:border-primary/50 bg-background hover:-translate-y-1'}`}>
                             <input type="radio" name="urgencia" value="alta" className="sr-only" onChange={() => setUrgency('alta')} checked={urgency === 'alta'} />
-                            <div className={`w-10 h-10 mb-3 rounded-full flex items-center justify-center ${urgency === 'alta' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
+                            <div className={`w-10 h-10 mb-3 rounded-full flex items-center justify-center ${urgency === 'alta' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                               <Zap size={20} />
                             </div>
                             <h4 className={`font-bold text-sm ${urgency === 'alta' ? 'text-primary' : 'text-foreground'}`}>Alta</h4>
@@ -626,7 +626,7 @@ export default function RequestBudget() {
                   {/* Botões do Wizard */}
                   <div className="mt-8 pt-6 border-t border-border flex gap-4">
                     {step > 1 && (
-                      <button type="button" onClick={prevStep} className="px-6 py-4 bg-secondary text-foreground font-bold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]">
+                      <button type="button" onClick={prevStep} className="px-6 py-4 bg-muted text-foreground font-bold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]">
                         Atrás
                       </button>
                     )}

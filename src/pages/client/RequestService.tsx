@@ -277,7 +277,7 @@ export default function RequestService() {
                 <button 
                   type="button"
                   onClick={resetForm}
-                  className="px-6 py-3 bg-secondary hover:bg-secondary/80 text-foreground font-semibold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                  className="px-6 py-3 bg-muted hover:bg-muted/80 text-foreground font-semibold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                 >
                   Solicitar otro servicio
                 </button>
@@ -366,7 +366,7 @@ export default function RequestService() {
                       
                       <div 
                         onClick={() => fileRef.current?.click()}
-                        className="w-full border-2 border-dashed border-border rounded-[24px] bg-secondary/30 hover:bg-primary/5 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-12"
+                        className="w-full border-2 border-dashed border-border rounded-[24px] bg-muted/30 hover:bg-primary/5 hover:border-primary/50 transition-colors cursor-pointer group flex flex-col items-center justify-center py-12"
                       >
                         {uploading ? (
                           <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -466,7 +466,7 @@ export default function RequestService() {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <label className={`relative flex flex-col items-center justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'baja' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                           <input type="radio" name="urgencia" value="baja" className="sr-only" onChange={() => setUrgencia('baja')} checked={urgencia === 'baja'} />
-                          <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'baja' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
+                          <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'baja' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                             <Clock size={16} />
                           </div>
                           <h4 className={`font-bold text-sm leading-tight mb-0.5 ${urgencia === 'baja' ? 'text-primary' : 'text-foreground'}`}>Baja</h4>
@@ -475,7 +475,7 @@ export default function RequestService() {
 
                         <label className={`relative flex flex-col items-center justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'media' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                           <input type="radio" name="urgencia" value="media" className="sr-only" onChange={() => setUrgencia('media')} checked={urgencia === 'media'} />
-                          <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'media' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
+                          <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'media' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                             <AlertCircle size={16} />
                           </div>
                           <h4 className={`font-bold text-sm leading-tight mb-0.5 ${urgencia === 'media' ? 'text-primary' : 'text-foreground'}`}>Media</h4>
@@ -484,7 +484,7 @@ export default function RequestService() {
 
                         <label className={`relative flex flex-col items-center justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'alta' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                           <input type="radio" name="urgencia" value="alta" className="sr-only" onChange={() => setUrgencia('alta')} checked={urgencia === 'alta'} />
-                          <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'alta' ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
+                          <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'alta' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                             <Zap size={16} />
                           </div>
                           <h4 className={`font-bold text-sm leading-tight mb-0.5 ${urgencia === 'alta' ? 'text-primary' : 'text-foreground'}`}>Alta</h4>
@@ -538,7 +538,7 @@ export default function RequestService() {
               {/* Botões do Wizard (Footer) */}
               <div className="mt-8 pt-6 border-t border-border flex gap-4">
                 {step > 1 && (
-                  <button type="button" onClick={prevStep} className="px-6 py-4 bg-secondary text-foreground font-bold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]">
+                  <button type="button" onClick={prevStep} className="px-6 py-4 bg-muted text-foreground font-bold rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98]">
                     Atrás
                   </button>
                 )}

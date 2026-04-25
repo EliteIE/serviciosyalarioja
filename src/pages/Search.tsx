@@ -64,7 +64,7 @@ export default function SearchPage() {
     todas: {
       titulo: 'Explorar Servicios',
       subtitulo: 'Encontrá al profesional ideal para tu necesidad en tu zona.',
-      color: 'bg-secondary',
+      color: 'bg-muted',
       txtColor: 'text-secondary-foreground',
       icono: LayoutGrid,
       bgEfecto: 'from-secondary to-background'
@@ -72,7 +72,7 @@ export default function SearchPage() {
     plomeria: {
       titulo: 'Expertos en Plomería',
       subtitulo: 'Reparaciones, instalaciones y urgencias con agua y gas.',
-      color: 'bg-secondary',
+      color: 'bg-muted',
       txtColor: 'text-secondary-foreground',
       icono: Wrench,
       bgEfecto: 'from-secondary to-[#0F3460]'
@@ -80,7 +80,7 @@ export default function SearchPage() {
     limpieza: {
       titulo: 'Profesionales de Limpieza',
       subtitulo: 'Limpieza profunda, post-obra y mantenimiento de espacios.',
-      color: 'bg-secondary',
+      color: 'bg-muted',
       txtColor: 'text-secondary-foreground',
       icono: Sparkles,
       bgEfecto: 'from-[#082345] to-secondary'
@@ -88,7 +88,7 @@ export default function SearchPage() {
     electricidad: {
       titulo: 'Técnicos Electricistas',
       subtitulo: 'Instalaciones seguras, tableros y reparaciones eléctricas.',
-      color: 'bg-secondary',
+      color: 'bg-muted',
       txtColor: 'text-secondary-foreground',
       icono: Zap,
       bgEfecto: 'from-secondary to-background'
@@ -96,7 +96,7 @@ export default function SearchPage() {
     jardineria: {
       titulo: 'Servicios de Jardinería',
       subtitulo: 'Mantenimiento de espacios verdes, poda y paisajismo.',
-      color: 'bg-secondary',
+      color: 'bg-muted',
       txtColor: 'text-secondary-foreground',
       icono: TreePine,
       bgEfecto: 'from-[#082345] to-background'
@@ -228,7 +228,7 @@ export default function SearchPage() {
             className={`hidden md:flex items-center gap-2 px-6 py-3.5 font-semibold rounded-[16px] transition-colors ${
               showFilters || ratingFilter > 0 || verifiedOnly || availableNow
                 ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary hover:bg-muted text-secondary-foreground'
+                : 'bg-muted hover:bg-muted text-secondary-foreground'
             }`}
           >
             <Filter size={20} />
@@ -385,14 +385,14 @@ export default function SearchPage() {
                             <ShieldCheck size={18} className="text-blue-500 shrink-0" title="Identidad Verificada" />
                           )}
                         </div>
-                        <span className="inline-block px-2.5 py-0.5 rounded-[16px] bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider mb-2 truncate max-w-full">
+                        <span className="inline-block px-2.5 py-0.5 rounded-[16px] bg-muted text-secondary-foreground text-xs font-bold uppercase tracking-wider mb-2 truncate max-w-full">
                           {getCategoryName(prestador.provider_category)}
                         </span>
                       </div>
                     </div>
                     <button
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(prestador.id); }}
-                      className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-secondary transition-colors"
+                      className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted transition-colors"
                       title={isFavorite(prestador.id) ? "Quitar de favoritos" : "Agregar a favoritos"}
                     >
                       <Heart size={18} className={isFavorite(prestador.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"} />

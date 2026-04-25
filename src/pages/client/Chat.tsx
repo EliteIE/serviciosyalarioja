@@ -307,7 +307,7 @@ export default function ChatPage() {
               {/* Botão Voltar (Apenas Mobile) */}
               <button 
                 onClick={() => handleSelectChat(null)}
-                className="md:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-full flex-shrink-0"
+                className="md:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full flex-shrink-0"
               >
                 <ArrowLeft size={20} />
               </button>
@@ -386,7 +386,7 @@ export default function ChatPage() {
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} gap-2`}>
                     {/* Avatar do remetente (só para mensagens de outros) */}
                     {!isMe && (
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-foreground flex-shrink-0 mt-5 overflow-hidden border border-border">
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground flex-shrink-0 mt-5 overflow-hidden border border-border">
                         {msg.sender_avatar ? (
                           <img src={msg.sender_avatar} alt="" className="w-full h-full object-cover" />
                         ) : (

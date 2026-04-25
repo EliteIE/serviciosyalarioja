@@ -186,25 +186,25 @@ export default function ClientServices() {
         <div className="flex overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 gap-2 no-scrollbar">
           <button 
             onClick={() => setFiltroActivo('todos')}
-            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'todos' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary'}`}
+            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'todos' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted'}`}
           >
             Todos ({counts.total})
           </button>
           <button 
             onClick={() => setFiltroActivo('activos')}
-            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'activos' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary'}`}
+            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'activos' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted'}`}
           >
             Activos ({counts.activos})
           </button>
           <button 
             onClick={() => setFiltroActivo('completado')}
-            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'completado' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary'}`}
+            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'completado' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted'}`}
           >
             Completados ({counts.completados})
           </button>
           <button 
             onClick={() => setFiltroActivo('cancelado')}
-            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'cancelado' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-secondary'}`}
+            className={`whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${filtroActivo === 'cancelado' ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted'}`}
           >
             Cancelados ({counts.cancelados})
           </button>
@@ -222,7 +222,7 @@ export default function ClientServices() {
               className="w-full bg-background border border-border rounded-[16px] pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-foreground"
             />
           </div>
-          <button className="p-2 border border-border rounded-[16px] text-muted-foreground hover:bg-secondary transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center gap-2">
+          <button className="p-2 border border-border rounded-[16px] text-muted-foreground hover:bg-muted transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center gap-2">
             <Filter size={18} />
             <span className="sr-only sm:not-sr-only sm:text-sm font-medium">Filtrar</span>
           </button>
@@ -271,8 +271,8 @@ export default function ClientServices() {
                   </h3>
                   
                   {/* Info do Prestador */}
-                  <div className="flex items-center gap-3 bg-secondary/30 p-3 rounded-[16px] border border-border">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${!solicitud.provider_name ? 'bg-secondary text-muted-foreground' : 'bg-primary/20 text-primary'}`}>
+                  <div className="flex items-center gap-3 bg-muted/30 p-3 rounded-[16px] border border-border">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${!solicitud.provider_name ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'}`}>
                       {solicitud.provider_avatar ? (
                         <img src={solicitud.provider_avatar} alt={solicitud.provider_name || ""} className="h-full w-full object-cover" />
                       ) : (
@@ -332,7 +332,7 @@ export default function ClientServices() {
                 </div>
 
                 {/* Rodapé do Cartão (Ações) */}
-                <div className="px-5 py-4 bg-secondary/10 border-t border-border flex items-center justify-between gap-3 mt-auto">
+                <div className="px-5 py-4 bg-muted/10 border-t border-border flex items-center justify-between gap-3 mt-auto">
                   <Link to={`/cliente/chat?service=${solicitud.id}`} className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
                     Ver detalles
                   </Link>
@@ -352,7 +352,7 @@ export default function ClientServices() {
                     {solicitud.status === 'completado' && !reviewedIds?.has(solicitud.id) && (
                       <button
                         onClick={() => setServicioACalificar(solicitud)}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:bg-secondary font-semibold text-sm rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98] shadow-sm"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border text-foreground hover:bg-muted font-semibold text-sm rounded-full transition-all hover:-translate-y-0.5 active:scale-[0.98] shadow-sm"
                       >
                         <Star size={16} className="text-yellow-500" />
                         Calificar
@@ -408,7 +408,7 @@ export default function ClientServices() {
             {!resenaEnviada && (
               <button 
                 onClick={fecharModalResena}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-secondary p-2 rounded-full transition-colors z-10"
+                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground hover:bg-muted p-2 rounded-full transition-colors z-10"
               >
                 <X size={20} />
               </button>
@@ -463,7 +463,7 @@ export default function ClientServices() {
                 <div className="flex gap-3">
                   <button 
                     onClick={fecharModalResena}
-                    className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-full hover:bg-secondary transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    className="flex-1 px-4 py-3 bg-card border border-border text-foreground font-semibold rounded-full hover:bg-muted transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                   >
                     Cancelar
                   </button>
