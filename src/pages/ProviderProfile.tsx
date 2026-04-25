@@ -14,11 +14,11 @@ import { ProviderProfileSkeleton } from "@/components/skeletons/ProviderProfileS
 
 const getCategoryTheme = (slug: string | null) => {
   const cat = (slug || "").toLowerCase();
-  if (cat.includes('plomeria')) return { bg: 'bg-blue-600', txt: 'text-blue-500', from: 'from-blue-500', to: 'to-blue-700' };
-  if (cat.includes('limpieza')) return { bg: 'bg-teal-500', txt: 'text-teal-500', from: 'from-teal-400', to: 'to-teal-600' };
-  if (cat.includes('electricidad')) return { bg: 'bg-amber-500', txt: 'text-amber-500', from: 'from-amber-400', to: 'to-amber-600' };
-  if (cat.includes('jardineria')) return { bg: 'bg-emerald-600', txt: 'text-emerald-500', from: 'from-emerald-500', to: 'to-emerald-700' };
-  return { bg: 'bg-primary', txt: 'text-primary', from: 'from-primary/80', to: 'to-primary' };
+  if (cat.includes('plomeria')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-secondary', to: 'to-[#0F3460]' };
+  if (cat.includes('limpieza')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-[#082345]', to: 'to-secondary' };
+  if (cat.includes('electricidad')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-secondary', to: 'to-background' };
+  if (cat.includes('jardineria')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-[#082345]', to: 'to-background' };
+  return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-secondary', to: 'to-background' };
 };
 
 export default function ProviderProfilePage() {
@@ -201,7 +201,7 @@ export default function ProviderProfilePage() {
             <section className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
               <h2 className="text-xl font-bold text-foreground mb-4">Sobre mí</h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line mb-6">
-                {provider.bio || "Este profesional aún no ha agregado una descripción sobre sus servicios."}
+                {provider.bio && provider.bio.toLowerCase() !== "teste teste" ? provider.bio : "Este profesional aún no ha agregado una descripción detallada sobre sus servicios."}
               </p>
 
               {coverageArea.length > 0 && (
@@ -342,7 +342,7 @@ export default function ProviderProfilePage() {
                             ) : (review.reviewer_name?.[0] || "?")}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground leading-none mb-1">{review.reviewer_name}</p>
+                            <p className="font-bold text-foreground leading-none mb-1">{review.reviewer_name || "Usuario verificado"}</p>
                             <span className="text-xs text-muted-foreground">{new Date(review.created_at).toLocaleDateString("es-AR", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                           </div>
                         </div>
@@ -352,7 +352,9 @@ export default function ProviderProfilePage() {
                           ))}
                         </div>
                       </div>
-                      {review.comment && <p className="text-muted-foreground text-sm leading-relaxed">{review.comment}</p>}
+                      <p className={`text-sm leading-relaxed ${review.comment ? "text-muted-foreground" : "text-muted-foreground/50 italic"}`}>
+                        {review.comment || "El usuario no dejó ningún comentario escrito."}
+                      </p>
                     </div>
                   ))}
                 </div>

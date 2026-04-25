@@ -45,6 +45,7 @@ const ClientDashboard = lazy(() => import("./pages/client/Dashboard"));
 const ClientChat = lazy(() => import("./pages/client/Chat"));
 const ClientServices = lazy(() => import("./pages/client/Services"));
 const ClientReviews = lazy(() => import("./pages/client/Reviews"));
+const ClientDisputes = lazy(() => import("./pages/client/Disputes"));
 const ClientProfile = lazy(() => import("./pages/client/Profile"));
 const RequestService = lazy(() => import("./pages/client/RequestService"));
 

@@ -118,7 +118,7 @@ export function TestimoniosSection() {
 
             // Ajustando a tradução pra não quebrar no mobile
             const translatePercent = isMobile ? 100 : 105;
-            const translateX = \`calc(-50% + \${diff * translatePercent}%)\`;
+            const translateX = `calc(-50% + ${diff * translatePercent}%)`;
             
             const scale = isCenter ? 1 : isAdjacent ? 0.85 : 0.7;
             const opacity = isCenter ? 1 : isAdjacent ? 0.6 : 0.2;
@@ -132,11 +132,11 @@ export function TestimoniosSection() {
             return (
               <div
                 key={testimonio.id}
-                className={\`absolute top-1/2 left-1/2 w-full max-w-[280px] md:max-w-[340px] p-6 lg:p-8 rounded-[24px] transition-all duration-500 ease-in-out flex flex-col shadow-2xl \${
+                className={`absolute top-1/2 left-1/2 w-full max-w-[280px] md:max-w-[340px] p-6 lg:p-8 rounded-[24px] transition-all duration-500 ease-in-out flex flex-col shadow-2xl ${
                   isCenter ? "bg-slate-800/60 backdrop-blur-xl border-white/20 shadow-black/50" : "bg-slate-800/30 backdrop-blur-md border-white/10"
-                } border\`}
+                } border`}
                 style={{
-                  transform: \`translate(\${translateX}, -50%) scale(\${scale})\`,
+                  transform: `translate(${translateX}, -50%) scale(${scale})`,
                   opacity,
                   zIndex,
                 }}
@@ -155,7 +155,7 @@ export function TestimoniosSection() {
 
                 {/* Info do Utilizador */}
                 <div className="flex items-center gap-3">
-                  <div className={\`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm \${testimonio.colorBg} \${testimonio.colorText}\`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${testimonio.colorBg} ${testimonio.colorText}`}>
                     {testimonio.inicial}
                   </div>
                   <div className="min-w-0">
@@ -194,10 +194,10 @@ export function TestimoniosSection() {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={\`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 \${
+              className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 ${
                 currentIndex === index ? "bg-white scale-125" : "bg-white/30 hover:bg-white/50"
-              }\`}
-              aria-label={\`Ir para testimonio \${index + 1}\`}
+              }`}
+              aria-label={`Ir para testimonio ${index + 1}`}
             />
           ))}
         </div>
