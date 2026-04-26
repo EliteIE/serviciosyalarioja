@@ -14,7 +14,8 @@ import {
   Zap,
   TreePine,
   LayoutGrid,
-  Heart
+  Heart,
+  ArrowRight
 } from "lucide-react";
 import { CATEGORIES } from "@/constants/categories";
 import { useSearchProviders } from "@/hooks/useSearchProviders";
@@ -355,15 +356,18 @@ export default function SearchPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {prestadoresFiltrados.map((prestador) => (
-              <Link to={`/p/${prestador.id}`} key={prestador.id} className="group">
-                <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full flex flex-col hover:-translate-y-1">
+              <Link to={`/p/${prestador.id}`} key={prestador.id} className="group outline-none">
+                <div className="bg-card rounded-[24px] border border-border/60 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-400 h-full flex flex-col group-hover:-translate-y-1 relative">
                   
-                  {/* Header do Cartão (Avatar e Nome) */}
-                  <div className="p-6 border-b border-border relative">
-                    <div className="flex gap-4">
+                  {/* Decorative Background Blur */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10 group-hover:bg-primary/10 transition-colors duration-500"></div>
+
+                  <div className="p-6 flex flex-col flex-1 relative z-10">
+                    {/* Header: Avatar, Name, Category */}
+                    <div className="flex gap-4 items-start mb-4">
                       {/* Avatar */}
-                      <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden">
+                      <div className="relative shrink-0">
+                        <div className="w-16 h-16 rounded-full bg-slate-100 border border-border flex items-center justify-center text-primary font-bold text-2xl overflow-hidden shadow-sm">
                           {prestador.avatar_url ? (
                             <img src={prestador.avatar_url} alt={`Foto de ${prestador.full_name}`} width={96} height={96} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                           ) : (
@@ -376,94 +380,111 @@ export default function SearchPage() {
                       </div>
 
                       {/* Info Principal */}
-                      <div className="flex-1 pt-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-1">
+                      <div className="flex-1 min-w-0 pt-1">
+                        <div className="flex items-center justify-between gap-2">
                           <h3 className="font-bold text-lg text-foreground leading-tight truncate group-hover:text-primary transition-colors">
                             {prestador.full_name}
                           </h3>
-                          {prestador.provider_verified && (
-                            <ShieldCheck size={18} className="text-blue-500 shrink-0" title="Identidad Verificada" />
-                          )}
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(prestador.id); }}
+                            className="p-1.5 -mr-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                            title={isFavorite(prestador.id) ? "Quitar de favoritos" : "Agregar a favoritos"}
+                          >
+                            <Heart size={20} className={isFavorite(prestador.id) ? "fill-red-500 text-red-500" : ""} />
+                          </button>
                         </div>
-                        <span className="inline-block px-2.5 py-0.5 rounded-[16px] bg-muted text-secondary-foreground text-xs font-bold uppercase tracking-wider mb-2 truncate max-w-full">
-                          {getCategoryName(prestador.provider_category)}
-                        </span>
+                        
+                        <div className="flex items-center gap-2 mt-1">
+                          {prestador.provider_verified && (
+                            <ShieldCheck size={16} className="text-blue-500 shrink-0" title="Identidad Verificada" />
+                          )}
+                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider truncate max-w-full">
+                            {getCategoryName(prestador.provider_category)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(prestador.id); }}
-                      className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted transition-colors"
-                      title={isFavorite(prestador.id) ? "Quitar de favoritos" : "Agregar a favoritos"}
-                    >
-                      <Heart size={18} className={isFavorite(prestador.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"} />
-                    </button>
-                  </div>
-
-                  {/* Corpo do Cartão */}
-                  <div className="p-6 bg-muted/20 flex-1 flex flex-col gap-4">
 
                     {/* Social Proof Badges */}
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 mb-4">
                       {prestador.rating_avg >= 4.5 && prestador.completed_jobs >= 5 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[16px] bg-yellow-500/10 text-yellow-600 text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFFBEB] border border-[#FEF3C7] text-[#D97706] text-[11px] font-semibold">
                           🏆 Top Prestador
                         </span>
                       )}
                       {prestador.completed_jobs >= 10 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[16px] bg-primary/10 text-primary text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-semibold">
                           🔥 Alta demanda
                         </span>
                       )}
                       {prestador.review_count >= 5 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[16px] bg-blue-500/10 text-blue-600 text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#EFF6FF] border border-[#DBEAFE] text-[#2563EB] text-[11px] font-semibold">
                           💬 Muy recomendado
                         </span>
                       )}
                     </div>
 
-                    {prestador.bio && <p className="text-sm text-muted-foreground line-clamp-2">{prestador.bio}</p>}
+                    {/* Bio */}
+                    {prestador.bio ? (
+                      <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed mb-6 flex-1">
+                        {prestador.bio}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-slate-400 italic line-clamp-2 leading-relaxed mb-6 flex-1">
+                        Sin descripción proporcionada.
+                      </p>
+                    )}
 
-                    <div className="flex justify-between items-center mt-auto">
+                    {/* Bottom Stats Grid */}
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-sm mt-auto pb-6">
                       {/* Rating */}
-                      <div className="flex items-center gap-1">
-                        <Star size={16} className="text-yellow-500" fill="currentColor" />
-                        <span className="font-bold text-foreground">{Number(prestador.rating_avg).toFixed(1)}</span>
-                        <span className="text-xs text-muted-foreground">({prestador.review_count})</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-7 h-7 rounded-full bg-[#FFFBEB] flex items-center justify-center shrink-0">
+                          <Star size={14} className="text-yellow-500" fill="currentColor" />
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                          <span className="font-bold text-foreground">{Number(prestador.rating_avg).toFixed(1)}</span>
+                          <span className="text-xs text-muted-foreground">({prestador.review_count})</span>
+                        </div>
                       </div>
                       
                       {/* Trabalhos */}
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-sm font-medium">
-                        <Briefcase size={16} className="text-muted-foreground" />
-                        {prestador.completed_jobs} trab.
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                          <Briefcase size={14} className="text-slate-600" />
+                        </div>
+                        <span className="text-slate-700 font-medium">{prestador.completed_jobs} <span className="text-xs text-muted-foreground font-normal">trab.</span></span>
                       </div>
-                    </div>
 
-                    <div className="flex justify-between items-center">
                       {/* Localização */}
                       {prestador.location && (
-                        <div className="flex items-center gap-1.5 text-muted-foreground text-sm truncate max-w-[120px]">
-                          <MapPin size={16} className="text-muted-foreground shrink-0" />
-                          <span className="truncate">{prestador.location}</span>
+                        <div className="flex items-center gap-1.5 truncate">
+                          <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                            <MapPin size={14} className="text-slate-600" />
+                          </div>
+                          <span className="truncate text-slate-700 font-medium">{prestador.location}</span>
                         </div>
                       )}
                       
                       {/* Response Time */}
                       {prestador.response_time && (
-                        <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                          <Clock size={16} className="text-muted-foreground shrink-0" />
-                          {prestador.response_time}
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                            <Clock size={14} className="text-slate-600" />
+                          </div>
+                          <span className="text-slate-700 font-medium">{prestador.response_time}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Rodapé do Cartão */}
-                  <div className="p-4 bg-card border-t border-border/50 mt-auto">
-                    <button className="w-full py-3 bg-background border border-primary/50 text-primary font-semibold rounded-full group-hover:bg-primary group-hover:text-primary-foreground group-active:scale-[0.98] transition-all duration-300 shadow-sm">
+                  {/* Footer Button */}
+                  <div className="p-4 pt-0 mt-auto">
+                    <button className="w-full py-3.5 bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-[16px] group-hover:bg-primary group-hover:border-primary group-hover:text-primary-foreground group-active:scale-[0.98] transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
                       Ver Perfil
+                      <ArrowRight size={18} className="opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                     </button>
                   </div>
-
                 </div>
               </Link>
             ))}

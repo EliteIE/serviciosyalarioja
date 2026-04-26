@@ -14,11 +14,11 @@ import { ProviderProfileSkeleton } from "@/components/skeletons/ProviderProfileS
 
 const getCategoryTheme = (slug: string | null) => {
   const cat = (slug || "").toLowerCase();
-  if (cat.includes('plomeria')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-secondary', to: 'to-[#0F3460]' };
-  if (cat.includes('limpieza')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-[#082345]', to: 'to-secondary' };
-  if (cat.includes('electricidad')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-secondary', to: 'to-background' };
-  if (cat.includes('jardineria')) return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-[#082345]', to: 'to-background' };
-  return { bg: 'bg-secondary', txt: 'text-secondary-foreground', from: 'from-secondary', to: 'to-background' };
+  if (cat.includes('plomeria')) return { bg: 'bg-primary/10', txt: 'text-primary', from: 'from-blue-100', to: 'to-blue-50' };
+  if (cat.includes('limpieza')) return { bg: 'bg-primary/10', txt: 'text-primary', from: 'from-teal-100', to: 'to-teal-50' };
+  if (cat.includes('electricidad')) return { bg: 'bg-primary/10', txt: 'text-primary', from: 'from-yellow-100', to: 'to-yellow-50' };
+  if (cat.includes('jardineria')) return { bg: 'bg-primary/10', txt: 'text-primary', from: 'from-green-100', to: 'to-green-50' };
+  return { bg: 'bg-primary/10', txt: 'text-primary', from: 'from-slate-100', to: 'to-slate-50' };
 };
 
 export default function ProviderProfilePage() {
@@ -154,7 +154,7 @@ export default function ProviderProfilePage() {
 
             <div className="hidden sm:flex gap-3 pb-2">
               <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Enlace copiado"); }}
-                className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-full transition-colors bg-card border border-border shadow-sm" title="Compartir">
+                className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors bg-card border border-border shadow-sm" title="Compartir">
                 <Share2 size={20} />
               </button>
             </div>
@@ -211,7 +211,7 @@ export default function ProviderProfilePage() {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {coverageArea.map((area, i) => (
-                      <span key={i} className="px-3 py-1.5 bg-secondary border border-border text-secondary-foreground font-medium text-sm rounded-[16px]">{area}</span>
+                      <span key={i} className="px-3 py-1.5 bg-muted border border-border text-foreground font-medium text-sm rounded-[16px]">{area}</span>
                     ))}
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export default function ProviderProfilePage() {
                     <div key={review.id} className="border-b border-border last:border-0 pb-6 last:pb-0">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-foreground font-bold text-sm overflow-hidden">
+                          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-sm overflow-hidden">
                             {review.reviewer_avatar ? (
                               <img src={review.reviewer_avatar} alt={`Foto de ${review.reviewer_name || "usuario"}`} width={48} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             ) : (review.reviewer_name?.[0] || "?")}
@@ -401,7 +401,7 @@ export default function ProviderProfilePage() {
                     <div className="flex items-center justify-end gap-1 w-8 text-sm font-semibold text-muted-foreground">
                       {item.stars} <Star size={12} fill="currentColor" className="text-muted-foreground/50" />
                     </div>
-                    <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                       <div className="h-full bg-yellow-400 rounded-full transition-all duration-1000 ease-out" style={{ width: `${item.percentage}%` }}></div>
                     </div>
                     <div className="w-8 text-right text-xs text-muted-foreground">{item.percentage}%</div>
