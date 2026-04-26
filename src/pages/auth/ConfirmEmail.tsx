@@ -47,9 +47,12 @@ const ConfirmEmail = () => {
               )}
             </div>
 
-            <div className="rounded-[16px] bg-secondary p-4 space-y-2">
-              <p className="text-sm text-secondary-foreground/80">
-                Hacé clic en el enlace del email para activar tu cuenta. Si no lo encontrás, revisá la carpeta de <span className="font-medium">spam</span>.
+            <div className="rounded-[16px] bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 space-y-2">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-semibold text-sm">
+                <span className="text-base">⚠️</span> ¡Revisá tu carpeta de spam!
+              </div>
+              <p className="text-sm text-amber-700/80 dark:text-amber-400/80">
+                Hacé clic en el enlace del email para activar tu cuenta. Si no lo encontrás en tu bandeja de entrada, <span className="font-bold">revisá la carpeta de spam o correo no deseado</span>.
               </p>
             </div>
 

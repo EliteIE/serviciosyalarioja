@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { translateSupabaseError } from "@/lib/translateError";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
@@ -76,7 +77,7 @@ const Login = () => {
     setIsSubmitting(false);
     
     if (error) { 
-      toast.error(error.message === "Invalid login credentials" ? "Email o contraseña incorrectos" : error.message); 
+      toast.error(translateSupabaseError(error.message)); 
       return; 
     }
     toast.success("¡Bienvenido!");
