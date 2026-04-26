@@ -82,9 +82,10 @@ export default function SearchPage() {
       titulo: 'Profesionales de Limpieza',
       subtitulo: 'Limpieza profunda, post-obra y mantenimiento de espacios.',
       color: 'bg-muted',
-      txtColor: 'text-secondary-foreground',
+      txtColor: 'text-white',
       icono: Sparkles,
-      bgEfecto: 'from-[#082345] to-secondary'
+      bgEfecto: 'from-[#082345] to-secondary',
+      bgImage: '/bg-limpieza.png'
     },
     electricidad: {
       titulo: 'Técnicos Electricistas',
@@ -164,7 +165,17 @@ export default function SearchPage() {
       {/* HEADER DINÂMICO (HERO SECTION) */}
       <div className={`relative pt-12 pb-20 px-6 lg:px-10 transition-colors duration-500 overflow-hidden ${tema.color}`}>
         {/* Efeitos de fundo dinâmicos */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${tema.bgEfecto} opacity-90`}></div>
+        {(tema as any).bgImage ? (
+          <>
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url('${(tema as any).bgImage}')` }}
+            ></div>
+            <div className="absolute inset-0 bg-[#082345]/70 backdrop-blur-[2px]"></div>
+          </>
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${(tema as any).bgEfecto} opacity-90`}></div>
+        )}
         <div className="absolute right-0 top-0 -mt-20 -mr-20 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl pointer-events-none transition-all duration-700"></div>
         
         <div className="relative z-10 max-w-7xl mx-auto flex items-center gap-6">
