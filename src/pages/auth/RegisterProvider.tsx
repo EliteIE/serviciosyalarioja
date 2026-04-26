@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   User,
@@ -89,6 +89,7 @@ const RegisterProvider = () => {
     descripcion: "",
     zona: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [docs, setDocs] = useState<Record<DocSlot, File | null>>({
@@ -117,7 +118,7 @@ const RegisterProvider = () => {
   const canAdvance = (): boolean => {
     switch (step) {
       case 1: return !!(formData.nombre.trim() && formData.telefono.length === 10 && isValidCuit(formData.cuit));
-      case 2: return !!(formData.email.trim() && formData.password.length >= 8);
+      case 2: return !!(formData.email.trim() && formData.password.length >= 8 && /[A-Z]/.test(formData.password) && /[0-9]/.test(formData.password) && formData.password === formData.confirmPassword);
       case 3: return !!(formData.categoria && formData.zona);
       case 4: return allDocsPresent;
       case 5: return termsAccepted;
@@ -130,9 +131,23 @@ const RegisterProvider = () => {
       toast.error("El teléfono debe tener exactamente 10 dígitos.");
       return;
     }
-    if (step === 2 && (formData.password.length < 8 || !/[A-Z]/.test(formData.password) || !/[0-9]/.test(formData.password))) {
-      toast.error("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
-      return;
+    if (step === 2) {
+      if (formData.password.length < 8) {
+        toast.error("La contraseña debe tener al menos 8 caracteres.");
+        return;
+      }
+      if (!/[A-Z]/.test(formData.password)) {
+        toast.error("La contraseña necesita al menos una letra mayúscula.");
+        return;
+      }
+      if (!/[0-9]/.test(formData.password)) {
+        toast.error("La contraseña necesita al menos un número.");
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Las contraseñas no coinciden.");
+        return;
+      }
     }
     if (step < TOTAL_STEPS) setStep(step + 1);
   };
@@ -389,11 +404,7 @@ const RegisterProvider = () => {
                       <input type="text" inputMode="numeric" name="cuit" required value={formData.cuit} onChange={(e) => { const raw = e.target.value.replace(/[^\d-]/g, "").slice(0, 13); setFormData((f) => ({ ...f, cuit: raw })); }} onBlur={() => { const digits = normalizeCuit(formData.cuit); if (digits.length === 11) setFormData((f) => ({ ...f, cuit: formatCuit(digits) })); }} placeholder="20-12345678-9" autoComplete="off" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
                     </div>
                     <p className="text-[11px] text-muted-foreground">Tu CUIT/CUIL de 11 dígitos para validar tu identidad fiscal.</p>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 2 â€” Account */}
+                          {/* STEP 2 — Account */}
               {step === 2 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="space-y-1.5">
@@ -407,15 +418,38 @@ const RegisterProvider = () => {
                     <label className="text-sm font-bold text-foreground">Contraseña <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Lock className="text-muted-foreground" size={18} /></div>
-                      <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} onChange={handleChange} placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número" autoComplete="new-password" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
+                      <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} onChange={handleChange} placeholder="Mín. 8 caracteres" autoComplete="new-password" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors">
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
+                    {formData.password.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${formData.password.length >= 8 ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>8+ caracteres</span>
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${/[A-Z]/.test(formData.password) ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>1 mayúscula</span>
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${/[0-9]/.test(formData.password) ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>1 número</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-foreground">Confirmar contraseña <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Lock className="text-muted-foreground" size={18} /></div>
+                      <input type={showPassword ? "text" : "password"} name="confirmPassword" required value={formData.confirmPassword} onChange={handleChange} placeholder="Repetí tu contraseña" autoComplete="new-password" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
+                    </div>
+                    {formData.confirmPassword.length > 0 && formData.password !== formData.confirmPassword && (
+                      <p className="text-[11px] text-destructive font-medium">Las contraseñas no coinciden</p>
+                    )}
+                    {formData.confirmPassword.length > 0 && formData.password === formData.confirmPassword && (
+                      <p className="text-[11px] text-green-600 font-medium">✓ Las contraseñas coinciden</p>
+                    )}
                   </div>
                   <div className="flex items-start gap-3 rounded-[24px] border border-info/30 bg-info/5 p-4">
                     <Info size={18} className="text-info mt-0.5 shrink-0" />
                     <p className="text-sm text-foreground/80 leading-relaxed">El registro de prestador es solo por email. Necesitamos verificar tu documentación.</p>
+                  </div>
+                </div>
+              )}
                   </div>
                 </div>
               )}
@@ -445,10 +479,7 @@ const RegisterProvider = () => {
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-foreground">Descripción de tus servicios</label>
-                    <textarea name="descripcion" rows={3} value={formData.descripcion} onChange={handleChange} placeholder="Contá qué servicios ofrecés y cuál es tu experiencia..." className="w-full rounded-[16px] border border-border/50 bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none" />
-                  </div>
+
                 </div>
               )}
 
