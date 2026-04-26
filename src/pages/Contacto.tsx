@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { CONTACT, SITE, buildWhatsAppLink } from "@/config/site";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contacto = () => {
   const [sending, setSending] = useState(false);
@@ -32,15 +33,44 @@ const Contacto = () => {
       toast.error("Por favor completá todos los campos");
       return;
     }
+    if (formData.mensaje.trim().length < 10) {
+      toast.error("Tu mensaje es demasiado corto (mínimo 10 caracteres)");
+      return;
+    }
 
     setSending(true);
     try {
-      // TODO: connect to Supabase table when ready
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const { data, error } = await supabase.functions.invoke("submit-contact", {
+        body: {
+          name: formData.nombre.trim(),
+          email: formData.email.trim(),
+          subject: formData.asunto,
+          message: formData.mensaje.trim(),
+        },
+      });
+
+      // supabase-js surfaces non-2xx responses as `error` with `context.status`.
+      if (error) {
+        const status = (error as unknown as { context?: { status?: number } }).context?.status;
+        if (status === 429) {
+          toast.error("Estás enviando muchos mensajes. Esperá un minuto y volvé a intentar.");
+        } else if (status === 400) {
+          toast.error("Algún dato no es válido. Revisá el formulario.");
+        } else {
+          toast.error("No pudimos enviar tu mensaje. Probá nuevamente más tarde.");
+        }
+        return;
+      }
+      if (!data?.ok) {
+        toast.error("No pudimos enviar tu mensaje. Probá nuevamente más tarde.");
+        return;
+      }
+
       toast.success("Mensaje enviado correctamente. Te responderemos a la brevedad.");
       setFormData({ nombre: "", email: "", asunto: "", mensaje: "" });
     } catch (err) {
-      toast.error(err.message || "Error al enviar el mensaje");
+      const msg = err instanceof Error ? err.message : "Error al enviar el mensaje";
+      toast.error(msg);
     } finally {
       setSending(false);
     }

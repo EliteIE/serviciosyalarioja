@@ -20,10 +20,12 @@ import {
   X,
   CheckCircle2,
   Info,
+  IdCard,
 } from "lucide-react";
 import { CATEGORIES } from "@/constants/categories";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { isValidCuit, normalizeCuit, formatCuit } from "@/lib/cuit";
 import logo from "@/assets/logo.png";
 
 const MAX_DOC_SIZE = 5 * 1024 * 1024; // 5MB
@@ -75,6 +77,7 @@ const RegisterProvider = () => {
     nombre: "",
     email: "",
     telefono: "",
+    cuit: "",
     categoria: "",
     descripcion: "",
     zona: "",
@@ -156,6 +159,10 @@ const RegisterProvider = () => {
       toast.error("Completá los campos obligatorios");
       return;
     }
+    if (!isValidCuit(formData.cuit)) {
+      toast.error("CUIT/CUIL inválido. Verificá los 11 dígitos.");
+      return;
+    }
     if (
       formData.password.length < 8 ||
       !/[A-Z]/.test(formData.password) ||
@@ -183,6 +190,7 @@ const RegisterProvider = () => {
           data: {
             full_name: formData.nombre.trim(),
             phone: formData.telefono.trim(),
+            cuit: normalizeCuit(formData.cuit),
             is_provider: true,
             category: formData.categoria,
             bio: formData.descripcion.trim(),
@@ -213,6 +221,7 @@ const RegisterProvider = () => {
               provider_criminal_record_url: urls.criminalRecord ?? null,
               provider_verification_status: "pending",
               terms_accepted_at: new Date().toISOString(),
+              cuit: normalizeCuit(formData.cuit),
             })
             .eq("id", authData.user.id);
         } catch (uploadErr) {
@@ -379,6 +388,44 @@ const RegisterProvider = () => {
                       className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-1.5 md:col-span-2">
+                  <label htmlFor="rp-cuit" className="text-sm font-bold text-foreground">
+                    CUIT / CUIL <span className="text-red-500" aria-hidden="true">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <IdCard className="text-muted-foreground" size={18} aria-hidden="true" />
+                    </div>
+                    <input
+                      id="rp-cuit"
+                      type="text"
+                      inputMode="numeric"
+                      name="cuit"
+                      required
+                      value={formData.cuit}
+                      onChange={(e) => {
+                        // Strip everything except digits and dashes while typing,
+                        // then format on blur. We allow up to 13 chars (XX-XXXXXXXX-X).
+                        const raw = e.target.value.replace(/[^\d-]/g, "").slice(0, 13);
+                        setFormData((f) => ({ ...f, cuit: raw }));
+                      }}
+                      onBlur={() => {
+                        const digits = normalizeCuit(formData.cuit);
+                        if (digits.length === 11) {
+                          setFormData((f) => ({ ...f, cuit: formatCuit(digits) }));
+                        }
+                      }}
+                      placeholder="20-12345678-9"
+                      autoComplete="off"
+                      aria-describedby="rp-cuit-hint"
+                      className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <p id="rp-cuit-hint" className="text-[11px] text-muted-foreground">
+                    Tu CUIT/CUIL de 11 dígitos. Lo usamos para emitir comprobantes y validar tu identidad fiscal ante AFIP.
+                  </p>
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
