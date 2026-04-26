@@ -61,7 +61,7 @@ const RegisterClient = () => {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (step === 1 && formData.telefono.length !== 10) {
       toast.error("El teléfono debe tener exactamente 10 dígitos.");
       return;
@@ -71,6 +71,23 @@ const RegisterClient = () => {
         toast.error("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
         return;
       }
+      
+      // Verify if email is already registered before advancing
+      setIsSubmitting(true);
+      try {
+        const { data: emailExists, error } = await supabase.rpc('check_email_exists', { 
+          check_email: formData.email 
+        });
+        
+        if (!error && emailExists) {
+          toast.error("Este email ya está registrado. Iniciá sesión o recuperá tu contraseña.");
+          setIsSubmitting(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Error checking email:", err);
+      }
+      setIsSubmitting(false);
     }
     if (step < TOTAL_STEPS) setStep(step + 1);
   };
