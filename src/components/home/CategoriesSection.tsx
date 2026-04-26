@@ -128,7 +128,7 @@ export const CategoriesSection = () => {
               />
 
               <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 flex items-end justify-between gap-3">
-                <h3 className="text-white font-bold text-lg md:text-xl drop-shadow-sm tracking-tight">
+                <h3 className="text-primary-foreground font-bold text-lg md:text-xl drop-shadow-sm tracking-tight">
                   {tile.name}
                 </h3>
                 <span

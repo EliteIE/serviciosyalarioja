@@ -95,7 +95,7 @@ export function TestimoniosSection() {
         
         {/* Cabeçalho */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground tracking-tight">
             Lo que dicen nuestros usuarios
           </h2>
         </div>
@@ -159,7 +159,7 @@ export function TestimoniosSection() {
                     {testimonio.inicial}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-bold text-white text-sm truncate tracking-tight">
+                    <h4 className="font-bold text-primary-foreground text-sm truncate tracking-tight">
                       {testimonio.nombre}
                     </h4>
                     <p className="text-xs text-slate-400 truncate">
@@ -175,13 +175,13 @@ export function TestimoniosSection() {
           <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-0 md:px-12 lg:px-24 z-40 pointer-events-none">
             <button
               onClick={handlePrev}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/50 border border-white/20 text-white flex items-center justify-center backdrop-blur-md hover:bg-slate-700/80 transition-all pointer-events-auto shadow-lg"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/50 border border-primary-foreground/20 text-primary-foreground flex items-center justify-center backdrop-blur-md hover:bg-slate-700/80 transition-all pointer-events-auto shadow-lg"
             >
               <ChevronLeft size={24} />
             </button>
             <button
               onClick={handleNext}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/50 border border-white/20 text-white flex items-center justify-center backdrop-blur-md hover:bg-slate-700/80 transition-all pointer-events-auto shadow-lg"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/50 border border-primary-foreground/20 text-primary-foreground flex items-center justify-center backdrop-blur-md hover:bg-slate-700/80 transition-all pointer-events-auto shadow-lg"
             >
               <ChevronRight size={24} />
             </button>

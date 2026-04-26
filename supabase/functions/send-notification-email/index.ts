@@ -154,11 +154,23 @@ async function sendViaResend(opts: {
   return { ok: res.ok, status: res.status, body };
 }
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-webhook-secret",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 Deno.serve(async (req: Request) => {
+  // CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
@@ -175,7 +187,7 @@ Deno.serve(async (req: Request) => {
     if (provided !== WEBHOOK_SECRET) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
   }
@@ -186,20 +198,20 @@ Deno.serve(async (req: Request) => {
   } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   if (payload?.type !== "INSERT" || payload.table !== "notifications") {
     return new Response(JSON.stringify({ ok: true, skipped: "non-insert" }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   const record = payload.record;
   if (!record?.user_id || !record?.title || !record?.message) {
     return new Response(JSON.stringify({ ok: true, skipped: "incomplete" }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
@@ -210,7 +222,7 @@ Deno.serve(async (req: Request) => {
     });
     return new Response(
       JSON.stringify({ ok: true, skipped: "resend_not_configured" }),
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 
@@ -230,7 +242,7 @@ Deno.serve(async (req: Request) => {
     });
     return new Response(
       JSON.stringify({ ok: true, skipped: "no_email" }),
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 
@@ -254,19 +266,19 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({ ok: false, status: result.status }),
         {
           status: 502,
-          headers: { "Content-Type": "application/json" },
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
     }
     return new Response(JSON.stringify({ ok: true }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("send-notification-email error", err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return new Response(JSON.stringify({ ok: false, error: msg }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

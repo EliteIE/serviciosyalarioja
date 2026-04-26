@@ -153,7 +153,7 @@ const FAQ = () => {
             href={buildWhatsAppLink("Hola, tengo una consulta sobre Servicios 360.")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-[16px] bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold px-5 py-3 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-[16px] bg-[#25D366] hover:bg-[#20BA5A] text-primary-foreground font-semibold px-5 py-3 transition-colors"
           >
             <MessageCircle size={18} /> Preguntá por WhatsApp
           </a>

@@ -141,7 +141,7 @@ export const Hero = () => {
 
             <button
               type="submit"
-              className="shrink-0 w-full md:w-auto px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-[16px] md:rounded-full transition-transform active:scale-95 flex items-center justify-center shadow-lg"
+              className="shrink-0 w-full md:w-auto px-8 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg rounded-[16px] md:rounded-full transition-transform active:scale-95 flex items-center justify-center shadow-lg"
             >
               Buscar
             </button>

@@ -182,7 +182,7 @@ export const DisputeDialog = ({
           <Button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {createDispute.isPending ? (
               <>

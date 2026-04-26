@@ -21,7 +21,7 @@ const WhatsAppButton = ({ message }: { message?: string }) => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed bottom-5 right-5 z-40 inline-flex items-center justify-center h-14 w-14 rounded-full bg-[#25D366] text-white shadow-[0_6px_20px_rgba(37,211,102,0.4)] hover:bg-[#20BA5A] hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 md:bottom-6 md:right-6"
+      className="fixed bottom-5 right-5 z-40 inline-flex items-center justify-center h-14 w-14 rounded-full bg-[#25D366] text-primary-foreground shadow-[0_6px_20px_rgba(37,211,102,0.4)] hover:bg-[#20BA5A] hover:scale-105 hover:-translate-y-0.5 transition-all duration-200 md:bottom-6 md:right-6"
     >
       {/* Official WhatsApp glyph */}
       <svg

@@ -82,7 +82,7 @@ export default function SearchPage() {
       titulo: 'Profesionales de Limpieza',
       subtitulo: 'Limpieza profunda, post-obra y mantenimiento de espacios.',
       color: 'bg-muted',
-      txtColor: 'text-white',
+      txtColor: 'text-secondary-foreground',
       icono: Sparkles,
       bgEfecto: 'from-[#082345] to-secondary',
       bgImage: '/bg-limpieza.png'

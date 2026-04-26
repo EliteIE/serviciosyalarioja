@@ -219,7 +219,7 @@ export default function RequestService() {
 
           <div className="flex items-center gap-3 mb-2 relative z-10">
             {step > 1 && !isSuccess && (
-              <button onClick={prevStep} className="p-2 -ml-2 rounded-full hover:bg-white/10 text-white transition-colors">
+              <button onClick={prevStep} className="p-2 -ml-2 rounded-full hover:bg-primary-foreground/10 text-primary-foreground transition-colors">
                 <ArrowLeft size={20} />
               </button>
             )}

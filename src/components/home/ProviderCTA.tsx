@@ -31,7 +31,7 @@ export const ProviderCTA = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link to="/registro/prestador">
-                <button className="px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                <button className="px-8 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                   Registrate gratis ahora
                 </button>
               </Link>
@@ -91,7 +91,7 @@ export const ProviderCTA = () => {
                       <div className="w-16 h-1.5 bg-slate-200 rounded-full"></div>
                     </div>
                   </div>
-                  <div className="px-3 py-1 bg-primary rounded text-[9px] text-white font-bold">
+                  <div className="px-3 py-1 bg-primary rounded text-[9px] text-primary-foreground font-bold">
                     Upgrade
                   </div>
                 </div>
@@ -129,7 +129,7 @@ export const ProviderCTA = () => {
                 <p className="text-[10px] text-slate-500 mb-4 leading-relaxed font-medium">
                   Tu perfil profesional es uno de los más visitados de la semana en tu zona.
                 </p>
-                <button className="w-full bg-primary hover:bg-primary/90 text-white text-[11px] font-bold py-2.5 rounded-[16px] transition-colors">
+                <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-[11px] font-bold py-2.5 rounded-[16px] transition-colors">
                   Ver mi perfil destacado
                 </button>
               </div>
