@@ -32,7 +32,7 @@ import { isValidCuit, normalizeCuit, formatCuit } from "@/lib/cuit";
 import logo from "@/assets/logo.png";
 
 const TOTAL_STEPS = 5;
-const STEP_TITLES = ["Datos personales", "Tu cuenta", "Perfil profesional", "DocumentaciÃ³n", "ConfirmaciÃ³n"];
+const STEP_TITLES = ["Datos personales", "Tu cuenta", "Perfil profesional", "Documentación", "Confirmación"];
 
 const MAX_DOC_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -64,7 +64,7 @@ const DOC_META: Record<DocSlot, { label: string; hint: string }> = {
   },
   dniBack: {
     label: "DNI â€” Dorso",
-    hint: "Foto clara del dorso. Tiene que verse el cÃ³digo de barras.",
+    hint: "Foto clara del dorso. Tiene que verse el código de barras.",
   },
   criminalRecord: {
     label: "Antecedentes Penales",
@@ -127,11 +127,11 @@ const RegisterProvider = () => {
 
   const nextStep = () => {
     if (step === 1 && formData.telefono.length !== 10) {
-      toast.error("El telÃ©fono debe tener exactamente 10 dÃ­gitos.");
+      toast.error("El teléfono debe tener exactamente 10 dígitos.");
       return;
     }
     if (step === 2 && (formData.password.length < 8 || !/[A-Z]/.test(formData.password) || !/[0-9]/.test(formData.password))) {
-      toast.error("La contraseÃ±a debe tener al menos 8 caracteres, una mayÃºscula y un nÃºmero.");
+      toast.error("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
       return;
     }
     if (step < TOTAL_STEPS) setStep(step + 1);
@@ -144,7 +144,7 @@ const RegisterProvider = () => {
     if (!file) return;
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast.error(`Formato no soportado en ${DOC_META[slot].label}. UsÃ¡ JPG, PNG, WEBP o PDF.`);
+      toast.error(`Formato no soportado en ${DOC_META[slot].label}. Usá JPG, PNG, WEBP o PDF.`);
       if (fileRefs[slot].current) fileRefs[slot].current!.value = "";
       return;
     }
@@ -155,7 +155,7 @@ const RegisterProvider = () => {
     }
     const validBytes = await validateMagicBytes(file);
     if (!validBytes) {
-      toast.error(`${file.name} no parece ser un archivo vÃ¡lido. VerificÃ¡ que sea JPG, PNG, WEBP o PDF.`);
+      toast.error(`${file.name} no parece ser un archivo válido. Verificá que sea JPG, PNG, WEBP o PDF.`);
       if (fileRefs[slot].current) fileRefs[slot].current!.value = "";
       return;
     }
@@ -219,7 +219,7 @@ const RegisterProvider = () => {
 
       // Detect duplicate email
       if (authData.user && (!authData.user.identities || authData.user.identities.length === 0)) {
-        toast.error("Este email ya estÃ¡ registrado. IniciÃ¡ sesiÃ³n o recuperÃ¡ tu contraseÃ±a.");
+        toast.error("Este email ya está registrado. Iniciá sesión o recuperá tu contraseña.");
         return;
       }
 
@@ -240,7 +240,7 @@ const RegisterProvider = () => {
         } catch (uploadErr) {
           console.error("[register-provider] doc upload failed", uploadErr);
           toast.warning(
-            "Tu cuenta se creÃ³ pero no pudimos subir los documentos ahora. Vas a poder terminar desde tu panel.",
+            "Tu cuenta se creó pero no pudimos subir los documentos ahora. Vas a poder terminar desde tu panel.",
           );
         }
       }
@@ -277,10 +277,10 @@ const RegisterProvider = () => {
 
         <div className="relative z-10 max-w-lg mt-12">
           <h1 className="text-4xl lg:text-5xl font-extrabold text-secondary-foreground mb-6 leading-[1.1]">
-            Convertite en el profesional mÃ¡s buscado.
+            Convertite en el profesional más buscado.
           </h1>
           <p className="text-lg text-secondary-foreground/80 mb-10 leading-relaxed">
-            Unite a la red de expertos de Servicios 360. ConseguÃ­ nuevos clientes todas las semanas, gestionÃ¡ tus presupuestos y hacÃ© crecer tu negocio.
+            Unite a la red de expertos de Servicios 360. Conseguí nuevos clientes todas las semanas, gestioná tus presupuestos y hacé crecer tu negocio.
           </p>
 
           <div className="space-y-6">
@@ -289,9 +289,9 @@ const RegisterProvider = () => {
                 <TrendingUp className="text-primary" size={24} />
               </div>
               <div>
-                <h3 className="text-secondary-foreground font-bold text-lg">MultiplicÃ¡ tus ingresos</h3>
+                <h3 className="text-secondary-foreground font-bold text-lg">Multiplicá tus ingresos</h3>
                 <p className="text-secondary-foreground/70 text-sm mt-1">
-                  AccedÃ© a cientos de solicitudes de servicio en tu zona de cobertura.
+                  Accedé a cientos de solicitudes de servicio en tu zona de cobertura.
                 </p>
               </div>
             </div>
@@ -301,9 +301,9 @@ const RegisterProvider = () => {
                 <Users className="text-blue-500" size={24} />
               </div>
               <div>
-                <h3 className="text-secondary-foreground font-bold text-lg">ConstruÃ­ tu reputaciÃ³n</h3>
+                <h3 className="text-secondary-foreground font-bold text-lg">Construí tu reputación</h3>
                 <p className="text-secondary-foreground/70 text-sm mt-1">
-                  Las buenas reseÃ±as de tus clientes te destacarÃ¡n por encima de la competencia.
+                  Las buenas reseñas de tus clientes te destacarán por encima de la competencia.
                 </p>
               </div>
             </div>
@@ -314,7 +314,7 @@ const RegisterProvider = () => {
           <div className="flex items-center gap-3">
             <ShieldCheck className="text-green-500" size={20} />
             <p className="text-sm text-secondary-foreground/80">
-              Tu perfil serÃ¡ validado por nuestro equipo de seguridad.
+              Tu perfil será validado por nuestro equipo de seguridad.
             </p>
           </div>
         </div>
@@ -336,7 +336,7 @@ const RegisterProvider = () => {
                 <Link to="/"><img src={logo} alt="Servicios 360" width={64} height={64} decoding="async" className="w-16 h-16 rounded-[24px] shadow-lg" /></Link>
               </div>
               <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Registro de Prestador</h2>
-              <p className="text-muted-foreground mt-2">CompletÃ¡ tus datos paso a paso para empezar a ofrecer servicios.</p>
+              <p className="text-muted-foreground mt-2">Completá tus datos paso a paso para empezar a ofrecer servicios.</p>
             </div>
 
             {/* Progress Bar */}
@@ -375,12 +375,12 @@ const RegisterProvider = () => {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-foreground">TelÃ©fono <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-bold text-foreground">Teléfono <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Phone className="text-muted-foreground" size={18} /></div>
-                      <input type="tel" name="telefono" required inputMode="numeric" value={formData.telefono} onChange={handlePhoneChange} placeholder="3804123456 (10 dÃ­gitos)" maxLength={10} className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
+                      <input type="tel" name="telefono" required inputMode="numeric" value={formData.telefono} onChange={handlePhoneChange} placeholder="3804123456 (10 dígitos)" maxLength={10} className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
                     </div>
-                    <p className="text-[11px] text-muted-foreground">{formData.telefono.length}/10 dÃ­gitos</p>
+                    <p className="text-[11px] text-muted-foreground">{formData.telefono.length}/10 dígitos</p>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-foreground">CUIT / CUIL <span className="text-red-500">*</span></label>
@@ -388,7 +388,7 @@ const RegisterProvider = () => {
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><IdCard className="text-muted-foreground" size={18} /></div>
                       <input type="text" inputMode="numeric" name="cuit" required value={formData.cuit} onChange={(e) => { const raw = e.target.value.replace(/[^\d-]/g, "").slice(0, 13); setFormData((f) => ({ ...f, cuit: raw })); }} onBlur={() => { const digits = normalizeCuit(formData.cuit); if (digits.length === 11) setFormData((f) => ({ ...f, cuit: formatCuit(digits) })); }} placeholder="20-12345678-9" autoComplete="off" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
                     </div>
-                    <p className="text-[11px] text-muted-foreground">Tu CUIT/CUIL de 11 dÃ­gitos para validar tu identidad fiscal.</p>
+                    <p className="text-[11px] text-muted-foreground">Tu CUIT/CUIL de 11 dígitos para validar tu identidad fiscal.</p>
                   </div>
                 </div>
               )}
@@ -404,10 +404,10 @@ const RegisterProvider = () => {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-foreground">ContraseÃ±a <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-bold text-foreground">Contraseña <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Lock className="text-muted-foreground" size={18} /></div>
-                      <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} onChange={handleChange} placeholder="MÃ­n. 8 caracteres, 1 mayÃºscula, 1 nÃºmero" autoComplete="new-password" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
+                      <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} onChange={handleChange} placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número" autoComplete="new-password" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-12 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors">
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -415,7 +415,7 @@ const RegisterProvider = () => {
                   </div>
                   <div className="flex items-start gap-3 rounded-[24px] border border-info/30 bg-info/5 p-4">
                     <Info size={18} className="text-info mt-0.5 shrink-0" />
-                    <p className="text-sm text-foreground/80 leading-relaxed">El registro de prestador es solo por email. Necesitamos verificar tu documentaciÃ³n.</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">El registro de prestador es solo por email. Necesitamos verificar tu documentación.</p>
                   </div>
                 </div>
               )}
@@ -424,11 +424,11 @@ const RegisterProvider = () => {
               {step === 3 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-foreground">CategorÃ­a principal <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-bold text-foreground">Categoría principal <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Briefcase className="text-muted-foreground" size={18} /></div>
                       <select name="categoria" required value={formData.categoria} onChange={handleChange} className="w-full appearance-none rounded-[16px] border border-border/50 bg-background pl-11 pr-10 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium cursor-pointer">
-                        <option value="" disabled>SeleccionÃ¡ tu oficio</option>
+                        <option value="" disabled>Seleccioná tu oficio</option>
                         {CATEGORIES.map((cat) => (<option key={cat.id} value={cat.slug}>{cat.name}</option>))}
                       </select>
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
@@ -439,15 +439,15 @@ const RegisterProvider = () => {
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><MapPin className="text-muted-foreground" size={18} /></div>
                       <select name="zona" required value={formData.zona} onChange={handleChange} className="w-full appearance-none rounded-[16px] border border-border/50 bg-background pl-11 pr-10 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium cursor-pointer">
-                        <option value="" disabled>SeleccionÃ¡ tu ciudad</option>
+                        <option value="" disabled>Seleccioná tu ciudad</option>
                         {LA_RIOJA_CITIES.map((city) => (<option key={city} value={city}>{city}</option>))}
                       </select>
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-foreground">DescripciÃ³n de tus servicios</label>
-                    <textarea name="descripcion" rows={3} value={formData.descripcion} onChange={handleChange} placeholder="ContÃ¡ quÃ© servicios ofrecÃ©s y cuÃ¡l es tu experiencia..." className="w-full rounded-[16px] border border-border/50 bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none" />
+                    <label className="text-sm font-bold text-foreground">Descripción de tus servicios</label>
+                    <textarea name="descripcion" rows={3} value={formData.descripcion} onChange={handleChange} placeholder="Contá qué servicios ofrecés y cuál es tu experiencia..." className="w-full rounded-[16px] border border-border/50 bg-background px-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground resize-none" />
                   </div>
                 </div>
               )}
@@ -456,8 +456,8 @@ const RegisterProvider = () => {
               {step === 4 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">DocumentaciÃ³n obligatoria <span className="text-red-500">*</span></h3>
-                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF. MÃ¡x. 5 MB cada uno.</p>
+                    <h3 className="text-sm font-bold text-foreground">Documentación obligatoria <span className="text-red-500">*</span></h3>
+                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF. Máx. 5 MB cada uno.</p>
                   </div>
                   <div className="grid grid-cols-1 gap-3">
                     {DOC_SLOTS.map((slot) => {
@@ -479,7 +479,7 @@ const RegisterProvider = () => {
                               <div className="w-11 h-11 rounded-[16px] bg-success/15 text-success flex items-center justify-center shrink-0"><CheckCircle2 size={20} /></div>
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold text-foreground">{label}</p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5"><FileText size={12} className="shrink-0" /><span className="truncate">{file.name}</span><span className="shrink-0">Â· {(file.size / 1024).toFixed(0)} KB</span></div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5"><FileText size={12} className="shrink-0" /><span className="truncate">{file.name}</span><span className="shrink-0">· {(file.size / 1024).toFixed(0)} KB</span></div>
                               </div>
                               <button type="button" onClick={() => removeDoc(slot)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0 p-1" aria-label={`Quitar ${label}`}><X size={18} /></button>
                             </div>
@@ -499,10 +499,10 @@ const RegisterProvider = () => {
                     <h3 className="text-sm font-bold text-foreground">Resumen de tu solicitud</h3>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div><span className="text-muted-foreground">Nombre:</span><p className="font-semibold text-foreground">{formData.nombre}</p></div>
-                      <div><span className="text-muted-foreground">TelÃ©fono:</span><p className="font-semibold text-foreground">{formData.telefono}</p></div>
+                      <div><span className="text-muted-foreground">Teléfono:</span><p className="font-semibold text-foreground">{formData.telefono}</p></div>
                       <div><span className="text-muted-foreground">CUIT:</span><p className="font-semibold text-foreground">{formData.cuit}</p></div>
                       <div><span className="text-muted-foreground">Email:</span><p className="font-semibold text-foreground truncate">{formData.email}</p></div>
-                      <div><span className="text-muted-foreground">CategorÃ­a:</span><p className="font-semibold text-foreground">{CATEGORIES.find(c => c.slug === formData.categoria)?.name || formData.categoria}</p></div>
+                      <div><span className="text-muted-foreground">Categoría:</span><p className="font-semibold text-foreground">{CATEGORIES.find(c => c.slug === formData.categoria)?.name || formData.categoria}</p></div>
                       <div><span className="text-muted-foreground">Zona:</span><p className="font-semibold text-foreground">{formData.zona}</p></div>
                     </div>
                     <div className="text-sm"><span className="text-muted-foreground">Documentos:</span><p className="font-semibold text-foreground">{DOC_SLOTS.filter(s => docs[s]).length}/3 cargados âœ“</p></div>
@@ -510,9 +510,9 @@ const RegisterProvider = () => {
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/30 cursor-pointer" required />
                     <span className="text-xs text-muted-foreground leading-relaxed">
-                      Declaro que la informaciÃ³n y documentaciÃ³n son verÃ­dicas y acepto los{" "}
-                      <Link to="/terminos" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">TÃ©rminos de Servicio</Link>{" "}y la{" "}
-                      <Link to="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">PolÃ­tica de Privacidad</Link>{" "}de Servicios 360. <span className="text-red-500">*</span>
+                      Declaro que la información y documentación son verídicas y acepto los{" "}
+                      <Link to="/terminos" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Términos de Servicio</Link>{" "}y la{" "}
+                      <Link to="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Política de Privacidad</Link>{" "}de Servicios 360. <span className="text-red-500">*</span>
                     </span>
                   </label>
                 </div>
@@ -540,13 +540,13 @@ const RegisterProvider = () => {
             {/* Footer links */}
             <div className="mt-8 pb-8 space-y-4 text-center">
               <p className="text-muted-foreground font-medium text-sm">
-                Â¿Ya tenÃ©s cuenta?{" "}
-                <Link to="/login" className="font-bold text-primary hover:text-primary/80 hover:underline underline-offset-4 transition-all">IniciÃ¡ sesiÃ³n</Link>
+                ¿Ya tenés cuenta?{" "}
+                <Link to="/login" className="font-bold text-primary hover:text-primary/80 hover:underline underline-offset-4 transition-all">Iniciá sesión</Link>
               </p>
               <div className="pt-4 border-t border-border mt-6 flex justify-center">
                 <Link to="/registro/cliente" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-card hover:bg-muted border border-border/50 text-sm font-semibold text-card-foreground transition-all group hover:-translate-y-0.5 active:scale-[0.98]">
                   <User size={18} className="text-muted-foreground group-hover:text-blue-500 transition-colors" />
-                  Â¿QuerÃ©s contratar servicios? <span className="text-blue-600 group-hover:underline">Registrate como cliente</span>
+                  ¿Querés contratar servicios? <span className="text-blue-600 group-hover:underline">Registrate como cliente</span>
                 </Link>
               </div>
             </div>
