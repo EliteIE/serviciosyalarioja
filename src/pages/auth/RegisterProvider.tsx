@@ -421,7 +421,10 @@ const RegisterProvider = () => {
                       <input type="text" inputMode="numeric" name="cuit" required value={formData.cuit} onChange={(e) => { const raw = e.target.value.replace(/[^\d-]/g, "").slice(0, 13); setFormData((f) => ({ ...f, cuit: raw })); }} onBlur={() => { const digits = normalizeCuit(formData.cuit); if (digits.length === 11) setFormData((f) => ({ ...f, cuit: formatCuit(digits) })); }} placeholder="20-12345678-9" autoComplete="off" className="w-full rounded-[16px] border border-border/50 bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-medium placeholder:text-muted-foreground" />
                     </div>
                     <p className="text-[11px] text-muted-foreground">Tu CUIT/CUIL de 11 dígitos para validar tu identidad fiscal.</p>
-                          {/* STEP 2 — Account */}
+                  </div>
+                </div>
+              )}
+              {/* STEP 2 — Account */}
               {step === 2 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="space-y-1.5">
