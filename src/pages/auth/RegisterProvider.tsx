@@ -470,9 +470,6 @@ const RegisterProvider = () => {
                   </div>
                 </div>
               )}
-                  </div>
-                </div>
-              )}
 
               {/* STEP 3 â€” Professional Profile */}
               {step === 3 && (
