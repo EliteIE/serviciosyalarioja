@@ -74,9 +74,10 @@ export default function SearchPage() {
       titulo: 'Expertos en Plomería',
       subtitulo: 'Reparaciones, instalaciones y urgencias con agua y gas.',
       color: 'bg-muted',
-      txtColor: 'text-secondary-foreground',
+      txtColor: 'text-white',
       icono: Wrench,
-      bgEfecto: 'from-secondary to-[#0F3460]'
+      bgEfecto: 'from-secondary to-[#0F3460]',
+      bgImage: '/bg-plomeria.png'
     },
     limpieza: {
       titulo: 'Profesionales de Limpieza',
@@ -91,17 +92,19 @@ export default function SearchPage() {
       titulo: 'Técnicos Electricistas',
       subtitulo: 'Instalaciones seguras, tableros y reparaciones eléctricas.',
       color: 'bg-muted',
-      txtColor: 'text-secondary-foreground',
+      txtColor: 'text-white',
       icono: Zap,
-      bgEfecto: 'from-secondary to-background'
+      bgEfecto: 'from-secondary to-background',
+      bgImage: '/bg-electricidad.png'
     },
     jardineria: {
       titulo: 'Servicios de Jardinería',
       subtitulo: 'Mantenimiento de espacios verdes, poda y paisajismo.',
       color: 'bg-muted',
-      txtColor: 'text-secondary-foreground',
+      txtColor: 'text-white',
       icono: TreePine,
-      bgEfecto: 'from-[#082345] to-background'
+      bgEfecto: 'from-[#082345] to-background',
+      bgImage: '/bg-jardineria.png'
     }
   };
 
