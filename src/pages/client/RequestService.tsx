@@ -208,10 +208,10 @@ export default function RequestService() {
   ];
 
   return (
-    <div className="font-sans flex justify-center pb-10 px-4 md:px-8 min-h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.16))] bg-background">
+    <div className="font-sans flex justify-center pb-10 px-4 md:px-8 min-h-[calc(100vh-theme(spacing.16))] bg-background">
 
       {/* Contentor Principal */}
-      <div className="w-full max-w-4xl bg-card rounded-[24px] shadow-sm border border-border flex flex-col lg:h-full overflow-hidden relative">
+      <div className="w-full max-w-4xl bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-visible relative">
 
         {/* Cabeçalho do Formulário */}
         <div className="bg-slate-900 px-8 py-8 relative shrink-0">
@@ -300,7 +300,7 @@ export default function RequestService() {
                       <p className="text-muted-foreground">Elegí la categoría que mejor describa tu problema.</p>
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         {CATEGORIES.map((cat) => {
                           const IconComponent = CATEGORY_ICONS[cat.icon];
                           return (
@@ -468,7 +468,7 @@ export default function RequestService() {
 
                     <div className="space-y-3">
                       <label className="text-sm font-semibold text-foreground">Nivel de urgencia</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         <label className={`relative flex flex-col items-center justify-center p-3 cursor-pointer rounded-[16px] border-2 transition-all duration-200 ${urgencia === 'baja' ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-border/80 bg-background'}`}>
                           <input type="radio" name="urgencia" value="baja" className="sr-only" onChange={() => setUrgencia('baja')} checked={urgencia === 'baja'} />
                           <div className={`w-8 h-8 mb-2 rounded-full flex items-center justify-center ${urgencia === 'baja' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
@@ -503,13 +503,13 @@ export default function RequestService() {
                         <label className="text-sm font-semibold text-foreground">Fecha preferida <span className="text-muted-foreground font-normal">(Opcional)</span></label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant={"outline"} className={cn("w-full rounded-[16px] border-border bg-background pl-11 pr-4 py-6 text-left font-medium hover:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10", !preferredDate && "text-muted-foreground font-normal")}>
+                            <Button variant={"outline"} className={cn("w-full rounded-[16px] border-border bg-background pl-11 pr-4 py-3.5 h-auto text-left font-medium hover:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10", !preferredDate && "text-muted-foreground font-normal")}>
                               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground"><Calendar size={18} /></div>
                               {preferredDate ? format(preferredDate, "dd 'de' MMMM, yyyy", { locale: es }) : <span>Seleccionar fecha</span>}
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent mode="single" selected={preferredDate} onSelect={setPreferredDate} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus />
+                          <PopoverContent className="w-auto p-0 z-[60]" align="start" side="top" sideOffset={8}>
+                            <CalendarComponent mode="single" selected={preferredDate} onSelect={setPreferredDate} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} locale={es} initialFocus />
                           </PopoverContent>
                         </Popover>
                       </div>
@@ -532,7 +532,7 @@ export default function RequestService() {
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><DollarSign className="text-muted-foreground" size={18} /></div>
-                        <input type="number" min="0" max="10000000" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="0" className="w-full rounded-[16px] border border-border bg-background pl-11 pr-4 py-3 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-bold placeholder:text-muted-foreground font-normal text-lg" />
+                        <input type="number" min="0" max="10000000" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="0" className="w-full rounded-[16px] border border-border bg-background pl-11 pr-4 py-3.5 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 font-bold text-lg placeholder:font-normal placeholder:text-muted-foreground" />
                       </div>
                     </div>
 
