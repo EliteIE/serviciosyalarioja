@@ -1,18 +1,55 @@
 import type { Category } from "@/types";
+import {
+  Wrench,
+  Zap,
+  Sparkles,
+  Paintbrush,
+  Hammer,
+  TreePine,
+  KeyRound,
+  Truck,
+  Wind,
+  Flame,
+  Axe,
+  Monitor,
+  type LucideIcon,
+} from "lucide-react";
+
+/**
+ * Maps the icon string name stored in each Category to its actual
+ * Lucide React component so we can render it anywhere with:
+ *
+ *   const Icon = CATEGORY_ICONS[cat.icon];
+ *   <Icon size={24} />
+ */
+export const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Wrench,
+  Zap,
+  Sparkles,
+  Paintbrush,
+  Hammer,
+  TreePine,
+  Key: KeyRound,   // KeyRound is the filled-looking key — better visual
+  Truck,
+  Wind,
+  Flame,
+  Axe,
+  Monitor,
+};
 
 export const CATEGORIES: Category[] = [
-  { id: "1", name: "Plomería", slug: "plomeria", icon: "Wrench", description: "Instalación y reparación de cañerías" },
-  { id: "2", name: "Electricidad", slug: "electricidad", icon: "Zap", description: "Instalaciones eléctricas y reparaciones" },
-  { id: "3", name: "Limpieza", slug: "limpieza", icon: "Sparkles", description: "Limpieza profesional del hogar y oficinas" },
-  { id: "4", name: "Pintura", slug: "pintura", icon: "Paintbrush", description: "Pintura interior y exterior" },
-  { id: "5", name: "Albañilería", slug: "albanileria", icon: "Hammer", description: "Construcción y reformas" },
-  { id: "6", name: "Jardinería", slug: "jardineria", icon: "TreePine", description: "Mantenimiento de jardines y parques" },
-  { id: "7", name: "Cerrajería", slug: "cerrajeria", icon: "Key", description: "Apertura y cambio de cerraduras" },
-  { id: "8", name: "Mudanzas", slug: "mudanzas", icon: "Truck", description: "Transporte y mudanzas" },
-  { id: "9", name: "Aire Acondicionado", slug: "aire-acondicionado", icon: "Wind", description: "Instalación y mantenimiento de A/C" },
-  { id: "10", name: "Gasista", slug: "gasista", icon: "Flame", description: "Instalación y reparación de gas" },
-  { id: "11", name: "Carpintería", slug: "carpinteria", icon: "Axe", description: "Muebles a medida y reparaciones" },
-  { id: "12", name: "Técnico PC", slug: "tecnico-pc", icon: "Monitor", description: "Reparación de computadoras" },
+  { id: "1",  name: "Plomería",           slug: "plomeria",          icon: "Wrench",     description: "Instalación y reparación de cañerías" },
+  { id: "2",  name: "Electricidad",       slug: "electricidad",      icon: "Zap",        description: "Instalaciones eléctricas y reparaciones" },
+  { id: "3",  name: "Limpieza",           slug: "limpieza",          icon: "Sparkles",   description: "Limpieza profesional del hogar y oficinas" },
+  { id: "4",  name: "Pintura",            slug: "pintura",           icon: "Paintbrush", description: "Pintura interior y exterior" },
+  { id: "5",  name: "Albañilería",        slug: "albanileria",       icon: "Hammer",     description: "Construcción y reformas" },
+  { id: "6",  name: "Jardinería",         slug: "jardineria",        icon: "TreePine",   description: "Mantenimiento de jardines y parques" },
+  { id: "7",  name: "Cerrajería",         slug: "cerrajeria",        icon: "Key",        description: "Apertura y cambio de cerraduras" },
+  { id: "8",  name: "Mudanzas",           slug: "mudanzas",          icon: "Truck",      description: "Transporte y mudanzas" },
+  { id: "9",  name: "Aire Acondicionado", slug: "aire-acondicionado", icon: "Wind",      description: "Instalación y mantenimiento de A/C" },
+  { id: "10", name: "Gasista",            slug: "gasista",           icon: "Flame",      description: "Instalación y reparación de gas" },
+  { id: "11", name: "Carpintería",        slug: "carpinteria",       icon: "Axe",        description: "Muebles a medida y reparaciones" },
+  { id: "12", name: "Técnico PC",         slug: "tecnico-pc",        icon: "Monitor",    description: "Reparación de computadoras" },
 ];
 
 export const URGENCY_LABELS = {

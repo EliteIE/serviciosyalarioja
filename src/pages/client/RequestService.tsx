@@ -19,7 +19,7 @@ import {
   Calendar,
   LocateFixed
 } from 'lucide-react';
-import { CATEGORIES } from "@/constants/categories";
+import { CATEGORIES, CATEGORY_ICONS } from "@/constants/categories";
 import { useCreateServiceRequest, useUploadFile } from "@/hooks/useServiceRequests";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -301,20 +301,25 @@ export default function RequestService() {
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {CATEGORIES.map((cat) => (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() => {
-                            setCategory(cat.slug);
-                            setTimeout(() => setStep(2), 200); // Auto-advance
-                          }}
-                          className={`flex flex-col items-center justify-center p-4 rounded-[16px] border-2 transition-all duration-200 hover:-translate-y-1 ${category === cat.slug ? 'border-primary bg-primary/5 shadow-md scale-105' : 'border-border hover:border-primary/30 bg-background'}`}
-                        >
-                          <span className="text-2xl mb-2">{cat.icon}</span>
-                          <span className={`text-sm font-semibold text-center ${category === cat.slug ? 'text-primary' : 'text-foreground'}`}>{cat.name}</span>
-                        </button>
-                      ))}
+                        {CATEGORIES.map((cat) => {
+                          const IconComponent = CATEGORY_ICONS[cat.icon];
+                          return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => {
+                              setCategory(cat.slug);
+                              setTimeout(() => setStep(2), 200); // Auto-advance
+                            }}
+                            className={`flex flex-col items-center justify-center p-4 rounded-[16px] border-2 transition-all duration-200 hover:-translate-y-1 ${category === cat.slug ? 'border-primary bg-primary/5 shadow-md scale-105' : 'border-border hover:border-primary/30 bg-background'}`}
+                          >
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-colors ${category === cat.slug ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                              {IconComponent ? <IconComponent size={24} strokeWidth={1.8} /> : <span className="text-xl">🔧</span>}
+                            </div>
+                            <span className={`text-sm font-semibold text-center ${category === cat.slug ? 'text-primary' : 'text-foreground'}`}>{cat.name}</span>
+                          </button>
+                          );
+                        })}
                     </div>
                   </div>
                 )}
