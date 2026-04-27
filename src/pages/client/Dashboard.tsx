@@ -289,12 +289,12 @@ const ClientDashboard = () => {
       {/* Cabeçalho da Página & CTA Principal */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">¡Hola, {firstName}! 👋</h1>
-          <p className="text-muted-foreground">Acá podés gestionar todas tus solicitudes y ver su estado.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-1">¡Hola, {firstName}!</h1>
+          <p className="text-sm text-muted-foreground">Acá podés gestionar tus solicitudes y ver su estado.</p>
         </div>
-        <Link to="/cliente/solicitar">
-          <button className="flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 active:scale-[0.98] transition-all w-full sm:w-auto">
-            <Plus size={20} strokeWidth={2.5} />
+        <Link to="/cliente/solicitar" className="w-full sm:w-auto">
+          <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-full shadow-sm active:scale-[0.98] transition-all w-full sm:w-auto">
+            <Plus size={18} strokeWidth={2.5} />
             Nuevo Servicio
           </button>
         </Link>
@@ -302,19 +302,19 @@ const ClientDashboard = () => {
 
       {/* Neurotécnica: Alerta urgente si hay presupuestos o finalizados pendientes (Loss Aversion) */}
       {(budgetReceived.length > 0 || finalizados.length > 0) && (
-        <div className="bg-primary/5 border border-primary/20 rounded-[24px] p-4 flex items-center justify-between gap-4 mb-6 animate-in slide-in-from-top duration-500">
-          <div className="flex items-center gap-3">
+        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 animate-in slide-in-from-top duration-500">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <AlertCircle className="h-5 w-5 text-primary" />
             </div>
-            <div>
-              <p className="text-sm font-bold text-foreground">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">
                 {budgetReceived.length > 0 ? `¡Tenés ${budgetReceived.length} presupuesto(s) esperando tu respuesta!` : `¡${finalizados.length} servicio(s) listo(s) para confirmar y pagar!`}
               </p>
               <p className="text-xs text-muted-foreground">Respondé rápido para no perder al profesional</p>
             </div>
           </div>
-          <a href="#action-section" className="text-sm font-semibold text-primary hover:underline shrink-0 flex items-center gap-1">
+          <a href="#action-section" className="text-sm font-semibold text-primary hover:underline shrink-0 inline-flex items-center gap-1 self-end sm:self-auto min-h-[44px] px-3 -mx-3">
             Ver ahora <ArrowRight size={14} />
           </a>
         </div>
@@ -322,17 +322,17 @@ const ClientDashboard = () => {
 
       {/* Pending review banner */}
       {pendingReviewServices.length > 0 && (
-        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-[24px] p-4 flex items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
               <Star className="h-5 w-5 text-yellow-500" />
             </div>
-            <div>
-              <p className="text-sm font-bold">{pendingReviewServices.length} servicio(s) sin calificar</p>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">{pendingReviewServices.length} servicio(s) sin calificar</p>
               <p className="text-xs text-muted-foreground">Tu opinión ayuda a mejorar la comunidad y motiva a los profesionales</p>
             </div>
           </div>
-          <Link to="/cliente/servicios" className="text-sm font-semibold text-yellow-600 hover:underline shrink-0">
+          <Link to="/cliente/servicios" className="text-sm font-semibold text-yellow-600 hover:underline shrink-0 self-end sm:self-auto inline-flex items-center min-h-[44px] px-3 -mx-3">
             Calificar ahora
           </Link>
         </div>
@@ -341,25 +341,25 @@ const ClientDashboard = () => {
       {/* Grelha de KPIs (Estatísticas) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
         {[
-          { label: 'Servicios Activos', value: activeServices.length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100', pulse: activeServices.length > 0 },
-          { label: 'Requieren Acción', value: budgetReceived.length + finalizados.length + pendingExtras.length, icon: AlertCircle, color: 'text-orange-600', bg: 'bg-orange-100', pulse: (budgetReceived.length + finalizados.length + pendingExtras.length) > 0 },
-          { label: 'Completados', value: completedServices.length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100', pulse: false },
-          { label: 'Total Histórico', value: services?.length || 0, icon: TrendingUp, color: 'text-slate-600', bg: 'bg-slate-100', pulse: false },
+          { label: 'Servicios Activos', value: activeServices.length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', pulse: activeServices.length > 0 },
+          { label: 'Requieren Acción', value: budgetReceived.length + finalizados.length + pendingExtras.length, icon: AlertCircle, color: 'text-primary', bg: 'bg-primary/10', pulse: (budgetReceived.length + finalizados.length + pendingExtras.length) > 0 },
+          { label: 'Completados', value: completedServices.length, icon: CheckCircle2, color: 'text-success', bg: 'bg-success/10', pulse: false },
+          { label: 'Total Histórico', value: services?.length || 0, icon: TrendingUp, color: 'text-secondary', bg: 'bg-secondary/10', pulse: false },
         ].map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-card rounded-[24px] p-6 border border-border/50 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">{stat.label}</p>
-                  <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
+            <div key={index} className="bg-card rounded-2xl p-5 lg:p-6 border border-border/60 transition-colors hover:border-border relative overflow-hidden">
+              <div className="flex justify-between items-start gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1.5 truncate">{stat.label}</p>
+                  <h3 className="text-2xl lg:text-3xl font-semibold tabular-nums tracking-tight text-foreground">{stat.value}</h3>
                 </div>
-                <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center ${stat.bg} ${stat.color} relative`}>
-                  <Icon size={24} />
+                <div className={`w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} relative shrink-0`}>
+                  <Icon size={20} strokeWidth={2} />
                   {stat.pulse && stat.value > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
                     </span>
                   )}
                 </div>
@@ -376,7 +376,7 @@ const ClientDashboard = () => {
           {/* Budget received section */}
           <div id="action-section" />
           {budgetReceived.length > 0 && (
-            <Card className="border-primary/30 rounded-[24px] shadow-sm">
+            <Card className="border-primary/30 rounded-2xl shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-primary" /> Presupuestos Recibidos
@@ -384,7 +384,7 @@ const ClientDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {budgetReceived.map((service) => (
-                  <div key={service.id} className="p-5 rounded-[16px] border-2 border-primary/20 bg-primary/[0.02] space-y-4 hover:border-primary/40 transition-colors">
+                  <div key={service.id} className="p-5 rounded-xl border-2 border-primary/20 bg-primary/[0.02] space-y-4 hover:border-primary/40 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center border border-primary/20 overflow-hidden">
@@ -410,7 +410,7 @@ const ClientDashboard = () => {
                       </div>
                     </div>
                     {service.budget_message && (
-                      <p className="text-sm bg-background/50 border border-border p-3 rounded-[16px] text-foreground/80 italic">"{service.budget_message}"</p>
+                      <p className="text-sm bg-background/50 border border-border p-3 rounded-xl text-foreground/80 italic">"{service.budget_message}"</p>
                     )}
                     <div className="flex gap-3">
                       <Button
@@ -434,7 +434,7 @@ const ClientDashboard = () => {
 
           {/* Pending extra charges */}
           {pendingExtras.length > 0 && (
-            <Card className="border-warning/30 rounded-[24px] shadow-sm">
+            <Card className="border-warning/30 rounded-2xl shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5 text-warning" /> Cargos Extra Pendientes
@@ -444,7 +444,7 @@ const ClientDashboard = () => {
                 {pendingExtras.map((extra) => {
                   const service = services?.find((s) => s.id === extra.service_request_id);
                   return (
-                    <div key={extra.id} className="p-4 rounded-[16px] border border-border/50 bg-warning/5 space-y-2">
+                    <div key={extra.id} className="p-4 rounded-xl border border-border/50 bg-warning/5 space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-sm text-foreground">{extra.description}</h4>
@@ -452,12 +452,12 @@ const ClientDashboard = () => {
                         </div>
                         <p className="text-lg font-bold text-primary">${Number(extra.amount).toLocaleString()}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 gap-1 rounded-full active:scale-[0.98]" onClick={() => handleApproveExtra(extra.id)}>
-                          <CheckCircle2 className="h-3 w-3" /> Aprobar
+                      <div className="flex gap-3">
+                        <Button className="flex-1 gap-1.5 rounded-full active:scale-[0.98] min-h-[44px]" onClick={() => handleApproveExtra(extra.id)}>
+                          <CheckCircle2 className="h-4 w-4" /> Aprobar
                         </Button>
-                        <Button size="sm" variant="outline" className="gap-1 rounded-[16px]" onClick={() => handleRejectExtra(extra.id)}>
-                          <X className="h-3 w-3" /> Rechazar
+                        <Button variant="outline" className="gap-1.5 rounded-full min-h-[44px]" onClick={() => handleRejectExtra(extra.id)}>
+                          <X className="h-4 w-4" /> Rechazar
                         </Button>
                       </div>
                     </div>
@@ -469,7 +469,7 @@ const ClientDashboard = () => {
 
           {/* Provider marked as done - client needs to confirm */}
           {finalizados.length > 0 && (
-            <Card className="border-success/30 rounded-[24px] shadow-sm">
+            <Card className="border-success/30 rounded-2xl shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShieldCheck className="h-5 w-5 text-success" /> Servicios para Confirmar
@@ -481,7 +481,7 @@ const ClientDashboard = () => {
                   const extraTotal = serviceExtras.reduce((sum: number, e) => sum + Number(e.amount), 0);
                   const total = (service.budget_amount || 0) + extraTotal;
                   return (
-                    <div key={service.id} className="p-4 rounded-[16px] border border-border/50 bg-success/5 space-y-3">
+                    <div key={service.id} className="p-4 rounded-xl border border-border/50 bg-success/5 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-foreground">{service.title}</h4>
@@ -511,10 +511,10 @@ const ClientDashboard = () => {
           <section>
             <div className="flex items-center justify-between mb-4 px-1">
               <h2 className="text-xl font-bold text-foreground">Servicios Activos</h2>
-              <Link to="/cliente/servicios" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">Ver todos</Link>
+              <Link to="/cliente/servicios" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors inline-flex items-center min-h-[44px] px-3 -mx-3">Ver todos</Link>
             </div>
             
-            <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm">
+            <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
               {isLoading ? (
                 <DashboardSkeleton />
               ) : activeServices.length === 0 ? (
@@ -523,74 +523,77 @@ const ClientDashboard = () => {
                 </div>
               ) : (
                 <ul className="divide-y divide-border/50">
-                  {activeServices.map((servicio) => (
-                    <li key={servicio.id} className="p-4 md:p-5 hover:bg-accent/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-4 group">
-                      <div className="flex items-start gap-4 flex-1 min-w-0">
-                        {/* Avatar */}
-                        <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg overflow-hidden ${servicio.provider_name ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground border border-border border-dashed'}`}>
-                          {servicio.provider_avatar ? (
-                            <img src={servicio.provider_avatar} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            servicio.provider_name?.[0] || '?'
-                          )}
-                        </div>
-                        
-                        {/* Info Principal */}
-                        <div className="flex-1 min-w-0">
-                          <Link to={`/cliente/servicios`} className="block">
-                            <h4 className="text-base font-bold text-foreground mb-0.5 group-hover:text-primary transition-colors truncate">{servicio.title}</h4>
-                          </Link>
-                          <div className="text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                            <span className="truncate">{servicio.provider_name || 'Sin asignar'}</span>
-                            <span className="hidden sm:inline-block w-1.5 h-1.5 bg-border rounded-full"></span>
-                            <span className="truncate">{servicio.category}</span>
-                          </div>
-                          <span className="block mt-0.5 text-xs text-muted-foreground">
-                            {new Date(servicio.created_at).toLocaleDateString("es-AR", { day: '2-digit', month: 'short', year: 'numeric' })}
-                          </span>
+                  {activeServices.map((servicio) => {
+                    const stepOrder = ['nuevo', 'presupuestado', 'aceptado', 'en_progreso', 'finalizado_prestador', 'completado'];
+                    const stepIdx = stepOrder.indexOf(servicio.status);
+                    const stepPct = `${Math.max(0, (stepIdx / (stepOrder.length - 1)) * 100)}%`;
 
-                          {servicio.status === "aceptado" && servicio.verification_code && (
-                            <div className="mt-3 inline-flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-[16px] px-2 py-1 w-fit">
-                              <KeyRound className="h-3 w-3 text-primary flex-shrink-0" />
-                              <span className="text-xs text-muted-foreground whitespace-nowrap">Código:</span>
-                              <span className="font-mono font-bold text-primary text-sm tracking-widest">{servicio.verification_code}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Badge e Ação */}
-                      <div className="flex items-center justify-between sm:justify-end gap-3 mt-1 sm:mt-0 pl-16 sm:pl-0 w-full sm:w-auto">
-                        <Badge className={`rounded-full px-3 py-1 whitespace-nowrap ${STATUS_COLORS[servicio.status]}`}>{STATUS_LABELS[servicio.status]}</Badge>
-                        {servicio.status === "en_progreso" && (
-                          <Link to={`/cliente/chat?service=${servicio.id}`}>
-                            <Button size="sm" variant="ghost" className="rounded-full relative hover:bg-primary/10 hover:text-primary transition-colors border border-border sm:border-transparent active:scale-[0.98]">
-                              <MessageSquare className="h-4 w-4 mr-2 sm:mr-0" />
-                              <span className="sm:hidden">Chat</span>
-                              {unreadServiceIds.has(servicio.id) && (
-                                <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-destructive border-2 border-background" />
+                    return (
+                      <li key={servicio.id} className="p-4 md:p-5 hover:bg-accent/30 transition-colors group">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                          {/* Avatar + Info */}
+                          <div className="flex items-start gap-4 flex-1 min-w-0">
+                            <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg overflow-hidden ${servicio.provider_name ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground border border-border border-dashed'}`}>
+                              {servicio.provider_avatar ? (
+                                <img src={servicio.provider_avatar} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                servicio.provider_name?.[0] || '?'
                               )}
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                      {/* Service Progress */}
-                      <div className="w-full mt-2 pl-16 sm:pl-0">
-                        <div className="h-1 bg-border rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full transition-all duration-500"
-                            style={{
-                              width: (() => {
-                                const order = ['nuevo', 'presupuestado', 'aceptado', 'en_progreso', 'finalizado_prestador', 'completado'];
-                                const idx = order.indexOf(servicio.status);
-                                return `${Math.max(0, (idx / (order.length - 1)) * 100)}%`;
-                              })()
-                            }}
-                          />
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <Link to="/cliente/servicios" className="block">
+                                <h4 className="text-base font-semibold text-foreground mb-1 group-hover:text-primary transition-colors truncate">{servicio.title}</h4>
+                              </Link>
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+                                <span className="truncate">{servicio.provider_name || 'Sin asignar'}</span>
+                                <span className="inline-block w-1 h-1 bg-border rounded-full" aria-hidden />
+                                <span className="truncate">{servicio.category}</span>
+                                <span className="inline-block w-1 h-1 bg-border rounded-full" aria-hidden />
+                                <span className="text-xs whitespace-nowrap tabular-nums">
+                                  {new Date(servicio.created_at).toLocaleDateString("es-AR", { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </span>
+                              </div>
+
+                              {servicio.status === "aceptado" && servicio.verification_code && (
+                                <div className="mt-3 inline-flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-full px-3 py-1 w-fit">
+                                  <KeyRound className="h-3 w-3 text-primary flex-shrink-0" />
+                                  <span className="text-xs text-muted-foreground whitespace-nowrap">Código:</span>
+                                  <span className="font-mono font-semibold text-primary text-sm tracking-widest">{servicio.verification_code}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Badge + Ação */}
+                          <div className="flex items-center justify-between sm:justify-end gap-3 pl-16 sm:pl-0 w-full sm:w-auto shrink-0">
+                            <Badge className={`rounded-full px-3 py-1 whitespace-nowrap ${STATUS_COLORS[servicio.status]}`}>{STATUS_LABELS[servicio.status]}</Badge>
+                            {servicio.status === "en_progreso" && (
+                              <Link to={`/cliente/chat?service=${servicio.id}`} aria-label="Abrir chat con prestador">
+                                <Button size="sm" variant="ghost" className="rounded-full relative hover:bg-primary/10 hover:text-primary transition-colors border border-border sm:border-transparent active:scale-[0.98] min-h-[44px] min-w-[44px]">
+                                  <MessageSquare className="h-4 w-4 mr-2 sm:mr-0" />
+                                  <span className="sm:hidden">Chat</span>
+                                  {unreadServiceIds.has(servicio.id) && (
+                                    <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-destructive border-2 border-background" />
+                                  )}
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  ))}
+
+                        {/* Progresso do serviço */}
+                        <div className="mt-3 sm:pl-16">
+                          <div className="h-1 bg-border rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary rounded-full transition-all duration-500"
+                              style={{ width: stepPct }}
+                            />
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
@@ -601,7 +604,7 @@ const ClientDashboard = () => {
             <section>
               <h2 className="text-xl font-bold text-foreground mb-4 px-1">Completados Recientemente</h2>
               
-              <div className="bg-card rounded-[24px] border border-border/50 overflow-hidden shadow-sm">
+              <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
                 <ul className="divide-y divide-border/50">
                   {completedServices.slice(0, 5).map((servicio) => (
                     <li key={servicio.id} className="p-5 hover:bg-accent/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-4 opacity-80 hover:opacity-100">
@@ -616,11 +619,11 @@ const ClientDashboard = () => {
                         <h4 className="text-base font-semibold text-foreground truncate">{servicio.title}</h4>
                         <p className="text-xs text-muted-foreground">{servicio.provider_name}</p>
                       </div>
-                      <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                        <span className="text-sm text-muted-foreground font-medium hidden sm:block">
+                      <div className="flex items-center gap-3 sm:gap-4 mt-2 sm:mt-0 shrink-0">
+                        <span className="text-xs sm:text-sm text-muted-foreground font-medium tabular-nums whitespace-nowrap">
                           {new Date(servicio.created_at).toLocaleDateString("es-AR", { day: '2-digit', month: 'short' })}
                         </span>
-                        <Badge className={`rounded-full px-3 py-1 bg-green-50 text-green-700 border-green-200`}>
+                        <Badge className={`rounded-full px-3 py-1 bg-green-50 text-green-700 border-green-200 whitespace-nowrap`}>
                           {STATUS_LABELS.completado}
                         </Badge>
                       </div>
@@ -636,20 +639,19 @@ const ClientDashboard = () => {
         {/* Coluna Lateral */}
         <div className="hidden xl:block space-y-6">
           {/* CTA Urgente */}
-          <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-[24px] p-6 text-primary-foreground shadow-lg relative overflow-hidden sticky top-6">
-            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-            <h3 className="text-xl font-bold mb-2 relative z-10">¿Necesitás ayuda urgente?</h3>
-            <p className="text-orange-100 text-sm mb-6 relative z-10">Tenemos profesionales disponibles 24/7 para emergencias en tu zona.</p>
+          <div className="bg-primary rounded-2xl p-6 text-primary-foreground sticky top-6">
+            <h3 className="text-lg font-semibold tracking-tight mb-1.5">¿Necesitás ayuda urgente?</h3>
+            <p className="text-primary-foreground/80 text-sm leading-relaxed mb-5">Tenemos profesionales disponibles 24/7 para emergencias en tu zona.</p>
             <Link to="/cliente/solicitar">
-              <button className="w-full bg-white text-orange-600 font-bold py-3 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:scale-[0.98] transition-all relative z-10 border border-transparent hover:border-orange-100">
+              <button className="w-full bg-white text-primary font-semibold py-2.5 rounded-full active:scale-[0.98] transition-all hover:bg-white/95">
                 Pedir Servicio Express
               </button>
             </Link>
           </div>
 
           {/* Neurotécnica: Cognitive Fluency — "Cómo funciona" stepper */}
-          <div className="bg-card rounded-[24px] border border-border/50 p-6 shadow-sm">
-            <h3 className="font-bold text-foreground text-sm mb-4">¿Cómo funciona?</h3>
+          <div className="bg-card rounded-2xl border border-border/60 p-6">
+            <h3 className="font-semibold text-foreground text-sm mb-4 tracking-tight">¿Cómo funciona?</h3>
             <div className="space-y-4">
               {[
                 { step: '1', label: 'Pedí', desc: 'Describí qué necesitás' },
@@ -657,12 +659,12 @@ const ClientDashboard = () => {
                 { step: '3', label: 'Listo', desc: 'El profesional va a tu casa' },
               ].map((item) => (
                 <div key={item.step} className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center flex-shrink-0 border border-primary/20">
+                  <div className="w-7 h-7 rounded-full bg-primary/10 text-primary font-semibold text-xs tabular-nums flex items-center justify-center flex-shrink-0 border border-primary/20">
                     {item.step}
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-foreground">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -670,12 +672,12 @@ const ClientDashboard = () => {
           </div>
 
           {/* Trust Badge */}
-          <div className="bg-card rounded-[24px] border border-border/50 p-4 shadow-sm text-center">
+          <div className="bg-card rounded-2xl border border-border/60 p-4 text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-1">
-              <ShieldCheck size={14} className="text-green-500" />
+              <ShieldCheck size={14} className="text-success" />
               <span className="font-semibold text-foreground">Pago protegido</span>
             </div>
-            <p className="text-[10px] text-muted-foreground">Tus datos están protegidos. Solo compartimos tu info con el prestador asignado.</p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">Tus datos están protegidos. Solo compartimos tu info con el prestador asignado.</p>
           </div>
         </div>
 
@@ -691,7 +693,7 @@ const ClientDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="text-center py-6">
-            <div className="inline-block bg-primary/5 border-2 border-primary/30 rounded-[24px] px-8 py-6">
+            <div className="inline-block bg-primary/5 border-2 border-primary/30 rounded-2xl px-8 py-6">
               <p className="font-mono text-4xl font-bold text-primary tracking-[0.3em]">{generatedCode}</p>
             </div>
             <p className="text-sm text-muted-foreground mt-4">Este código es único para este servicio. No lo compartas hasta que el prestador esté presente.</p>
@@ -764,9 +766,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("mercadopago")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-[16px] bg-blue-100 text-blue-600">
+              <div className="p-2 rounded-xl bg-blue-100 text-blue-600">
                 <Smartphone className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -778,9 +780,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("tarjeta")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-[16px] bg-purple-100 text-purple-600">
+              <div className="p-2 rounded-xl bg-purple-100 text-purple-600">
                 <CreditCard className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -792,9 +794,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("transferencia")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-[16px] bg-green-100 text-green-600">
+              <div className="p-2 rounded-xl bg-green-100 text-green-600">
                 <ArrowRightLeft className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -806,9 +808,9 @@ const ClientDashboard = () => {
             <button
               onClick={() => handleSelectPaymentMethod("efectivo")}
               disabled={confirming}
-              className="w-full flex items-center gap-4 p-4 rounded-[16px] border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
-              <div className="p-2 rounded-[16px] bg-amber-100 text-amber-600">
+              <div className="p-2 rounded-xl bg-amber-100 text-amber-600">
                 <Banknote className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -832,7 +834,7 @@ const ClientDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="rounded-[24px] bg-accent/50 border p-4 space-y-3">
+            <div className="rounded-2xl bg-accent/50 border p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">Prestador</p>
                 <p className="font-medium">{providerProfile?.full_name || completionService?.provider_name || "—"}</p>
@@ -844,7 +846,7 @@ const ClientDashboard = () => {
             </div>
 
             {providerProfile?.bank_alias || providerProfile?.bank_cvu ? (
-              <div className="rounded-[24px] border p-4 space-y-3">
+              <div className="rounded-2xl border p-4 space-y-3">
                 {providerProfile.bank_alias && (
                   <div className="flex items-center justify-between">
                     <div>
@@ -879,7 +881,7 @@ const ClientDashboard = () => {
                 )}
               </div>
             ) : (
-              <div className="rounded-[16px] bg-warning/5 border border-warning/20 p-4">
+              <div className="rounded-xl bg-warning/5 border border-warning/20 p-4">
                 <p className="text-sm text-warning font-medium">⚠️ El prestador no ha registrado datos bancarios.</p>
                 <p className="text-xs text-muted-foreground mt-1">Contactalo por chat para obtener sus datos de transferencia.</p>
               </div>
