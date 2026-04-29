@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Rocket, Wrench, Shield, Users, ArrowRight, Mail } from "lucide-react";
+import { Rocket, Zap, Wrench, Sparkles, Paintbrush, Wind, Shield, ArrowRight, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Seo from "@/components/Seo";
 
@@ -8,7 +8,7 @@ const ComingSoon = () => {
     <div className="relative min-h-screen flex flex-col bg-[hsl(213,80%,8%)] overflow-hidden">
       <Seo
         title="Servicios 360 — Muy pronto en La Rioja"
-        description="La plataforma N°1 de servicios del hogar llega a La Rioja. Profesionales verificados, presupuestos transparentes y pagos seguros."
+        description="¿Necesitás un plomero, electricista o pintor en La Rioja? Servicios 360 conecta vecinos con profesionales verificados del hogar. Lanzamiento próximo."
         canonicalPath="/"
       />
 
@@ -56,43 +56,45 @@ const ComingSoon = () => {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-            La mejor plataforma de{" "}
-            servicios llega a<br />
+            Tu plomero, electricista y más — a un clic en<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[hsl(30,100%,60%)]">
               La Rioja
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-white/60 leading-relaxed mb-10 max-w-lg mx-auto">
-            Estamos construyendo la plataforma que va a conectar a los mejores profesionales con los vecinos de toda la provincia. Muy pronto, todo en un solo lugar.
+          <p className="text-lg sm:text-xl text-white/60 leading-relaxed mb-8 max-w-xl mx-auto">
+            Servicios 360 es la plataforma que conecta a los vecinos de La Rioja con profesionales del hogar verificados. Desde una canilla que gotea hasta una reforma completa, encontrá al profesional ideal — sin vueltas.
           </p>
 
-          {/* Feature pills */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+          {/* Service category examples */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-10">
             {[
-              { icon: Shield, text: "Profesionales verificados" },
-              { icon: Wrench, text: "12 categorías de servicio" },
-              { icon: Users, text: "Presupuestos transparentes" },
+              { icon: Wrench, text: "Plomería" },
+              { icon: Zap, text: "Electricidad" },
+              { icon: Sparkles, text: "Limpieza" },
+              { icon: Paintbrush, text: "Pintura" },
+              { icon: Wind, text: "Aire Acond." },
+              { icon: Shield, text: "+7 más" },
             ].map((f) => (
               <div
                 key={f.text}
-                className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2"
+                className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3.5 py-2"
               >
-                <f.icon className="h-4 w-4 text-primary" />
+                <f.icon className="h-3.5 w-3.5 text-primary" />
                 <span className="text-sm text-white/70 font-medium">{f.text}</span>
               </div>
             ))}
           </div>
 
           {/* CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <Link to="/quiero-ser-prestador">
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full px-8 gap-2 shadow-xl shadow-primary/25 transition-all hover:shadow-2xl hover:shadow-primary/30 hover:scale-[1.03] text-base"
               >
                 <Rocket className="h-5 w-5" />
-                Quiero ser prestador
+                Soy profesional, quiero sumarme
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -107,6 +109,11 @@ const ComingSoon = () => {
               </Button>
             </a>
           </div>
+
+          {/* Sub-copy */}
+          <p className="text-sm text-white/35 max-w-md mx-auto leading-relaxed">
+            Estamos sumando a los mejores profesionales de la provincia antes del lanzamiento. Si sos plomero, electricista, gasista, pintor o de cualquier oficio del hogar — te estamos buscando.
+          </p>
         </div>
       </main>
 
