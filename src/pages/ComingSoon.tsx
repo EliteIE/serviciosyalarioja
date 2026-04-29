@@ -40,11 +40,6 @@ const ComingSoon = () => {
             Servicios <span className="text-primary">360</span>
           </span>
         </div>
-        <Link to="/quiero-ser-prestador">
-          <Button variant="outline" size="sm" className="border-white/20 text-white/80 hover:bg-white/10 hover:text-white rounded-full text-xs font-semibold">
-            Quiero ser prestador
-          </Button>
-        </Link>
       </header>
 
       {/* Main content */}
