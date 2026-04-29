@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAdminPendingProviders, useAdminReviews, useAdminDeleteReview, useAdminVerifyProvider } from "@/hooks/useAdmin";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AdminModeration = () => {
   const queryClient = useQueryClient();

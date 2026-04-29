@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAdminDisputes, useAdminUpdateDispute } from "@/hooks/useAdmin";
+import { useQueryClient } from "@tanstack/react-query";
 
 const statusColors: Record<string, string> = {
   abierta: "bg-destructive/10 text-destructive",

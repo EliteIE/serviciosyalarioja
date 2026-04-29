@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAdminAuditLog } from "@/hooks/useAdmin";
+import { useQueryClient } from "@tanstack/react-query";
 
 const PAGE_SIZE = 25;
 

@@ -16,6 +16,7 @@ import { useAdminProviders, useAdminVerifyProvider, useAdminUpdateCriminalRecord
 import { toast } from "sonner";
 import { CATEGORIES } from "@/constants/categories";
 import { logger } from "@/lib/logger";
+import { useQueryClient } from "@tanstack/react-query";
 
 const PAGE_SIZE = 20;
 
