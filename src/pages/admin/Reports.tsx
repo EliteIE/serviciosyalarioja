@@ -16,6 +16,11 @@ import {
   useAdminPayments, 
   useAdminMonthlyRevenue 
 } from "@/hooks/useAdmin";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip,
+  CartesianGrid, ResponsiveContainer,
+} from "recharts";
 
 const PAGE_SIZE = 20;
 

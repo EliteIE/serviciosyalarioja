@@ -13,6 +13,10 @@ import {
 } from "@/hooks/useAdmin";
 
 import { CATEGORIES } from "@/constants/categories";
+import {
+  BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
+} from "recharts";
 
 const COLORS = ["hsl(25, 100%, 50%)", "hsl(213, 80%, 15%)", "hsl(142, 70%, 45%)", "hsl(38, 92%, 50%)", "hsl(0, 84%, 60%)", "hsl(280, 70%, 50%)"];
 
