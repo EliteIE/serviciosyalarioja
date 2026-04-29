@@ -17,6 +17,15 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 // Home is eager for fastest LCP; everything else is lazy-loaded.
 import Index from "./pages/Index";
+import ComingSoon from "./pages/ComingSoon";
+
+// ══════════════════════════════════════════════════════════════
+// 🚧  MAINTENANCE / COMING-SOON MODE
+//     Set to `true` to block public access and show the
+//     "coming soon" landing.  Provider intake, legal pages,
+//     admin panel and auth routes remain accessible.
+// ══════════════════════════════════════════════════════════════
+const MAINTENANCE_MODE = true;
 
 // ---- Lazy route chunks -------------------------------------------------
 // Public
@@ -87,17 +96,27 @@ const App = () => (
           <AuthProvider>
             <Suspense fallback={<PageSkeleton />}>
               <Routes>
+                {/* Coming Soon — blocks public access when MAINTENANCE_MODE is on */}
+                {MAINTENANCE_MODE && (
+                  <Route path="/" element={<ComingSoon />} />
+                )}
+
                 {/* Public */}
                 <Route element={<PublicLayout />}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/buscar" element={<SearchPage />} />
-                  <Route path="/p/:id" element={<ProviderProfilePage />} />
+                  {!MAINTENANCE_MODE && (
+                    <>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/buscar" element={<SearchPage />} />
+                      <Route path="/p/:id" element={<ProviderProfilePage />} />
+                      <Route path="/como-funciona" element={<ComoFunciona />} />
+                      <Route path="/preguntas-frecuentes" element={<FAQ />} />
+                      <Route path="/nosotros" element={<Nosotros />} />
+                    </>
+                  )}
+                  {/* Legal pages always accessible */}
                   <Route path="/terminos" element={<TermsAndConditions />} />
                   <Route path="/privacidad" element={<PrivacyPolicy />} />
                   <Route path="/contacto" element={<Contacto />} />
-                  <Route path="/como-funciona" element={<ComoFunciona />} />
-                  <Route path="/preguntas-frecuentes" element={<FAQ />} />
-                  <Route path="/nosotros" element={<Nosotros />} />
                   <Route path="/arrepentimiento" element={<Arrepentimiento />} />
                 </Route>
 
