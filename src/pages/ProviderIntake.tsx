@@ -145,20 +145,85 @@ const ProviderIntake = () => {
         </div>
       </header>
 
-      {/* Hero compacto */}
+      {/* Hero + Copy persuasiva para prestadores */}
       {phase !== "done" && (
-        <section className="w-full bg-gradient-to-b from-primary/[0.05] to-transparent border-b border-border/40">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 text-center">
-            <div className="inline-flex items-center gap-2 bg-riojano/10 text-riojano px-3 py-1 rounded-full text-xs font-semibold mb-4">
-              <Sparkles size={12} />
-              Captación abierta solo en La Rioja Capital · 2026
+        <section className="w-full bg-gradient-to-b from-primary/[0.06] via-primary/[0.02] to-transparent border-b border-border/40">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+            {/* Badge */}
+            <div className="flex justify-center mb-5">
+              <div className="inline-flex items-center gap-2 bg-riojano/10 text-riojano px-3 py-1 rounded-full text-xs font-semibold">
+                <Sparkles size={12} />
+                Captación abierta · La Rioja Capital · 2026
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">
-              Quiero ofrecer mis servicios
+
+            {/* Headline */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground text-center mb-3">
+              Crecé como profesional con{" "}
+              <span className="text-primary">Servicios 360</span>
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto">
-              Contanos brevemente sobre vos y tu oficio. Te vamos a contactar en
-              24-48hs hábiles para una entrevista personal.
+            <p className="text-base sm:text-lg text-muted-foreground text-center max-w-lg mx-auto mb-8 leading-relaxed">
+              La primera plataforma de La Rioja que conecta profesionales verificados con clientes que realmente necesitan tus servicios.
+            </p>
+
+            {/* Beneficios */}
+            <div className="grid sm:grid-cols-3 gap-4 mb-8">
+              {[
+                {
+                  icon: Users,
+                  title: "Clientes reales",
+                  desc: "Recibí solicitudes de personas cerca tuyo que buscan tu oficio. Sin intermediarios.",
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Perfil verificado",
+                  desc: "Obtené la insignia de profesional verificado y destacá por sobre el resto.",
+                },
+                {
+                  icon: Briefcase,
+                  title: "Vos manejás tu agenda",
+                  desc: "Elegí cuántos trabajos tomar por semana. Sin exclusividad, sin obligaciones.",
+                },
+              ].map((b) => (
+                <div
+                  key={b.title}
+                  className="bg-card rounded-2xl border border-border/50 p-4 text-center"
+                >
+                  <div className="w-10 h-10 mx-auto mb-2.5 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <b.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-sm font-bold text-foreground mb-1">{b.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{b.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Como funciona */}
+            <div className="bg-card rounded-2xl border border-border/50 p-5 mb-6">
+              <h2 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                <ArrowRight size={14} className="text-primary" />
+                ¿Cómo es el proceso?
+              </h2>
+              <ol className="space-y-2.5 text-sm text-muted-foreground">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">1</span>
+                  <span><strong className="text-foreground">Completás este formulario</strong> — son solo 2 minutos.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">2</span>
+                  <span><strong className="text-foreground">Te contactamos</strong> en 24-48hs por WhatsApp para una breve entrevista.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">3</span>
+                  <span><strong className="text-foreground">Activamos tu perfil</strong> y empezás a recibir clientes de tu zona.</span>
+                </li>
+              </ol>
+            </div>
+
+            {/* Trust signal */}
+            <p className="text-xs text-muted-foreground text-center leading-relaxed max-w-md mx-auto">
+              🔒 Tu información es confidencial. No compartimos tus datos con terceros.
+              Registrarte es <strong className="text-foreground">100% gratuito</strong>.
             </p>
           </div>
         </section>

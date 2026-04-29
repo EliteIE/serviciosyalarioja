@@ -56,7 +56,8 @@ const ComingSoon = () => {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-            La mejor plataforma de servicios llega a{" "}
+            La mejor plataforma de{" "}
+            servicios llega a<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[hsl(30,100%,60%)]">
               La Rioja
             </span>
