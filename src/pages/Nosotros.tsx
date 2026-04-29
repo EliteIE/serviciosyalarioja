@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { PROVIDER_INTAKE_PATH } from "@/constants/external";
 import {
   MapPin,
   Heart,
@@ -197,7 +198,7 @@ const Nosotros = () => {
             <Link to="/registro/cliente">Registrate como Cliente</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="rounded-[16px]">
-            <Link to="/registro/prestador">
+            <Link to={PROVIDER_INTAKE_PATH}>
               <Briefcase className="mr-2 h-4 w-4" /> Ofrecer Servicios
             </Link>
           </Button>

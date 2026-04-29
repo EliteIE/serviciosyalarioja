@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { translateSupabaseError } from "@/lib/translateError";
 import { LA_RIOJA_CITIES } from "@/constants/locations";
+import { PROVIDER_INTAKE_PATH } from "@/constants/external";
 import logo from "@/assets/logo.png";
 
 const TOTAL_STEPS = 4;
@@ -509,7 +510,7 @@ const RegisterClient = () => {
             </p>
             
             <div className="pt-4 border-t border-border mt-6 flex justify-center">
-              <Link to="/registro/prestador" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-card hover:bg-muted border border-border/50 text-sm font-semibold text-card-foreground transition-all group hover:-translate-y-0.5 active:scale-[0.98]">
+              <Link to={PROVIDER_INTAKE_PATH} className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-card hover:bg-muted border border-border/50 text-sm font-semibold text-card-foreground transition-all group hover:-translate-y-0.5 active:scale-[0.98]">
                 <Briefcase size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 ¿Querés ofrecer servicios? <span className="text-primary group-hover:underline">Registrate como prestador</span>
               </Link>

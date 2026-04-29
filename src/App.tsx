@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -30,6 +30,7 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const Nosotros = lazy(() => import("./pages/Nosotros"));
 const Arrepentimiento = lazy(() => import("./pages/Arrepentimiento"));
 const RequestBudget = lazy(() => import("./pages/RequestBudget"));
+const ProviderIntake = lazy(() => import("./pages/ProviderIntake"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Auth
@@ -64,6 +65,7 @@ const AdminDisputes = lazy(() => import("./pages/admin/Disputes"));
 const AdminReports = lazy(() => import("./pages/admin/Reports"));
 const AdminModeration = lazy(() => import("./pages/admin/Moderation"));
 const AdminAuditLog = lazy(() => import("./pages/admin/AuditLog"));
+const AdminProviderLeads = lazy(() => import("./pages/admin/ProviderLeads"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -104,10 +106,22 @@ const App = () => (
                   <Route path="/solicitar/:providerId" element={<RequestBudget />} />
                 </Route>
 
+                {/* Provider intake (público — captação 1×1, sem auth) */}
+                <Route path="/quiero-ser-prestador" element={<ProviderIntake />} />
+
                 {/* Auth (no layout) */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro/cliente" element={<RegisterClient />} />
-                <Route path="/registro/prestador" element={<RegisterProvider />} />
+                {/*
+                 * Auto-registro de prestador suspenso desde 27/04/2026.
+                 * Legacy route redireciona pro novo wizard de captação 1×1.
+                 * Ver docs/superpowers/specs/2026-04-27-provider-intake-pivot-design.md
+                 */}
+                <Route
+                  path="/registro/prestador"
+                  element={<Navigate to="/quiero-ser-prestador" replace />}
+                />
+                <Route path="/_legacy/registro/prestador" element={<RegisterProvider />} />
                 <Route path="/confirmar-email" element={<ConfirmEmail />} />
                 <Route path="/recuperar" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
@@ -147,6 +161,7 @@ const App = () => (
                     <Route path="/admin/reportes" element={<AdminReports />} />
                     <Route path="/admin/moderacion" element={<AdminModeration />} />
                     <Route path="/admin/audit" element={<AdminAuditLog />} />
+                    <Route path="/admin/leads-prestadores" element={<AdminProviderLeads />} />
                   </Route>
                 </Route>
 

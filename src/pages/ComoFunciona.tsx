@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Search, BarChart3, Handshake, Star, UserPlus, FileText, Bell, DollarSign } from "lucide-react";
 import Seo from "@/components/Seo";
+import { PROVIDER_INTAKE_PATH } from "@/constants/external";
 
 const clientSteps = [
   {
@@ -150,9 +151,9 @@ export default function ComoFunciona() {
                 Buscar un profesional
               </button>
             </Link>
-            <Link to="/registro/prestador">
+            <Link to={PROVIDER_INTAKE_PATH}>
               <button className="w-full sm:w-auto px-8 py-4 bg-transparent hover:bg-secondary-foreground/5 text-secondary-foreground font-semibold rounded-[16px] transition-all duration-300 border border-secondary-foreground/20 hover:border-secondary-foreground/40">
-                Registrarme como prestador
+                Quiero ofrecer mis servicios
               </button>
             </Link>
           </div>

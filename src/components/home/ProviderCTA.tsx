@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { X } from "lucide-react";
+import { PROVIDER_INTAKE_PATH } from "@/constants/external";
 
 export const ProviderCTA = () => {
   return (
@@ -30,9 +31,9 @@ export const ProviderCTA = () => {
               Miles de clientes en tu zona están buscando lo que hacés. Unite a Servicios 360, destacá tu talento y conseguí nuevos proyectos sin esfuerzo.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Link to="/registro/prestador">
+              <Link to={PROVIDER_INTAKE_PATH}>
                 <button className="px-8 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                  Registrate gratis ahora
+                  Quiero ofrecer mis servicios
                 </button>
               </Link>
               <Link to="/como-funciona" className="text-[#082345] font-bold hover:underline px-4 py-3">

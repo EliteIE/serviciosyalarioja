@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { CATEGORIES } from "@/constants/categories";
 import { SITE, CONTACT, LEGAL, SOCIAL, buildWhatsAppLink } from "@/config/site";
+import { PROVIDER_INTAKE_PATH } from "@/constants/external";
 import logo from "@/assets/logo.png";
 import {
   Facebook,
@@ -124,7 +125,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/registro/prestador"
+                  to={PROVIDER_INTAKE_PATH}
                   className="text-secondary-foreground/80 hover:text-primary transition-colors text-sm font-medium"
                 >
                   Ofrecer Servicios

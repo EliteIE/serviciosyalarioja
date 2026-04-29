@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, AlertTriangle, TrendingUp,
   Home, Briefcase, Image, DollarSign, UserCircle,
-  ClipboardList, MessageSquare, Star, Shield, PlusCircle, FileText, Scale
+  ClipboardList, MessageSquare, Star, Shield, PlusCircle, FileText, Scale,
+  UserPlus,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -16,6 +17,7 @@ import { useActiveServiceRequestIds } from "@/hooks/useServiceRequests";
 
 const adminItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { title: "Leads Prestadores", url: "/admin/leads-prestadores", icon: UserPlus },
   { title: "Prestadores", url: "/admin/prestadores", icon: Users },
   { title: "Disputas", url: "/admin/disputas", icon: AlertTriangle },
   { title: "Reportes", url: "/admin/reportes", icon: TrendingUp },

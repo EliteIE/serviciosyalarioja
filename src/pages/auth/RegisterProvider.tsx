@@ -1,3 +1,16 @@
+/**
+ * @deprecated 2026-04-27 — Auto-registro suspenso (pivô captação 1×1).
+ *
+ * A captação de prestadores agora é via wizard interno em
+ * /quiero-ser-prestador (ProviderIntake.tsx) que apenas registra um lead
+ * em provider_intake_leads. O time aprova manualmente após entrevista.
+ *
+ * Este arquivo é mantido apenas em /_legacy/registro/prestador para
+ * permitir rollback rápido caso a estratégia precise reverter. Não é
+ * referenciado nos CTAs públicos.
+ *
+ * Ver docs/superpowers/specs/2026-04-27-provider-intake-pivot-design.md
+ */
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {

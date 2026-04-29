@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import logo from "@/assets/logo.png";
+import { PROVIDER_INTAKE_PATH } from "@/constants/external";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,7 +71,7 @@ const Header = () => {
               <Link to="/buscar"><Button variant="ghost" size="sm">Explorar</Button></Link>
               <Link to="/login"><Button variant="ghost" size="sm">Iniciar Sesión</Button></Link>
               <Link to="/registro/cliente"><Button variant="outline" size="sm">Registrate Gratis</Button></Link>
-              <Link to="/registro/prestador"><Button size="sm">Ofrecer Servicios</Button></Link>
+              <Link to={PROVIDER_INTAKE_PATH}><Button size="sm">Ofrecer Servicios</Button></Link>
             </>
           ) : (
             <>
@@ -136,7 +137,7 @@ const Header = () => {
                 <Link to="/login" className="block" onClick={() => setMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start">Iniciar Sesión</Button>
                 </Link>
-                <Link to="/registro/prestador" className="block" onClick={() => setMenuOpen(false)}>
+                <Link to={PROVIDER_INTAKE_PATH} className="block" onClick={() => setMenuOpen(false)}>
                   <Button className="w-full">Ofrecer Servicios</Button>
                 </Link>
               </>
